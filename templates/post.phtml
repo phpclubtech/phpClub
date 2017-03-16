@@ -1,0 +1,50 @@
+<div id="post-<?= $post->post ?>" class="<?= ($post->isOpPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
+                        <div class="post <?= ($post->isOpPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->post ?>"" data-num="<?= $post->post ?>"">
+                
+                            <div class="post-details" id="post-details-<?= $post->post ?>"">
+                                <input name="delete" class="turnmeoff" value="<?= $post->post ?>"" type="checkbox">
+                                
+                                <span class="post-title"><?= $post->subject ?></span>
+                                <span class="ananimas"><?= $post->name ?></span>
+                                
+                                
+                                
+                                
+                                <span class="posttime-reflink">
+                                    <span class="posttime"><?= $post->date ?>&nbsp;</span>
+                                    <span class="reflink">
+                                        
+                                        <a href="/pr/chain/<?= $post->post ?>#<?= $post->post ?>">№</a><a href="/pr/res/<?= $post->thread ?>.html#<?= $post->post ?>" class="postbtn-reply-href" id="<?= $post->post ?>"><?= $post->post ?></a>
+                                        
+                                    </span>
+                                </span>
+                                <br class="turnmeoff">
+                            </div>
+                            
+                            <?php if ($post->files->count() > 0) : ?>
+                                <div class="images <?= ($post->files->count() > 1) ? 'images-multi' : 'images-single' ?> ">
+                                    <?php foreach($post->files as $file) :?>       
+                                        <figure class="image">
+                                            <figcaption class="file-attr">
+                                                <a class="desktop" target="_blank" href="<?= $file->path ?>" id="title-<?= $file->post ?>-<?= $file->md5 ?>" title="<?= $file->name ?>"><?= $file->fullname ?></a> 
+                                                
+                                                <span class="filesize">(<?= $file->size ?>, <?= $file->width ?>x<?= $file->height ?>)</span>
+                                            </figcaption>
+                                            
+                                            <div id="exlink-<?= $file->post ?>-<?= $file->md5 ?>" class="image-link">
+                                                <a href="<?= $file->path ?>" target="_blank" onclick="return expand('<?= $file->post ?>-<?= $file->md5 ?>','<?= $file->path ?>','<?= $file->thumbnail ?>',<?= $file->width ?>,<?= $file->height ?>,<?= $file->tn_width ?>,<?= $file->tn_height ?>, 0, 0)">
+                                                    <img src="<?= $file->thumbnail ?>" alt="<?= $file->height ?>x<?=$file->width ?>" class="img preview  " width="<?= $file->tn_width ?>" height="<?= $file->tn_height?>">
+                                                </a>
+                                            </div>
+                                        </figure>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <blockquote id="m<?= $post->post ?>" class="post-message">
+                                <?= $post->comment ?>   
+                            </blockquote>
+
+                            <div id="refmap-<?= $post->post ?>" class="ABU-refmap" style="display: none;"><em>Ответы: </em></div>
+                        </div>
+                    </div>  

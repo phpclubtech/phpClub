@@ -1,0 +1,7 @@
+/vendor/
+/pr/src/**
+/pr/thumb/**
+/json/**
+!/json/.gitkeep
+!/pr/src/.gitkeep
+!/pr/thumb/.gitkeep
