@@ -21,21 +21,31 @@ class Threader extends Controller
     {
         $threads = file_get_contents('https://2ch.hk/pr/catalog.json');
 
-        if (!$threads) {
+        if ($http_response_header[9] != 'Content-Type: application/json') {
             throw new Exception("Invalid catalog file");
         }
 
         $threads = json_decode($threads);
 
+        if (!$threads) {
+            throw new Exception("Failed decoding threads json file");
+            
+        }
+
         foreach ($threads->threads as $someThread) {
             if (Validator::validateThreadSubject($someThread->subject)) {
                 $json = file_get_contents("https://2ch.hk/pr/res/{$someThread->num}.json");
 
-                if (!$json) {
+                if ($http_response_header[9] != 'Content-Type: application/json') {
                     throw new Exception("Invalid thread file");
                 }
 
                 $jsonthread = json_decode($json);
+
+                if (!jsonthread) {
+                    throw new Exception("Failed decoding thread json file");
+    
+                }
 
                 $thread = new Thread($this->pdo);
                 $thread->number = $jsonthread->current_thread;
