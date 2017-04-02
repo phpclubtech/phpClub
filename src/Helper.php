@@ -3,7 +3,7 @@ namespace App;
 
 class Helper
 {
-    public static function createRefMap(\SplObjectStorage $posts)
+    public static function createRefMap(array $posts)
     {
         $refmap = array();
 
@@ -13,9 +13,9 @@ class Helper
 
         foreach ($posts as $post) {
             //Validator
-            if (preg_match_all($regexp, $post->comment, $matches)) {
+            if (preg_match_all($regexp, $post->getComment(), $matches)) {
                 foreach ($matches[2] as $reflink) {
-                    $refmap[] = array('number' => $post->post, 'reflink' => $reflink);
+                    $refmap[] = array('number' => $post->getPost(), 'reflink' => $reflink);
                 }
             }
         }

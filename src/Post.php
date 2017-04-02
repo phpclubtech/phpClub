@@ -1,156 +1,110 @@
 <?php
 namespace App;
 
-use App\ActiveRecord;
-
-class Post extends ActiveRecord
+/**
+* @Entity @Table(name="posts")
+**/
+class Post
 {
-    protected $pdo;
+    /** @Id @Column(type="integer") @GeneratedValue **/
+    protected $id;
 
-    public $thread;
-    public $post;
-    public $comment;
-    public $date;
-    public $email;
-    public $name;
-    public $subject;
+    /** @Column(type="integer") **/
+    protected $thread;
+
+    /** @Column(type="integer") **/
+    protected $post;
+
+    /** @Column(type="text") **/
+    protected $comment;
+
+    /** @Column(type="string") **/
+    protected $date;
+
+    /** @Column(type="string") **/
+    protected $email;
+
+    /** @Column(type="string") **/
+    protected $name;
+
+    /** @Column(type="string") **/
+    protected $subject;
 
     public $files;
 
-    public function addPost()
+    public function getId()
     {
-        $pdo = $this->getPDO();
-
-        $query = $pdo->prepare("INSERT INTO posts (
-                thread,
-                post,
-                comment,
-                date,
-                email,
-                name,
-                subject
-            )
-             VALUES (
-                :thread,
-                :post,
-                :comment,
-                :date,
-                :email,
-                :name,
-                :subject
-                
-            )
-        ");
-
-        $query->execute(array(
-            ':thread' => $this->thread,
-            ':post' => $this->post,
-            ':comment' => $this->comment,
-            ':date' => $this->date,
-            ':email' => $this->email,
-            ':name' => $this->name,
-            ':subject' => $this->subject
-        ));
+        return $this->id;
     }
 
-    public function getPost($number)
+    public function getThread()
     {
-        $pdo = $this->getPDO();
-
-        $query = $pdo->prepare("SELECT * FROM posts WHERE post=:post");
-        $query->bindValue(':post', $number);
-        $query->execute();
-
-        $result = $query->fetch(\PDO::FETCH_ASSOC);
-
-        if (empty($result)) {
-            return false;
-        }
-
-        $post = new Post($pdo);
-        
-        $post->thread = $result['thread'];
-        $post->post = $result['post'];
-        $post->comment = $result['comment'];
-        $post->date = $result['date'];
-        $post->email = $result['email'];
-        $post->name = $result['name'];
-        $post->subject = $result['subject'];
-
-        return $post;
+        return $this->thread;
     }
 
-    public function getPostsByThread($number, $limit = 2147483647, $offset = 0)
+    public function setThread($thread)
     {
-        $pdo = $this->getPDO();
-
-        $query = $pdo->prepare("SELECT * FROM posts WHERE thread=:number LIMIT :limit OFFSET :offset");
-        $query->bindValue(':number', $number);
-        $query->bindValue(':limit', (int) $limit, \PDO::PARAM_INT);
-        $query->bindValue(':offset', (int) $offset, \PDO::PARAM_INT);
-        $query->execute();
-
-        $results = $query->fetchAll(\PDO::FETCH_ASSOC);
-
-        $posts = new \SplObjectStorage();
-
-        foreach ($results as $result) {
-            $post = new Post($pdo);
-
-            $post->thread = $result['thread'];
-            $post->post = $result['post'];
-            $post->comment = $result['comment'];
-            $post->date = $result['date'];
-            $post->email = $result['email'];
-            $post->name = $result['name'];
-            $post->subject = $result['subject'];
-
-            $posts->attach($post);
-        }
-
-        return $posts;
+        $this->thread = $thread;
     }
 
-    public function getAllPosts()
+    public function getPost()
     {
-        $pdo = $this->getPDO();
-
-        $query = $pdo->prepare("SELECT * FROM posts");
-        $query->execute();
-
-        $results = $query->fetchAll(\PDO::FETCH_ASSOC);
-
-        $posts = new \SplObjectStorage();
-
-        foreach ($results as $result) {
-            $post = new Post($pdo);
-
-            $post->thread = $result['thread'];
-            $post->post = $result['post'];
-            $post->comment = $result['comment'];
-            $post->date = $result['date'];
-            $post->email = $result['email'];
-            $post->name = $result['name'];
-            $post->subject = $result['subject'];
-
-            $posts->attach($post);
-        }
-
-        return $posts;
+        return $this->post;
     }
 
-    public function getCountByThread($number)
+    public function setPost($post)
     {
-        $pdo = $this->getPDO();
+        $this->post = $post;
+    }
 
-        $query = $pdo->prepare("SELECT COUNT(*) FROM posts WHERE thread=:number");
-        $query->bindValue(':number', $number);
-        $query->execute();
+    public function getComment()
+    {
+        return $this->comment;
+    }
 
-        $result = $query->fetchColumn();
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+    }
 
-        return $result;
+    public function getDate()
+    {
+        return $this->date;
+    }
 
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
     }
 
     public function isOpPost()

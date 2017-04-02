@@ -1,39 +1,39 @@
-<div id="post-<?= $post->post ?>" class="<?= ($post->isOpPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
-                        <div class="post <?= ($post->isOpPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->post ?>"" data-num="<?= $post->post ?>"">
+<div id="post-<?= $post->getPost() ?>" class="<?= ($post->isOpPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
+                        <div class="post <?= ($post->isOpPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getPost() ?>"" data-num="<?= $post->getPost() ?>"">
                 
-                            <div class="post-details" id="post-details-<?= $post->post ?>"">
-                                <input name="delete" class="turnmeoff" value="<?= $post->post ?>"" type="checkbox">
+                            <div class="post-details" id="post-details-<?= $post->getPost() ?>"">
+                                <input name="delete" class="turnmeoff" value="<?= $post->getPost() ?>"" type="checkbox">
                                 
-                                <span class="post-title"><?= $post->subject ?></span>
-                                <span class="ananimas"><?= $post->name ?></span>
+                                <span class="post-title"><?= $post->getSubject() ?></span>
+                                <span class="ananimas"><?= $post->getName() ?></span>
                                 
                                 
                                 
                                 
                                 <span class="posttime-reflink">
-                                    <span class="posttime"><?= $post->date ?>&nbsp;</span>
+                                    <span class="posttime"><?= $post->getDate() ?>&nbsp;</span>
                                     <span class="reflink">
                                         
-                                        <a href="/pr/chain/<?= $post->post ?>#<?= $post->post ?>">№</a><a href="/pr/res/<?= $post->thread ?>.html#<?= $post->post ?>" class="postbtn-reply-href" id="<?= $post->post ?>"><?= $post->post ?></a>
+                                        <a href="/pr/chain/<?= $post->getPost() ?>#<?= $post->getPost() ?>">№</a><a href="/pr/res/<?= $post->getThread() ?>.html#<?= $post->getPost() ?>" class="postbtn-reply-href" id="<?= $post->getPost() ?>"><?= $post->getPost() ?></a>
                                         
                                     </span>
                                 </span>
                                 <br class="turnmeoff">
                             </div>
                             
-                            <?php if ($post->files->count() > 0) : ?>
-                                <div class="images <?= ($post->files->count() > 1) ? 'images-multi' : 'images-single' ?> ">
+                            <?php if (count($post->files) > 0) : ?>
+                                <div class="images <?= (count($post->files) > 1) ? 'images-multi' : 'images-single' ?> ">
                                     <?php foreach($post->files as $file) :?>       
                                         <figure class="image">
                                             <figcaption class="file-attr">
-                                                <a class="desktop" target="_blank" href="<?= $file->path ?>" id="title-<?= $file->post ?>-<?= $file->md5 ?>" title="<?= $file->name ?>"><?= $file->fullname ?></a> 
+                                                <a class="desktop" target="_blank" href="<?= $file->getPath() ?>" id="title-<?= $file->getPost() ?>-<?= $file->getMd5 ?>" title="<?= $file->getName() ?>"><?= $file->getFullname() ?></a> 
                                                 
-                                                <span class="filesize">(<?= $file->size ?>, <?= $file->width ?>x<?= $file->height ?>)</span>
+                                                <span class="filesize">(<?= $file->getSize() ?>, <?= $file->getWidth() ?>x<?= $file->getHeight() ?>)</span>
                                             </figcaption>
                                             
-                                            <div id="exlink-<?= $file->post ?>-<?= $file->md5 ?>" class="image-link">
-                                                <a href="<?= $file->path ?>" target="_blank" onclick="return expand('<?= $file->post ?>-<?= $file->md5 ?>','<?= $file->path ?>','<?= $file->thumbnail ?>',<?= $file->width ?>,<?= $file->height ?>,<?= $file->tn_width ?>,<?= $file->tn_height ?>, 0, 0)">
-                                                    <img src="<?= $file->thumbnail ?>" alt="<?= $file->height ?>x<?=$file->width ?>" class="img preview  " width="<?= $file->tn_width ?>" height="<?= $file->tn_height?>">
+                                            <div id="exlink-<?= $file->getPost() ?>-<?= $file->getMd5() ?>" class="image-link">
+                                                <a href="<?= $file->getPath() ?>" target="_blank" onclick="return expand('<?= $file->getPost() ?>-<?= $file->getMd5() ?>','<?= $file->getPath() ?>','<?= $file->getThumbnail() ?>',<?= $file->getWidth() ?>,<?= $file->getHeight() ?>,<?= $file->getTn_width() ?>,<?= $file->getTn_height() ?>, 0, 0)">
+                                                    <img src="<?= $file->getThumbnail() ?>" alt="<?= $file->getHeight() ?>x<?=$file->getWidth() ?>" class="img preview  " width="<?= $file->getTn_width() ?>" height="<?= $file->getTn_height() ?>">
                                                 </a>
                                             </div>
                                         </figure>
@@ -41,10 +41,10 @@
                                 </div>
                             <?php endif; ?>
 
-                            <blockquote id="m<?= $post->post ?>" class="post-message">
-                                <?= $post->comment ?>   
+                            <blockquote id="m<?= $post->getPost() ?>" class="post-message">
+                                <?= $post->getComment() ?>   
                             </blockquote>
 
-                            <div id="refmap-<?= $post->post ?>" class="ABU-refmap" style="display: none;"><em>Ответы: </em></div>
+                            <div id="refmap-<?= $post->getPost() ?>" class="ABU-refmap" style="display: none;"><em>Ответы: </em></div>
                         </div>
                     </div>  

@@ -3,6 +3,10 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Pimple\Container;
 
+use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Migrations;
+
 use App\ActiveRecord;
 use App\Thread;
 use App\Post;
@@ -13,29 +17,20 @@ use App\Router;
 
 $container = new Container();
 
-$container['PDO'] = function () {
+$container['EntityManager'] = function () {
+    $paths = array(__DIR__ . "/");
+    $isDevMode = false;
+
     $config = parse_ini_file(__DIR__ . '/config.ini');
 
-    $pdo = new \PDO(
-        "mysql:host={$config['host']}; dbname={$config['name']}; charset=utf8",
-        $config['user'],
-        $config['password']
-    );
+    $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+    $entityManager = EntityManager::create($config, $metaConfig);
 
-    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-    $query = $pdo->prepare("SET sql_mode = 'STRICT_ALL_TABLES'");
-    $query->execute();
-    
-    return $pdo;
+    return $entityManager;
 };
-
-$container['ActiveRecord'] = function ($c) {
-    return new ActiveRecord($c['PDO']);
-};
-
 
 $container['Threader'] = function ($c) {
-    return new Threader($c['PDO']);
+    return new Threader($c['EntityManager']);
 };
 
 $container['Router'] = function ($c) {

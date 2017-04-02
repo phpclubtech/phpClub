@@ -1,6 +1,6 @@
 <section class="posts">
     <form id="posts-form">
-            <div id="thread-<?= $thread->number ?>" class="thread">
+            <div id="thread-<?= $thread->getNumber() ?>" class="thread">
                             
                 <?php foreach ($thread->posts as $post) :?>                
 

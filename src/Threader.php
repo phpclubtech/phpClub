@@ -10,11 +10,11 @@ use App\File;
 
 class Threader extends Controller
 {
-    protected $pdo;
+    protected $em;
 
-    public function __construct(\PDO $pdo)
+    public function __construct(\Doctrine\ORM\EntityManager $em)
     {
-        $this->pdo = $pdo;
+        $this->em = $em;
     }
 
     public function update()
@@ -22,13 +22,13 @@ class Threader extends Controller
         $threads = file_get_contents('https://2ch.hk/pr/catalog.json');
 
         if ($http_response_header[9] != 'Content-Type: application/json') {
-            throw new Exception("Invalid catalog file");
+            throw new \Exception("Invalid catalog file");
         }
 
         $threads = json_decode($threads);
 
         if (!$threads) {
-            throw new Exception("Failed decoding threads json file");
+            throw new \Exception("Failed decoding threads json file");
             
         }
 
@@ -37,77 +37,80 @@ class Threader extends Controller
                 $json = file_get_contents("https://2ch.hk/pr/res/{$someThread->num}.json");
 
                 if ($http_response_header[9] != 'Content-Type: application/json') {
-                    throw new Exception("Invalid thread file");
+                    throw new \Exception("Invalid thread file");
                 }
 
                 $jsonthread = json_decode($json);
 
                 if (!jsonthread) {
-                    throw new Exception("Failed decoding thread json file");
+                    throw new \Exception("Failed decoding thread json file");
     
                 }
 
-                $thread = new Thread($this->pdo);
-                $thread->number = $jsonthread->current_thread;
+                $thread = new Thread();
+                $thread->setNumber($jsonthread->current_thread);
 
-                if (!$thread->getThread($jsonthread->current_thread)) {
+                if (!$this->em->getRepository('App\Thread')->findOneBy(array('number' => $jsonthread->current_thread))) {
                     mkdir(__DIR__ . "/../pr/src/$jsonthread->current_thread");
                     mkdir(__DIR__ . "/../pr/thumb/$jsonthread->current_thread");
 
-                    $thread->addThread();
+                    $this->em->persist($thread);
+                    $this->em->flush();
                 }
 
                 foreach ($jsonthread->threads['0']->posts as $jsonpost) {
-                    $post = new Post($this->pdo);
-
-                    if ($post->getPost($jsonpost->num)) {
+                    if ($this->em->getRepository('App\Post')->findOneBy(array('post' => $jsonpost->num))) {
                         continue;
                     }
+                    
+                    $post = new Post();
 
-                    $post->thread = $jsonthread->current_thread;
-                    $post->post = $jsonpost->num;
-                    $post->comment = $jsonpost->comment;
-                    $post->date = $jsonpost->date;
-                    $post->email = $jsonpost->email;
-                    $post->name = $jsonpost->name;
-                    $post->subject = $jsonpost->subject;
+                    $post->setThread($jsonthread->current_thread);
+                    $post->setPost($jsonpost->num);
+                    $post->setComment($jsonpost->comment);
+                    $post->setDate($jsonpost->date);
+                    $post->setEmail($jsonpost->email);
+                    $post->setName($jsonpost->name);
+                    $post->setSubject($jsonpost->subject);
 
-                    $post->addPost();
+                    $this->em->persist($post);
+                    $this->em->flush();
 
                     foreach($jsonpost->files as $jsonfile) {
                         if ($jsonfile->displayname == 'Стикер') {
                             continue;
                         }
 
-                        $file = new File($this->pdo);
+                        $file = new File();
 
-                        $file->post = $jsonpost->num;
-                        $file->displayname = $jsonfile->displayname;
-                        $file->duration = (isset($jsonfile->duration)) ? $jsonfile->duration : '';
-                        $file->fullname = $jsonfile->fullname;
-                        $file->height = $jsonfile->height;
-                        $file->md5 = $jsonfile->md5;
-                        $file->name = $jsonfile->name;
-                        $file->nsfw = $jsonfile->nsfw;
-                        $file->path = $jsonfile->path;
-                        $file->size = $jsonfile->size;
-                        $file->thumbnail = $jsonfile->thumbnail;
-                        $file->tn_height = $jsonfile->tn_height;
-                        $file->tn_width = $jsonfile->tn_width;
-                        $file->type = $jsonfile->type;
-                        $file->width = $jsonfile->width;
+                        $file->setPost($jsonpost->num);
+                        $file->setDisplayname($jsonfile->displayname);
+                        $file->setDuration((isset($jsonfile->duration)) ? $jsonfile->duration : '');
+                        $file->setFullname($jsonfile->fullname);
+                        $file->setHeight($jsonfile->height);
+                        $file->setMd5($jsonfile->md5);
+                        $file->setName($jsonfile->name);
+                        $file->setNsfw($jsonfile->nsfw);
+                        $file->setPath($jsonfile->path);
+                        $file->setSize($jsonfile->size);
+                        $file->setThumbnail($jsonfile->thumbnail);
+                        $file->setTn_height($jsonfile->tn_height);
+                        $file->setTn_width($jsonfile->tn_width);
+                        $file->setType($jsonfile->type);
+                        $file->setWidth($jsonfile->width);
 
-                        $file->addFile();
+                        $this->em->persist($file);
+                        $this->em->flush();
                         
-                        $content = file_get_contents("https://2ch.hk{$file->path}");
-                        $thumbnail = file_get_contents("https://2ch.hk{$file->thumbnail}");
+                        $content = file_get_contents("https://2ch.hk{$file->getPath()}");
+                        $thumbnail = file_get_contents("https://2ch.hk{$file->getThumbnail()}");
 
                         if (!$content or !$thumbnail) {
-                            throw new Exception("Invalid files");
+                            throw new \Exception("Invalid files");
                         }
 
-                        file_put_contents(__DIR__ . "/..{$file->path}", $content);
-                        file_put_contents(__DIR__ . "/..{$file->thumbnail}", $thumbnail);
+                        file_put_contents(__DIR__ . "/..{$file->getPath()}", $content);
+                        file_put_contents(__DIR__ . "/..{$file->getThumbnail()}", $thumbnail);
                     }
                 }
 
@@ -119,24 +122,22 @@ class Threader extends Controller
 
     public function runThreads()
     {
-        //mess
-        $thread = new Thread($this->pdo);
-        $threads = $thread->getThreads();
+        $threads = $this->em->getRepository('App\Thread')->findAll();
 
-        foreach ($threads as $somethread) {
+        foreach ($threads as $thread) {
+            $countQuery = $this->em->createQuery("SELECT COUNT(p) FROM App\Post p WHERE p.thread = :number");
+            $countQuery->setParameter('number', $thread->getNumber());
+            $count = $countQuery->getSingleScalarResult();
 
-            //mess
-            $post = new Post($this->pdo);
+            $opPost = $this->em->getRepository('App\Post')->findOneBy(array('post' => $thread->getNumber()));
+            $posts = $this->em->getRepository('App\Post')->findBy(array('thread' => $thread->getNumber()), array(), 3, $count - 3);
 
-            $count = $post->getCountByThread($somethread->number);
+            array_unshift($posts, $opPost);
 
-            $somethread->posts = new \SplObjectStorage();
-            $somethread->posts->attach($post->getPost($somethread->number));
-            $somethread->posts->addAll($post->getPostsByThread($somethread->number, 3, $count - 3));
+            $thread->posts = $posts;
 
-            foreach ($somethread->posts as $threadpost) {
-                $file = new File($this->pdo);
-                $threadpost->files = $file->getFilesByPost($threadpost->post);
+            foreach ($thread->posts as $post) {
+                $post->files = $this->em->getRepository('App\File')->findBy(array('post' => $post->getPost()));
             }
         }
 
@@ -151,17 +152,13 @@ class Threader extends Controller
             $this->redirect();
         }
 
-        $thread = new Thread($this->pdo);
-        $thread->number = $number;
+        $thread = new Thread();
+        $thread->setNumber($number);
 
-        //mess
-        $post = new Post($this->pdo);
-        $thread->posts = $post->getPostsByThread($thread->number);
+        $thread->posts = $this->em->getRepository('App\Post')->findBy(array('thread' => $thread->getNumber()));
 
-        foreach ($thread->posts as $threadpost) {
-            //mess
-            $file = new File($this->pdo);
-            $threadpost->files = $file->getFilesByPost($threadpost->post);
+        foreach ($thread->posts as $post) {
+            $post->files = $this->em->getRepository('App\File')->findBy(array('post' => $post->getPost()));
         }
 
         $this->render('public/thread.php', compact('thread'));
@@ -175,9 +172,7 @@ class Threader extends Controller
             $this->redirect();
         }
 
-        //mess
-        $post = new Post($this->pdo);
-        $allPosts = $post->getAllPosts();
+        $allPosts = $this->em->getRepository('App\Post')->findAll();
 
         $refmap = Helper::createRefMap($allPosts);
         $chain = Helper::createChain($number, $refmap);
@@ -190,21 +185,18 @@ class Threader extends Controller
             return ($a < $b) ? -1 : 1;
         });
 
-        $posts = new \SplObjectStorage();
+        $posts = array();
         
         foreach ($chain as $link) {
-            $post = new Post($this->pdo);
-            $post = $post->getPost($link);
+            $post = $this->em->getRepository('App\Post')->findOneBy(array('post' => $link));
 
             if (!$post) {
                 continue;
             } 
 
-            //mess
-            $file = new File($this->pdo);
-            $post->files = $file->getFilesByPost($post->post);
+            $post->files = $this->em->getRepository('App\File')->findBy(array('post' => $post->getPost()));
 
-            $posts->attach($post);
+            $posts[] = $post;
         }
 
         $this->render('public/chain.php', compact('posts'));
