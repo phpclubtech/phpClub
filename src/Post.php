@@ -1,18 +1,20 @@
 <?php
 namespace App;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
 * @Entity @Table(name="posts")
 **/
 class Post
 {
-    /** @Id @Column(type="integer") @GeneratedValue **/
-    protected $id;
-
-    /** @Column(type="integer") **/
+    /**
+    * @ManyToOne(targetEntity="App\Thread", inversedBy="posts")
+    * @JoinColumn(name="thread", referencedColumnName="number")
+    **/
     protected $thread;
 
-    /** @Column(type="integer") **/
+    /** @Id @Column(type="integer") **/
     protected $post;
 
     /** @Column(type="text") **/
@@ -30,7 +32,12 @@ class Post
     /** @Column(type="string") **/
     protected $subject;
 
+    /** @OneToMany(targetEntity="App\File", mappedBy="post") **/
     public $files;
+
+    public function __construct() {
+        $this->files = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -107,9 +114,26 @@ class Post
         $this->subject = $subject;
     }
 
+    public function addFile(\App\File $file)
+    {
+        $this->files[] = $file;
+
+        return $this;
+    }
+
+    public function removeFile(\App\File $file)
+    {
+        $this->files->removeElement($file);
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
+    }
+    
     public function isOpPost()
     {
-        if ($this->thread == $this->post) {
+        if ($this->thread->getNumber() == $this->post) {
             return true;
         }
 

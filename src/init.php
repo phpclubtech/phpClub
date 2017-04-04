@@ -24,6 +24,8 @@ $container['EntityManager'] = function () {
     $config = parse_ini_file(__DIR__ . '/config.ini');
 
     $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+    $metaConfig->setAutoGenerateProxyClasses(\Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_ALWAYS);
+
     $entityManager = EntityManager::create($config, $metaConfig);
 
     return $entityManager;

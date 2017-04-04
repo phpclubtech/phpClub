@@ -1,6 +1,8 @@
 <?php
 namespace App;
 
+use \Doctrine\ORM\EntityManager;
+
 use App\Controller;
 use App\Validator;
 use App\Helper;
@@ -12,19 +14,20 @@ class Threader extends Controller
 {
     protected $em;
 
-    public function __construct(\Doctrine\ORM\EntityManager $em)
+    public function __construct(EntityManager $em)
     {
         $this->em = $em;
     }
 
     public function update()
     {
-        $threads = file_get_contents('https://2ch.hk/pr/catalog.json');
+        $threadsHeaders = get_headers('https://2ch.hk/pr/catalog.json', true);
 
-        if ($http_response_header[9] != 'Content-Type: application/json') {
+        if ($threadsHeaders['Content-Type'][0] != 'application/json') {
             throw new \Exception("Invalid catalog file");
         }
 
+        $threads = file_get_contents('https://2ch.hk/pr/catalog.json');
         $threads = json_decode($threads);
 
         if (!$threads) {
@@ -34,23 +37,27 @@ class Threader extends Controller
 
         foreach ($threads->threads as $someThread) {
             if (Validator::validateThreadSubject($someThread->subject)) {
-                $json = file_get_contents("https://2ch.hk/pr/res/{$someThread->num}.json");
 
-                if ($http_response_header[9] != 'Content-Type: application/json') {
+                $threadHeaders = get_headers("https://2ch.hk/pr/res/{$someThread->num}.json", true);
+
+                if ($threadHeaders['Content-Type'][0] != 'application/json') {
                     throw new \Exception("Invalid thread file");
                 }
 
+                $json = file_get_contents("https://2ch.hk/pr/res/{$someThread->num}.json");
                 $jsonthread = json_decode($json);
 
-                if (!jsonthread) {
+                if (!$jsonthread) {
                     throw new \Exception("Failed decoding thread json file");
     
                 }
 
-                $thread = new Thread();
-                $thread->setNumber($jsonthread->current_thread);
+                $thread = $this->em->getRepository('App\Thread')->find($jsonthread->current_thread);
 
-                if (!$this->em->getRepository('App\Thread')->findOneBy(array('number' => $jsonthread->current_thread))) {
+                if (!$thread) {
+                    $thread = new Thread();
+                    $thread->setNumber($jsonthread->current_thread);
+
                     mkdir(__DIR__ . "/../pr/src/$jsonthread->current_thread");
                     mkdir(__DIR__ . "/../pr/thumb/$jsonthread->current_thread");
 
@@ -59,13 +66,13 @@ class Threader extends Controller
                 }
 
                 foreach ($jsonthread->threads['0']->posts as $jsonpost) {
-                    if ($this->em->getRepository('App\Post')->findOneBy(array('post' => $jsonpost->num))) {
+                    if ($this->em->getRepository('App\Post')->find($jsonpost->num)) {
                         continue;
                     }
                     
                     $post = new Post();
 
-                    $post->setThread($jsonthread->current_thread);
+                    $post->setThread($thread);
                     $post->setPost($jsonpost->num);
                     $post->setComment($jsonpost->comment);
                     $post->setDate($jsonpost->date);
@@ -83,9 +90,9 @@ class Threader extends Controller
 
                         $file = new File();
 
-                        $file->setPost($jsonpost->num);
+                        $file->setPost($post);
                         $file->setDisplayname($jsonfile->displayname);
-                        $file->setDuration((isset($jsonfile->duration)) ? $jsonfile->duration : '');
+                        $file->setDuration((isset($jsonfile->duration)) ? $jsonfile->duration : null);
                         $file->setFullname($jsonfile->fullname);
                         $file->setHeight($jsonfile->height);
                         $file->setMd5($jsonfile->md5);
@@ -125,19 +132,15 @@ class Threader extends Controller
         $threads = $this->em->getRepository('App\Thread')->findAll();
 
         foreach ($threads as $thread) {
-            $countQuery = $this->em->createQuery("SELECT COUNT(p) FROM App\Post p WHERE p.thread = :number");
-            $countQuery->setParameter('number', $thread->getNumber());
-            $count = $countQuery->getSingleScalarResult();
+            $count = $thread->getPosts()->count();
+            
+            foreach ($thread->getPosts() as $post) {
+                if ($post->isOpPost() or $thread->getPosts()->key() >= $count - 3) {
+                    $thread->getPosts()->next();
+                    continue;
+                }
 
-            $opPost = $this->em->getRepository('App\Post')->findOneBy(array('post' => $thread->getNumber()));
-            $posts = $this->em->getRepository('App\Post')->findBy(array('thread' => $thread->getNumber()), array(), 3, $count - 3);
-
-            array_unshift($posts, $opPost);
-
-            $thread->posts = $posts;
-
-            foreach ($thread->posts as $post) {
-                $post->files = $this->em->getRepository('App\File')->findBy(array('post' => $post->getPost()));
+                $thread->getPosts()->removeElement($post);
             }
         }
 
@@ -152,14 +155,7 @@ class Threader extends Controller
             $this->redirect();
         }
 
-        $thread = new Thread();
-        $thread->setNumber($number);
-
-        $thread->posts = $this->em->getRepository('App\Post')->findBy(array('thread' => $thread->getNumber()));
-
-        foreach ($thread->posts as $post) {
-            $post->files = $this->em->getRepository('App\File')->findBy(array('post' => $post->getPost()));
-        }
+        $thread = $this->em->getRepository('App\Thread')->find($number);
 
         $this->render('public/thread.php', compact('thread'));
     }
@@ -185,7 +181,7 @@ class Threader extends Controller
             return ($a < $b) ? -1 : 1;
         });
 
-        $posts = array();
+        $posts = new \Doctrine\Common\Collections\ArrayCollection();
         
         foreach ($chain as $link) {
             $post = $this->em->getRepository('App\Post')->findOneBy(array('post' => $link));
@@ -194,9 +190,7 @@ class Threader extends Controller
                 continue;
             } 
 
-            $post->files = $this->em->getRepository('App\File')->findBy(array('post' => $post->getPost()));
-
-            $posts[] = $post;
+            $posts->add($post);
         }
 
         $this->render('public/chain.php', compact('posts'));

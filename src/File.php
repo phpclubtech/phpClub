@@ -9,13 +9,16 @@ class File
     /** @Id @Column(type="integer") @GeneratedValue **/
     protected $id;
 
-    /** @Column(type="integer") **/
+    /**
+    * @ManyToOne(targetEntity="App\Post", inversedBy="files")
+    * @JoinColumn(name="post", referencedColumnName="post")
+    **/
     protected $post;
 
     /** @Column(type="string") **/
     protected $displayname;
 
-    /** @Column(type="time") **/
+    /** @Column(type="time", nullable=true) **/
     protected $duration;
 
     /** @Column(type="string") **/

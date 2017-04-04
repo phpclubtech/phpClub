@@ -14,25 +14,25 @@
                                     <span class="posttime"><?= $post->getDate() ?>&nbsp;</span>
                                     <span class="reflink">
                                         
-                                        <a href="/pr/chain/<?= $post->getPost() ?>#<?= $post->getPost() ?>">№</a><a href="/pr/res/<?= $post->getThread() ?>.html#<?= $post->getPost() ?>" class="postbtn-reply-href" id="<?= $post->getPost() ?>"><?= $post->getPost() ?></a>
+                                        <a href="/pr/chain/<?= $post->getPost() ?>#<?= $post->getPost() ?>">№</a><a href="/pr/res/<?= $post->getThread()->getNumber() ?>.html#<?= $post->getPost() ?>" class="postbtn-reply-href" id="<?= $post->getPost() ?>"><?= $post->getPost() ?></a>
                                         
                                     </span>
                                 </span>
                                 <br class="turnmeoff">
                             </div>
-                            
-                            <?php if (count($post->files) > 0) : ?>
-                                <div class="images <?= (count($post->files) > 1) ? 'images-multi' : 'images-single' ?> ">
-                                    <?php foreach($post->files as $file) :?>       
+
+                            <?php if ($post->getFiles()->count() > 0) : ?>
+                                <div class="images <?= ($post->getFiles()->count() > 1) ? 'images-multi' : 'images-single' ?> ">
+                                    <?php foreach($post->getFiles() as $file) :?>       
                                         <figure class="image">
                                             <figcaption class="file-attr">
-                                                <a class="desktop" target="_blank" href="<?= $file->getPath() ?>" id="title-<?= $file->getPost() ?>-<?= $file->getMd5 ?>" title="<?= $file->getName() ?>"><?= $file->getFullname() ?></a> 
+                                                <a class="desktop" target="_blank" href="<?= $file->getPath() ?>" id="title-<?= $file->getPost()->getPost() ?>-<?= $file->getMd5() ?>" title="<?= $file->getName() ?>"><?= $file->getFullname() ?></a>
                                                 
                                                 <span class="filesize">(<?= $file->getSize() ?>, <?= $file->getWidth() ?>x<?= $file->getHeight() ?>)</span>
                                             </figcaption>
                                             
-                                            <div id="exlink-<?= $file->getPost() ?>-<?= $file->getMd5() ?>" class="image-link">
-                                                <a href="<?= $file->getPath() ?>" target="_blank" onclick="return expand('<?= $file->getPost() ?>-<?= $file->getMd5() ?>','<?= $file->getPath() ?>','<?= $file->getThumbnail() ?>',<?= $file->getWidth() ?>,<?= $file->getHeight() ?>,<?= $file->getTn_width() ?>,<?= $file->getTn_height() ?>, 0, 0)">
+                                            <div id="exlink-<?= $file->getPost()->getPost() ?>-<?= $file->getMd5() ?>" class="image-link">
+                                                <a href="<?= $file->getPath() ?>" target="_blank" onclick="return expand('<?= $file->getPost()->getPost() ?>-<?= $file->getMd5() ?>','<?= $file->getPath() ?>','<?= $file->getThumbnail() ?>',<?= $file->getWidth() ?>,<?= $file->getHeight() ?>,<?= $file->getTn_width() ?>,<?= $file->getTn_height() ?>, 0, 0)">
                                                     <img src="<?= $file->getThumbnail() ?>" alt="<?= $file->getHeight() ?>x<?=$file->getWidth() ?>" class="img preview  " width="<?= $file->getTn_width() ?>" height="<?= $file->getTn_height() ?>">
                                                 </a>
                                             </div>
