@@ -71,14 +71,8 @@ class Threader extends Controller
                     }
                     
                     $post = new Post();
-
                     $post->setThread($thread);
-                    $post->setPost($jsonpost->num);
-                    $post->setComment($jsonpost->comment);
-                    $post->setDate($jsonpost->date);
-                    $post->setEmail($jsonpost->email);
-                    $post->setName($jsonpost->name);
-                    $post->setSubject($jsonpost->subject);
+                    $post->fillData($jsonpost);
 
                     $this->em->persist($post);
                     $this->em->flush();
@@ -89,22 +83,8 @@ class Threader extends Controller
                         }
 
                         $file = new File();
-
                         $file->setPost($post);
-                        $file->setDisplayname($jsonfile->displayname);
-                        $file->setDuration((isset($jsonfile->duration)) ? $jsonfile->duration : null);
-                        $file->setFullname($jsonfile->fullname);
-                        $file->setHeight($jsonfile->height);
-                        $file->setMd5($jsonfile->md5);
-                        $file->setName($jsonfile->name);
-                        $file->setNsfw($jsonfile->nsfw);
-                        $file->setPath($jsonfile->path);
-                        $file->setSize($jsonfile->size);
-                        $file->setThumbnail($jsonfile->thumbnail);
-                        $file->setTn_height($jsonfile->tn_height);
-                        $file->setTn_width($jsonfile->tn_width);
-                        $file->setType($jsonfile->type);
-                        $file->setWidth($jsonfile->width);
+                        $file->fillData($jsonfile);
 
                         $this->em->persist($file);
                         $this->em->flush();

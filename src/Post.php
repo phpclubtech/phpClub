@@ -39,9 +39,22 @@ class Post
         $this->files = new ArrayCollection();
     }
 
-    public function getId()
+    public function fillData($json)
     {
-        return $this->id;
+        $allowed = [
+            'num' => 'post',
+            'comment' => 'comment',
+            'date' => 'date',
+            'email' => 'email',
+            'name' => 'name',
+            'subject' => 'subject'
+        ];
+
+        foreach ($allowed as $field => $property) {
+            if (property_exists($json, $field)) {
+                $this->$property = $json->$field;
+            }
+        }
     }
 
     public function getThread()

@@ -57,10 +57,30 @@ class File
     /** @Column(type="integer") **/
     protected $width;
 
-
-    public function getId()
+    public function fillData($json)
     {
-        return $this->id;
+        $allowed = [
+            'displayname',
+            'duration',
+            'fullname',
+            'height',
+            'md5',
+            'name',
+            'nsfw',
+            'path',
+            'size',
+            'thumbnail',
+            'tn_height',
+            'tn_width',
+            'type',
+            'width'
+        ];
+
+        foreach ($allowed as $field) {
+            if (property_exists($json, $field)) {
+                $this->$field = $json->$field;
+            }
+        }
     }
     
     public function getPost()

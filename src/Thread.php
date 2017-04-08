@@ -19,11 +19,6 @@ class Thread
         $this->posts = new ArrayCollection();
     }
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
     public function getNumber()
     {
         return $this->number;
