@@ -21,13 +21,13 @@ class Threader extends Controller
 
     public function update()
     {
-        $threadsHeaders = get_headers('https://2ch.hk/pr/catalog.json', true);
+        $threadsHeaders = get_headers(Helper::getCatalogUrl(), true);
 
         if ($threadsHeaders['Content-Type'][0] != 'application/json') {
             throw new \Exception("Invalid catalog file");
         }
 
-        $threads = file_get_contents('https://2ch.hk/pr/catalog.json');
+        $threads = file_get_contents(Helper::getCatalogUrl());
         $threads = json_decode($threads);
 
         if (!$threads) {
@@ -38,13 +38,13 @@ class Threader extends Controller
         foreach ($threads->threads as $someThread) {
             if (Validator::validateThreadSubject($someThread->subject)) {
 
-                $threadHeaders = get_headers("https://2ch.hk/pr/res/{$someThread->num}.json", true);
+                $threadHeaders = get_headers(Helper::getThreadUrl($someThread->num), true);
 
                 if ($threadHeaders['Content-Type'][0] != 'application/json') {
                     throw new \Exception("Invalid thread file");
                 }
 
-                $json = file_get_contents("https://2ch.hk/pr/res/{$someThread->num}.json");
+                $json = file_get_contents(Helper::getThreadUrl($someThread->num));
                 $jsonthread = json_decode($json);
 
                 if (!$jsonthread) {
@@ -58,8 +58,8 @@ class Threader extends Controller
                     $thread = new Thread();
                     $thread->setNumber($jsonthread->current_thread);
 
-                    mkdir(__DIR__ . "/../pr/src/$jsonthread->current_thread");
-                    mkdir(__DIR__ . "/../pr/thumb/$jsonthread->current_thread");
+                    mkdir(Helper::getSrcDirectoryPath());
+                    mkdir(Helper::getThumbDirectoryPath());
 
                     $this->em->persist($thread);
                     $this->em->flush();
@@ -89,20 +89,20 @@ class Threader extends Controller
                         $this->em->persist($file);
                         $this->em->flush();
                         
-                        $content = file_get_contents("https://2ch.hk{$file->getPath()}");
-                        $thumbnail = file_get_contents("https://2ch.hk{$file->getThumbnail()}");
+                        $content = file_get_contents(Helper::getSrcUrl($file->getPath()));
+                        $thumbnail = file_get_contents(Helper::getThumbSrc($file->getThumbnail()));
 
                         if (!$content or !$thumbnail) {
                             throw new \Exception("Invalid files");
                         }
 
-                        file_put_contents(__DIR__ . "/..{$file->getPath()}", $content);
-                        file_put_contents(__DIR__ . "/..{$file->getThumbnail()}", $thumbnail);
+                        file_put_contents(Helper::getSrcUrl($file->getPath()), $content);
+                        file_put_contents(Helper::getThumbPath($file->getThumbnail()), $thumbnail);
                     }
                 }
 
                 //just in case
-                file_put_contents(__DIR__ . "/../json/{$jsonthread->current_thread}.json", $json);
+                file_put_contents(Helper::getJsonPath($jsonthread->current_thread), $json);
             }
         }
     }
