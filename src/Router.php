@@ -25,6 +25,8 @@ class Router
         } elseif (Validator::validateChainLink($path)) {
             $this->threader->runChain();
         } else {
+            header("HTTP/1.0 404 Not Found");
+            
             $this->threader->render('templates/404.html');
         }
     }
