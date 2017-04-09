@@ -18,6 +18,13 @@
                                         
                                     </span>
                                 </span>
+
+                                <?php if (isset($threads) and $post->isOpPost()) : ?>
+                                    <span class="desktop">
+                                    [<a class="orange" href="/pr/res/<?= $post->getThread()->getNumber() ?>.html">Просмотреть</a>]
+                                    </span>
+                                <?php endif; ?>
+                                
                                 <br class="turnmeoff">
                             </div>
 
