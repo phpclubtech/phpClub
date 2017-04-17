@@ -62,5 +62,5 @@
 </div>
 
 <?php if (isset($threads) and $post->isOpPost()) : ?>
-    <span class="mess-post desktop">Нажмите <a href="https://2ch.hk/pr/res/942030.html">Просмотреть</a>, чтобы посмотреть.</span>
+    <span class="mess-post desktop">Нажмите <a href="/pr/res/<?= $post->getThread()->getNumber() ?>.html">Просмотреть</a>, чтобы посмотреть.</span>
 <?php endif; ?>
