@@ -109,6 +109,7 @@ class Threader extends Controller
 
     public function runThreads()
     {
+
         $threads = $this->em->getRepository('App\Thread')->findAll();
 
         foreach ($threads as $thread) {

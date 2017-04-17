@@ -1,13 +1,10 @@
 <section class="posts">
     <form id="posts-form">
-            <div id="thread-<?= $thread->getNumber() ?>" class="thread">
-                            
-                <?php foreach ($thread->getPosts() as $post) :?>                
-
-                    <?php include __DIR__ . '/../templates/post.phtml'; ?>
-
-                <?php endforeach; ?>                 
-            </div>
-            <hr>
+        <div id="thread-<?= $thread->getNumber() ?>" class="thread">
+            <?php foreach ($thread->getPosts() as $post) :?>
+                <?php include __DIR__ . '/../templates/post.phtml'; ?>
+            <?php endforeach; ?>
+        </div>
+        <hr>
     </form>
 </section>
