@@ -109,19 +109,27 @@ class Threader extends Controller
 
     public function runThreads()
     {
-       $threads = $this->em->getRepository('App\Thread')->findAll();
+        $threadsQuery = $this->em->createQuery('SELECT t FROM App\Thread t');
+        $threads = $threadsQuery->getArrayResult();
 
-        foreach ($threads as $thread) {
-            $count = $thread->getPosts()->count();
-            
-            foreach ($thread->getPosts() as $post) {
-                if ($post->isOpPost() or $thread->getPosts()->key() >= $count - 3) {
-                    $thread->getPosts()->next();
-                    continue;
-                }
+        foreach ($threads as $key => $value) {
+            $thread = new Thread();
+            $thread->setNumber($value['number']);
 
-                $thread->getPosts()->removeElement($post);
+            $countQuery = $this->em->createQuery("SELECT COUNT(p) FROM App\Post p WHERE p.thread = :number");
+            $countQuery->setParameter('number', $thread->getNumber());
+            $count = $countQuery->getSingleScalarResult();
+
+            $opPost = $this->em->getRepository('App\Post')->findOneBy(array('post' => $thread->getNumber()));
+            $posts = $this->em->getRepository('App\Post')->findBy(array('thread' => $thread->getNumber()), array(), 3, $count - 3);
+
+            $thread->addPost($opPost);
+
+            foreach ($posts as $post) {
+                $thread->addPost($post);
             }
+
+            $threads[$key] = $thread;
         }
 
         $this->render('public/board.php', compact('threads'));
