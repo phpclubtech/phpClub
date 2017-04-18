@@ -90,13 +90,13 @@ class Threader extends Controller
                         $this->em->flush();
                         
                         $content = file_get_contents(Helper::getSrcUrl($file->getPath()));
-                        $thumbnail = file_get_contents(Helper::getThumbSrc($file->getThumbnail()));
+                        $thumbnail = file_get_contents(Helper::getThumbUrl($file->getThumbnail()));
 
                         if (!$content or !$thumbnail) {
                             throw new \Exception("Invalid files");
                         }
 
-                        file_put_contents(Helper::getSrcUrl($file->getPath()), $content);
+                        file_put_contents(Helper::getSrcPath($file->getPath()), $content);
                         file_put_contents(Helper::getThumbPath($file->getThumbnail()), $thumbnail);
                     }
                 }
@@ -109,7 +109,7 @@ class Threader extends Controller
 
     public function runThreads()
     {
-        $threads = $this->em->getRepository('App\Thread')->findAll();
+       $threads = $this->em->getRepository('App\Thread')->findAll();
 
         foreach ($threads as $thread) {
             $count = $thread->getPosts()->count();

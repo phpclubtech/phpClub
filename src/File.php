@@ -78,6 +78,12 @@ class File
 
         foreach ($allowed as $field) {
             if (property_exists($json, $field)) {
+                if ($field == 'duration') {
+                    $this->$field = new \DateTime($json->$field);
+
+                    continue;
+                }
+
                 $this->$field = $json->$field;
             }
         }
