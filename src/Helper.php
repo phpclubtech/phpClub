@@ -1,44 +1,37 @@
 <?php
 namespace App;
 
+use \Doctrine\ORM\EntityManager;
+
 class Helper
 {
-
-    public static function createRefMap(array $posts)
+    public static function getChain($number, EntityManager $em)
     {
-        $refmap = array();
-
-        //Validator
-        $regexp = '/<a href="[\S]+" class="post-reply-link" data-thread="(\d+)" data-num="(\d+)">/';
-        $matches = array();
-
-        foreach ($posts as $post) {
-            //Validator
-            if (preg_match_all($regexp, $post->getComment(), $matches)) {
-                foreach ($matches[2] as $reflink) {
-                    $refmap[] = array('number' => $post->getPost(), 'reflink' => $reflink);
-                }
-            }
-        }
-
-        return $refmap;
-    }
-
-    public static function createChain($number, $refmap)
-    {
-        static $chain = array();
+        static $chain = [];
 
         if (!in_array($number, $chain)) {
             $chain[] = $number;
-        
-            foreach($refmap as $ref) {
-                if ($ref['number'] == $number) {
-                    Helper::createChain($ref['reflink'], $refmap);
-                } elseif($ref['reflink'] == $number) {
-                    Helper::createChain($ref['number'], $refmap);
-                }
+
+            $links = $em->getRepository('App\RefLink')->findBy(['post' => $number]);
+
+            foreach ($links as $link) {
+                Helper::getChain($link->getReference(), $em);
+            }
+
+            $links = $em->getRepository('App\RefLink')->findBy(['reference' => $number]);
+
+            foreach ($links as $link) {
+                Helper::getChain($link->getPost(), $em);
             }
         }
+
+        usort($chain, function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        });
 
         return $chain;
     }

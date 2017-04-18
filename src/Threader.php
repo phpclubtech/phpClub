@@ -77,6 +77,18 @@ class Threader extends Controller
                     $this->em->persist($post);
                     $this->em->flush();
 
+                    $reflinks = Validator::validateRefLinks($post->getComment());
+
+                    foreach ($reflinks as $link) {
+                        $reflink = new RefLink();
+                        $reflink->setPost($post->getPost());
+                        $reflink->setReference($link);
+
+                        $this->em->persist($reflink);
+                        $this->em->flush();
+                    }
+
+
                     foreach($jsonpost->files as $jsonfile) {
                         if ($jsonfile->displayname == 'Стикер') {
                             continue;
@@ -156,18 +168,7 @@ class Threader extends Controller
             $this->redirect();
         }
 
-        $allPosts = $this->em->getRepository('App\Post')->findAll();
-
-        $refmap = Helper::createRefMap($allPosts);
-        $chain = Helper::createChain($number, $refmap);
-
-        usort($chain, function ($a, $b) {
-            if ($a == $b) {
-                return 0;
-            }
-
-            return ($a < $b) ? -1 : 1;
-        });
+        $chain = Helper::getChain($number, $this->em);
 
         $posts = new \Doctrine\Common\Collections\ArrayCollection();
         

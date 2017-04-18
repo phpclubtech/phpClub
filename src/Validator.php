@@ -39,4 +39,14 @@ class Validator
 
         return false;
     }
+
+    public static function validateRefLinks($comment)
+    {
+        $regexp = '/<a href="[\S]+" class="post-reply-link" data-thread="(\d+)" data-num="(\d+)">/';
+        $matches = array();
+
+        preg_match_all($regexp, $comment, $matches);
+
+        return $matches[2];
+    }
 }
