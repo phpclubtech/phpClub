@@ -1,5 +1,5 @@
 .phpClubLogo {font-weight: bold; font-size: 48px; text-decoration: none; margin: 10px;}
-.four-hundred-four {width: 600px; margin: 0 auto; text-align: center;}
+.container {width: 600px; margin: 0 auto; text-align: center;}
 
 html,body{background-color:#EEEEEE;color:#333333;font-family: Verdana,sans-serif;font-size:1em;}
 body { margin: 0; padding: 8px; margin-bottom: auto;font-size:0.9em; }
