@@ -2,6 +2,7 @@
 namespace App;
 
 use App\Threader;
+use App\Authorizer;
 use App\Validator;
 
 class Router
@@ -27,7 +28,7 @@ class Router
         } else {
             header("HTTP/1.0 404 Not Found");
             
-            $this->threader->render('templates/404.html');
+            $this->threader->render('public/404.php');
         }
     }
 }

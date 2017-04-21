@@ -2,9 +2,7 @@
     <form id="posts-form">
             <div id="thread-<?= $thread->number ?>" class="thread">     
                 <?php foreach ($posts as $post) :?>                
-
-                    <?php include __DIR__ . '/../templates/post.phtml'; ?>
-                    
+                    <?php $this->render('templates/board/post.phtml', compact('post')); ?>            
                 <?php endforeach; ?>                 
             </div>
             <hr>
