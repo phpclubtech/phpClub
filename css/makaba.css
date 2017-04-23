@@ -1,9 +1,31 @@
-header {padding: 10px;}
+header, footer {padding: 10px;}
 .phpClubLogo {font-weight: bold; font-size: 48px; text-decoration: none;}
+.authorization-menu {float:right;}
+.authorization-menu li {display:inline-block; padding-right: 5px;}
+.config li {display: block; padding: 20px 10px; border-bottom: 1px solid #DDD}
+.config label {display:inline-block; width: 125px; margin-right: 10px;}
+.config label span {float: right;}
+.id {margin-left: 3px; font-weight: bold;}
 .mainheader {text-align: center;}
+.authorization-form label, .authorization-form input {display: block; width: 200px;}
+.authorization-form label, .authorization-form input[type="submit"] {margin: 10px auto;}
+.authorization-form input[type="submit"] {height: 36px;}
+.archive-links img {width: 16px;}
+.archive-link-form div {margin: 5px 0;}
+.archive-link-form ul {margin: 5px 0; padding-left: 10px;}
+.archive-link-form li {display: block;}
+.form-error {color: red;}
 .four-hundred-four {display: block; margin: 0 auto;}
 
 @media only screen and (max-width: 480px) {
+	header {text-align: center;}
+	.config {padding: 0;}
+	.config li {margin: 20px auto;}
+	.config label {display: block; width: auto;}
+	.config label[for="id"] {display: inline-block;}
+	.config label span {float: none;}
+	.authorization-menu {float: none; padding: 0; margin-bottom: 0;}
+	.authorization-menu li {display: block; padding: 5px 0;}
 	.four-hundred-four {width: 75%;}
 }
 

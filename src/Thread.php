@@ -15,8 +15,12 @@ class Thread
     /** @OneToMany(targetEntity="App\Post", mappedBy="thread") **/
     public $posts;
 
+    /** @OneToMany(targetEntity="App\ArchiveLink", mappedBy="thread") **/
+    public $archiveLinks;
+
     public function __construct() {
         $this->posts = new ArrayCollection();
+        $this->archiveLinks = new ArrayCollection();
     }
 
     public function getNumber()
@@ -44,5 +48,22 @@ class Thread
     public function getPosts()
     {
         return $this->posts;
+    }
+
+    public function addArchiveLink(\App\ArchiveLink $archiveLink)
+    {
+        $this->archiveLinks[] = $archiveLink;
+
+        return $this;
+    }
+
+    public function removeArchiveLink(\App\ArchiveLink $archiveLink)
+    {
+        $this->archiveLinks->removeElement($archiveLink);;
+    }
+
+    public function getArchiveLinks()
+    {
+        return $this->archiveLinks;
     }
 }

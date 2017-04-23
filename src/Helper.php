@@ -36,6 +36,48 @@ class Helper
         return $chain;
     }
 
+    public static function generateSalt()
+    {
+        $salt = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.*-^%$#@!?%&%_=+<>[]{}0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.*-^%$#@!?%&%_=+<>[]{}'), 0, 44);
+
+        return $salt;
+    }
+
+    public static function generateHash($password, $salt) {
+        $hash = md5($password . $salt);
+
+        return $hash;
+    }
+
+    public static function generateToken()
+    {
+        $token = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 32);
+        
+        return $token;
+    }
+
+    public static function getToken() 
+    {
+        if (isset($_COOKIE['token'])) {
+            $token = $_COOKIE['token'];
+        } else {
+            $token = $this->generateToken();
+        }
+
+        return $token;
+    }
+
+    public static function getArchiveIconUrl($link)
+    {
+        if (preg_match("!^https?:\/\/2ch\.hk\/pr\/arch\/\d{4}-\d{2}-\d{2}\/res\/\d+\.html$!", $link)) {
+            return '/2ch.ico';
+        }
+
+        if (preg_match("!^https?:\/\/arhivach\.org\/thread\/\d+\/?$!", $link)) {
+            return '/arhivach.ico';
+        }
+    }
+
     public static function getCatalogUrl()
     {
         return "https://2ch.hk/pr/catalog.json";

@@ -5,6 +5,7 @@ use \Doctrine\ORM\EntityManager;
 
 use App\Controller;
 use App\Validator;
+use App\Authorizer;
 use App\Helper;
 use App\Thread;
 use App\Post;
@@ -13,10 +14,12 @@ use App\File;
 class Threader extends Controller
 {
     protected $em;
+    protected $authorizer;
 
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, Authorizer $authorizer)
     {
         $this->em = $em;
+        $this->authorizer = $authorizer;
     }
 
     public function update()
@@ -121,6 +124,8 @@ class Threader extends Controller
 
     public function runThreads()
     {
+        $logged = $this->authorizer->isLoggedIn();
+
         $threadsQuery = $this->em->createQuery('SELECT t FROM App\Thread t');
         $threads = $threadsQuery->getArrayResult();
 
@@ -144,11 +149,13 @@ class Threader extends Controller
             $threads[$key] = $thread;
         }
 
-        $this->render('public/board.php', compact('threads'));
+        $this->render('public/board.php', compact('logged','threads'));
     }
 
     public function runThread()
     {
+        $logged = $this->authorizer->isLoggedIn();
+
         $number = $this->getNumberQuery();
 
         if (!$number) {
@@ -157,11 +164,13 @@ class Threader extends Controller
 
         $thread = $this->em->getRepository('App\Thread')->find($number);
 
-        $this->render('public/thread.php', compact('thread'));
+        $this->render('public/thread.php', compact('logged', 'thread'));
     }
 
     public function runChain()
     {
+        $logged = $this->authorizer->isLoggedIn();
+
         $number = $this->getChainQuery();
 
         if (!$number) {
@@ -182,6 +191,6 @@ class Threader extends Controller
             $posts->add($post);
         }
 
-        $this->render('public/chain.php', compact('posts'));
+        $this->render('public/chain.php', compact('logged', 'posts'));
     }
 }

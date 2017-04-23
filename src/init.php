@@ -7,12 +7,9 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\Migrations;
 
-use App\ActiveRecord;
-use App\Thread;
-use App\Post;
-use App\File;
-
 use App\Threader;
+use App\Authorizer;
+use App\ArchiveLinkController;
 use App\Router;
 
 $container = new Container();
@@ -31,10 +28,19 @@ $container['EntityManager'] = function () {
     return $entityManager;
 };
 
+
+$container['Authorizer'] = function ($c) {
+    return new Authorizer($c['EntityManager']);
+};
+
 $container['Threader'] = function ($c) {
-    return new Threader($c['EntityManager']);
+    return new Threader($c['EntityManager'], $c['Authorizer']);
+};
+
+$container['ArchiveLinkController'] = function ($c) {
+    return new ArchiveLinkController($c['EntityManager'], $c['Authorizer']);
 };
 
 $container['Router'] = function ($c) {
-    return new Router($c['Threader']);
+    return new Router($c['Threader'], $c['Authorizer'], $c['ArchiveLinkController']);
 };

@@ -21,7 +21,13 @@
                 </span>
             <?php endif; ?>
 
-
+            <?php if ($post->isOpPost()) : ?>
+                <span class="archive-links">
+                    <?php foreach($post->getThread()->getArchiveLinks() as $archiveLink) :?>
+                        <a href="<?= $archiveLink->getLink() ?>"><img src="<?= App\Helper::getArchiveIconUrl($archiveLink->getLink())?>"></a>
+                    <?php endforeach; ?>
+                </span>
+            <?php endif; ?>
             
             <br class="turnmeoff">
         </div>
