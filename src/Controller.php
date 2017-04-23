@@ -42,7 +42,7 @@ class Controller
         if (file_exists($path)) {
             include $path;
         } else {
-            throw new Exception("Invalid template path");
+            throw new \Exception("Invalid template path");
         }
     }
 
