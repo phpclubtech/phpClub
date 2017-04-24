@@ -7,9 +7,9 @@ use App\Controller;
 use App\Validator;
 use App\Authorizer;
 use App\Helper;
-use App\Thread;
-use App\Post;
-use App\File;
+use App\Entities\Thread;
+use App\Entities\Post;
+use App\Entities\File;
 
 class Threader extends Controller
 {
@@ -55,7 +55,7 @@ class Threader extends Controller
     
                 }
 
-                $thread = $this->em->getRepository('App\Thread')->find($jsonthread->current_thread);
+                $thread = $this->em->getRepository('App\Entities\Thread')->find($jsonthread->current_thread);
 
                 if (!$thread) {
                     $thread = new Thread();
@@ -69,7 +69,7 @@ class Threader extends Controller
                 }
 
                 foreach ($jsonthread->threads['0']->posts as $jsonpost) {
-                    if ($this->em->getRepository('App\Post')->find($jsonpost->num)) {
+                    if ($this->em->getRepository('App\Entities\Post')->find($jsonpost->num)) {
                         continue;
                     }
                     
@@ -126,19 +126,19 @@ class Threader extends Controller
     {
         $logged = $this->authorizer->isLoggedIn();
 
-        $threadsQuery = $this->em->createQuery('SELECT t FROM App\Thread t');
+        $threadsQuery = $this->em->createQuery('SELECT t FROM App\Entities\Thread t');
         $threads = $threadsQuery->getArrayResult();
 
         foreach ($threads as $key => $value) {
             $thread = new Thread();
             $thread->setNumber($value['number']);
 
-            $countQuery = $this->em->createQuery("SELECT COUNT(p) FROM App\Post p WHERE p.thread = :number");
+            $countQuery = $this->em->createQuery("SELECT COUNT(p) FROM App\Entities\Post p WHERE p.thread = :number");
             $countQuery->setParameter('number', $thread->getNumber());
             $count = $countQuery->getSingleScalarResult();
 
-            $opPost = $this->em->getRepository('App\Post')->findOneBy(array('post' => $thread->getNumber()));
-            $posts = $this->em->getRepository('App\Post')->findBy(array('thread' => $thread->getNumber()), array(), 3, $count - 3);
+            $opPost = $this->em->getRepository('App\Entities\Post')->findOneBy(array('post' => $thread->getNumber()));
+            $posts = $this->em->getRepository('App\Entities\Post')->findBy(array('thread' => $thread->getNumber()), array(), 3, $count - 3);
 
             $thread->addPost($opPost);
 
@@ -162,7 +162,7 @@ class Threader extends Controller
             $this->redirect();
         }
 
-        $thread = $this->em->getRepository('App\Thread')->find($number);
+        $thread = $this->em->getRepository('App\Entities\Thread')->find($number);
 
         $this->render('public/thread.php', compact('logged', 'thread'));
     }
@@ -182,7 +182,7 @@ class Threader extends Controller
         $posts = new \Doctrine\Common\Collections\ArrayCollection();
         
         foreach ($chain as $link) {
-            $post = $this->em->getRepository('App\Post')->findOneBy(array('post' => $link));
+            $post = $this->em->getRepository('App\Entities\Post')->findOneBy(array('post' => $link));
 
             if (!$post) {
                 continue;

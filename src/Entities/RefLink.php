@@ -1,6 +1,5 @@
 <?php
-namespace App;
-
+namespace App\Entities;
 
 /**
 * @Entity @Table(name="refmap")

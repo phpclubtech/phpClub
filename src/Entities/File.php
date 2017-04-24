@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace App\Entities;
 
 /**
 * @Entity @Table(name="files")
@@ -10,7 +10,7 @@ class File
     protected $id;
 
     /**
-    * @ManyToOne(targetEntity="App\Post", inversedBy="files")
+    * @ManyToOne(targetEntity="App\Entities\Post", inversedBy="files")
     * @JoinColumn(name="post", referencedColumnName="post")
     **/
     protected $post;

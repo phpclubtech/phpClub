@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace App\Entities;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Post
 {
     /**
-    * @ManyToOne(targetEntity="App\Thread", inversedBy="posts")
+    * @ManyToOne(targetEntity="App\Entities\Thread", inversedBy="posts")
     * @JoinColumn(name="thread", referencedColumnName="number")
     **/
     protected $thread;
@@ -32,7 +32,7 @@ class Post
     /** @Column(type="string") **/
     protected $subject;
 
-    /** @OneToMany(targetEntity="App\File", mappedBy="post") **/
+    /** @OneToMany(targetEntity="App\Entities\File", mappedBy="post") **/
     public $files;
 
     public function __construct() {
@@ -127,14 +127,14 @@ class Post
         $this->subject = $subject;
     }
 
-    public function addFile(\App\File $file)
+    public function addFile(\App\Entities\File $file)
     {
         $this->files[] = $file;
 
         return $this;
     }
 
-    public function removeFile(\App\File $file)
+    public function removeFile(\App\Entities\File $file)
     {
         $this->files->removeElement($file);
     }

@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace App\Entities;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -12,10 +12,10 @@ class Thread
     /** @Id @Column(type="integer") **/
     protected $number;
     
-    /** @OneToMany(targetEntity="App\Post", mappedBy="thread") **/
+    /** @OneToMany(targetEntity="App\Entities\Post", mappedBy="thread") **/
     public $posts;
 
-    /** @OneToMany(targetEntity="App\ArchiveLink", mappedBy="thread") **/
+    /** @OneToMany(targetEntity="App\Entities\ArchiveLink", mappedBy="thread") **/
     public $archiveLinks;
 
     public function __construct() {
@@ -33,14 +33,14 @@ class Thread
         $this->number = $number;
     }    
 
-    public function addPost(\App\Post $post)
+    public function addPost(\App\Entities\Post $post)
     {
         $this->posts[] = $post;
 
         return $this;
     }
 
-    public function removePost(\App\Post $post)
+    public function removePost(\App\Entities\Post $post)
     {
         $this->posts->removeElement($post);
     }
@@ -50,14 +50,14 @@ class Thread
         return $this->posts;
     }
 
-    public function addArchiveLink(\App\ArchiveLink $archiveLink)
+    public function addArchiveLink(\App\Entities\ArchiveLink $archiveLink)
     {
         $this->archiveLinks[] = $archiveLink;
 
         return $this;
     }
 
-    public function removeArchiveLink(\App\ArchiveLink $archiveLink)
+    public function removeArchiveLink(\App\Entities\ArchiveLink $archiveLink)
     {
         $this->archiveLinks->removeElement($archiveLink);;
     }

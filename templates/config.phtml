@@ -1,0 +1,52 @@
+        <ul class="config">
+            <li><label for="id"><span>Id:</span></label><span class="id"><?= $logged->getId() ?></span></li>
+            <li>
+                <form method="post" name="name" action="/config/">
+                    <input type="hidden" name="token" value="$_COOKIE['token']">
+
+                    <label for="name"><span>Имя:</span></label>
+                    <input type="text" name="name" pattern="\D{1,20}" required value="<?= (isset($post['name'])) ? htmlspecialchars($post['name'], ENT_QUOTES) : $logged->getName() ?>">
+
+                    <input type="submit" name="submit" value="Ок">
+
+                    <span class="form-error">
+                        <?= (array_key_exists('email', $errors) ? $errors['email'] : '' ) ?>
+                    </span>
+                </form>               
+            </li>
+            <li>
+                <form method="post" name="email" action="/config/">
+                    <input type="hidden" name="token" value="$_COOKIE['token']">
+
+                    <label for="email"><span>Почта:</span></label>
+                    <input type="text" name="email" pattern=".+@.+\..+"" required value="<?= (isset($post['email'])) ? htmlspecialchars($post['email'], ENT_QUOTES) : $logged->getEmail() ?>">
+
+                    <input type="submit" name="submit" value="Ок">
+
+                    <span class="form-error">
+                        <?= (array_key_exists('email', $errors) ? $errors['email'] : '' ) ?>
+                    </span>
+                </form>                
+            </li>
+            <li>
+                <form method="post" name="password" action="/config/">
+                    <input type="hidden" name="token" value="$_COOKIE['token']">
+
+                    <label for="password"><span>Пароль:</span></label>
+                    <input type="password" name="password" pattern="(.){6,20}" required>
+                    <span class="form-error">
+                        <?= (array_key_exists('password', $errors) ? $errors['password'] : '' ) ?>
+                    </span>
+                    <br>
+                    <br>
+                    <label for="password"><span>Повторите пароль:</span></label>
+                    <input type="password" name="retryPassword" pattern="(.){6,20}" required>
+
+                    <input type="submit" name="submit" value="Ок">
+
+                    <span class="form-error">
+                        <?= (array_key_exists('retryPassword', $errors) ? $errors['retryPassword'] : '' ) ?>
+                    </span>
+                </form>                
+            </li>
+        </ul>

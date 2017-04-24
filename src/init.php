@@ -15,7 +15,7 @@ use App\Router;
 $container = new Container();
 
 $container['EntityManager'] = function () {
-    $paths = array(__DIR__ . "/");
+    $paths = array(__DIR__ . "/Entities/");
     $isDevMode = false;
 
     $config = parse_ini_file(__DIR__ . '/config.ini');

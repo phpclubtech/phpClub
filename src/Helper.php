@@ -12,13 +12,13 @@ class Helper
         if (!in_array($number, $chain)) {
             $chain[] = $number;
 
-            $links = $em->getRepository('App\RefLink')->findBy(['post' => $number]);
+            $links = $em->getRepository('App\Entities\RefLink')->findBy(['post' => $number]);
 
             foreach ($links as $link) {
                 Helper::getChain($link->getReference(), $em);
             }
 
-            $links = $em->getRepository('App\RefLink')->findBy(['reference' => $number]);
+            $links = $em->getRepository('App\Entities\RefLink')->findBy(['reference' => $number]);
 
             foreach ($links as $link) {
                 Helper::getChain($link->getPost(), $em);
