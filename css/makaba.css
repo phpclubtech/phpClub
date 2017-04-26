@@ -445,7 +445,7 @@ label, input[type="button"], input[type="submit"], button {
 }
 
 .pace .pace-progress {
-  background: #dd7822;
+  background: #4f48a8;
   position: fixed;
   z-index: 2000;
   top: 0;
