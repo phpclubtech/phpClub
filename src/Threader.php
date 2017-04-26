@@ -126,7 +126,7 @@ class Threader extends Controller
     {
         $logged = $this->authorizer->isLoggedIn();
 
-        $threadsQuery = $this->em->createQuery('SELECT t FROM App\Entities\Thread t');
+        $threadsQuery = $this->em->createQuery('SELECT t FROM App\Entities\Thread t ORDER BY t.number DESC');
         $threads = $threadsQuery->getArrayResult();
 
         foreach ($threads as $key => $value) {
