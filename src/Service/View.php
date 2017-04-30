@@ -38,9 +38,6 @@ class View
     /**
      * Renders a template with given name to PSR-7 Response object using PHP's output buffering control.
      *
-     * Do note, that output buffering does not send any headers to the client, since it never sends
-     * the client anything when require() function call is made, ob_end_clean() call ensures that behavior.
-     *
      * @param Response $response
      * @param string   $template
      * @param array    $data
@@ -57,6 +54,14 @@ class View
     }
 
     /**
+     * We're not using ob_end_clean here, because Slim framework already does that for some reason.
+     * If you try and uncomment that, the application will crash at some point in Slim's route resolving.
+     *
+     * Do note, that output buffering does not send any headers to the client, since it never sends
+     * the client anything when require() function call is made, ob_end_clean() call ensures that behavior.
+     *
+     * @todo Investigate why Slim framework clears output buffer.
+     *
      * @param string $template
      * @param array  $data
      *

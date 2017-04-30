@@ -20,7 +20,7 @@ use phpClub\Service\Threader;
  * @package phpClub\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
-class BoardController extends BaseController
+class BoardController
 {
     protected $view;
 

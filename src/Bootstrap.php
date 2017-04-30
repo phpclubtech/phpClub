@@ -14,8 +14,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
 use phpClub\Service\View;
 use phpClub\Controller\BoardController;
+use phpClub\Controller\SearchController;
 use phpClub\Service\Threader;
 use phpClub\Service\Authorizer;
+use phpClub\Service\Searcher;
 
 $slimConfig = [
     'settings' => [
@@ -25,6 +27,7 @@ $slimConfig = [
 
 $di = new Container($slimConfig);
 
+/* General services section */
 $di['EntityManager'] = function (Container $di): EntityManager {
     $paths = array(__DIR__ . "/Entities/");
     $isDevMode = false;
@@ -43,6 +46,8 @@ $di['config'] = function (): array {
     return parse_ini_file(__DIR__ . '/../config/config.ini');
 };
 
+
+/* Application services section */
 $di['View'] = function (): View {
     return new View(__DIR__ . '/../templates');
 };
@@ -55,10 +60,22 @@ $di['Authorizer'] = function (Container $di): Authorizer {
     return new Authorizer($di->get('EntityManager'));
 };
 
+$di['Searcher'] = function (Container $di): Searcher {
+    return new Searcher($di->get('EntityManager'));
+};
+
+
+/* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
     return new BoardController($di->get('Threader'), $di->get('View'));
 };
 
+$di['SearchController'] = function (Container $di): SearchController {
+    return new SearchController($di->get('Searcher'), $di->get('View'));
+};
+
+
+/* Error handler for altering PHP errors output */
 $di['PHPErrorHandler'] = function (): callable {
     return function (int $errno, string $errstr, string $errfile, int $errline): void {
         if (!(error_reporting() & $errno)) {

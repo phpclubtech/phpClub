@@ -1,4 +1,3 @@
 <?php
-require_once __DIR__ . '/src/init.php';
-
-$container['Threader']->update();
+require(__DIR__ . '/src/Bootstrap.php');
+$di['Threader']->update();

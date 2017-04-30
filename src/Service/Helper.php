@@ -1,11 +1,8 @@
 <?php
-namespace App;
+namespace phpClub\Service;
 
 use \Doctrine\ORM\EntityManager;
-
-use App\Validator;
-
-use App\Entities\RefLink;
+use phpClub\Entity\RefLink;
 
 class Helper
 {
@@ -24,7 +21,7 @@ class Helper
         $references = Validator::validateRefLinks($reference->getComment());
 
         foreach ($references as $r) {
-            $r = $em->getRepository('App\Entities\Post')->find($r);
+            $r = $em->getRepository('phpClub\Entity\Post')->find($r);
 
             if ($r) {
                 $reflink = new RefLink();
@@ -53,13 +50,13 @@ class Helper
         if (!in_array($number, $chain)) {
             $chain[] = $number;
 
-            $links = $em->getRepository('App\Entities\RefLink')->findBy(['post' => $number]);
+            $links = $em->getRepository('phpClub\Entity\RefLink')->findBy(['post' => $number]);
 
             foreach ($links as $link) {
                 Helper::getChain($link->getReference(), $em);
             }
 
-            $links = $em->getRepository('App\Entities\RefLink')->findBy(['reference' => $number]);
+            $links = $em->getRepository('phpClub\Entity\RefLink')->findBy(['reference' => $number]);
 
             foreach ($links as $link) {
                 Helper::getChain($link->getPost(), $em);
@@ -84,7 +81,8 @@ class Helper
         return $salt;
     }
 
-    public static function generateHash($password, $salt) {
+    public static function generateHash($password, $salt)
+    {
         $hash = md5($password . $salt);
 
         return $hash;
@@ -141,26 +139,26 @@ class Helper
 
     public static function getSrcDirectoryPath($number)
     {
-        return __DIR__ . "/../pr/src/{$number}";
+        return __DIR__ . "/../../public/pr/src/{$number}";
     }
 
     public static function getThumbDirectoryPath($number)
     {
-        return __DIR__ . "/../pr/thumb/{$number}";
+        return __DIR__ . "/../../public/pr/thumb/{$number}";
     }
 
     public static function getSrcPath($filepath)
     {
-        return __DIR__ . "/..{$filepath}";
+        return __DIR__ . "/../../public/{$filepath}";
     }
 
     public static function getThumbPath($thumbpath)
     {
-        return __DIR__ . "/..{$thumbpath}";
+        return __DIR__ . "/../../public/{$thumbpath}";
     }
 
     public static function getJsonPath($threadnumber)
     {
-        return __DIR__ . "/../json/{$threadnumber}.json";
+        return __DIR__ . "/../../public/json/{$threadnumber}.json";
     }
 }

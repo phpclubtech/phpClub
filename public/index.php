@@ -15,5 +15,6 @@ $application = new App($di);
 /* Register application routes */
 $application->get('/', 'BoardController:indexAction');
 $application->get('/pr/res/{thread:[0-9]+}.html', 'BoardController:threadAction');
+$application->get('/search/{searchQuery}', 'SearchController:searchAction');
 
 $application->run();

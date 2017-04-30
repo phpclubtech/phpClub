@@ -37,7 +37,7 @@ class LastPost
         return $this->thread;
     }
 
-    public function setThread(\App\Entities\Thread $thread)
+    public function setThread(Thread $thread)
     {
         $this->thread = $thread;
 
@@ -49,7 +49,7 @@ class LastPost
         return $this->post;
     }
 
-    public function setPost(\App\Entities\Post $post)
+    public function setPost(Post $post)
     {
         $this->post = $post;
 

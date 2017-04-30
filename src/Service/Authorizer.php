@@ -21,7 +21,7 @@ class Authorizer
     public function isLoggedIn()
     {
         if (isset($_COOKIE['id'])) {
-            $student = $this->em->getRepository('App\Entities\User')->find($_COOKIE['id']);
+            $student = $this->em->getRepository('phpClub\Entity\User')->find($_COOKIE['id']);
 
             if (isset($_COOKIE['token'])) {
                 if ($student->getHash() == $_COOKIE['hash']) {
@@ -58,7 +58,7 @@ class Authorizer
 
             $errors = Validator::validateRegistrationPost($post);
 
-            if ($this->em->getRepository('App\Entities\User')->findOneBy(['email' => $post['email']])) {
+            if ($this->em->getRepository('phpClub\Entity\User')->findOneBy(['email' => $post['email']])) {
                 $errors['email'] = "Почта уже занята";
             }
 
@@ -104,7 +104,7 @@ class Authorizer
             $errors = Validator::validateLoginPost($post);
 
             if (empty($errors)) {
-                $user = $this->em->getRepository('App\Entities\User')->findOneBy(['email' => $post['email']]);
+                $user = $this->em->getRepository('phpClub\Entity\User')->findOneBy(['email' => $post['email']]);
 
                 if ($user) {
                     if ($user->getHash() == Helper::generateHash($post['password'], $user->getSalt())) {
