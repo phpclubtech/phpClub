@@ -68,16 +68,11 @@ class Threader
 
     public function getThread(int $number)
     {
-        // $logged = $this->authorizer->isLoggedIn();
-
-        // $number = $this->getNumberQuery();
-
-        if (!$number) {
-            throw new \Exception('Not found...');
-            // $this->redirect();
-        }
-
         $thread = $this->em->getRepository('phpClub\Entity\Thread')->find($number);
+
+        if ($thread === null) {
+            throw new \InvalidArgumentException("Thread with number {$number} does not exist in the system.");
+        }
 
         return $thread;
     }

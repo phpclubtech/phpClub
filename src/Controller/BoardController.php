@@ -8,6 +8,7 @@
 
 namespace phpClub\Controller;
 
+use Slim\Exception\NotFoundException;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use phpClub\Service\View;
@@ -39,7 +40,12 @@ class BoardController extends BaseController
 
     public function threadAction(Request $request, Response $response, array $args = []): Response
     {
-        $threadId = (int)$args['thread'];
-        return $this->view->renderToResponse($response, 'thread', ['thread' => $this->threader->getThread($threadId)]);
+        try {
+            $thread = $this->threader->getThread((int)$args['thread']);
+        } catch (\InvalidArgumentException $e) {
+            throw new NotFoundException($request, $response);
+        }
+
+        return $this->view->renderToResponse($response, 'thread', ['thread' => $thread]);
     }
 }
