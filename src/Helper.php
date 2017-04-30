@@ -139,12 +139,12 @@ class Helper
         return "https://2ch.hk{$thumbpath}";
     }
 
-    public static function getSrcDirectroyPath($number)
+    public static function getSrcDirectoryPath($number)
     {
         return __DIR__ . "/../pr/src/{$number}";
     }
 
-    public static function getThumbDirectroyPath($number)
+    public static function getThumbDirectoryPath($number)
     {
         return __DIR__ . "/../pr/thumb/{$number}";
     }
