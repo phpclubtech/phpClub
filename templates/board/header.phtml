@@ -13,5 +13,15 @@
                     </li>
                 </ul>
             <?php endif; ?>
+
+
+            <div class="search-form">
+                <form method="get" name="search" action="/search">
+                    <label>
+                        <input type="text" name="q" value="<?= (isset($query)) ? htmlspecialchars($query, ENT_QUOTES) : '' ?>">
+                    </label>
+                    <input id="button" type="submit" value="Поиск">
+                </form>
+            </div>
         </header>
         <hr>

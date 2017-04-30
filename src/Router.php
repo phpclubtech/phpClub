@@ -3,6 +3,7 @@ namespace App;
 
 use App\Threader;
 use App\Authorizer;
+use App\Searcher;
 use App\ArchiveLinkController;
 use App\Validator;
 
@@ -10,12 +11,14 @@ class Router
 {
     protected $threader;
     protected $authorizer;
+    protected $searcher;
     protected $archiveLinkController;
 
-    public function __construct(Threader $threader, Authorizer $authorizer, ArchiveLinkController $archiveLinkController)
+    public function __construct(Threader $threader, Authorizer $authorizer, Searcher $searcher, ArchiveLinkController $archiveLinkController)
     {
         $this->threader = $threader;
         $this->authorizer = $authorizer;
+        $this->searcher = $searcher;
         $this->archiveLinkController = $archiveLinkController;
     }
 
@@ -38,6 +41,8 @@ class Router
             $this->authorizer->configurate();
         } elseif(Validator::validateLogoutLink($path)) {
             $this->authorizer->logout();
+        } elseif (Validator::validateSearchLink($path)) {
+            $this->searcher->search();
         } elseif(Validator::validateAddArchiveLink($path)) {
             $this->archiveLinkController->addLink();
         } elseif(Validator::validateRemoveArchiveLink($path)) {

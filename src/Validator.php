@@ -103,6 +103,19 @@ class Validator
         return false;
     }
 
+    public static function validateSearchLink($path)
+    {
+        $matches = array();
+
+        if (preg_match('!\/search\/(.+[^/])\/?!ui', $path, $matches)) {
+            var_dump($matches[1]);
+
+            return $matches[1];
+        }
+
+        return false;
+    }
+
     public static function validateRefLinks($comment)
     {
         $regexp = '/<a href="[\S]+" class="post-reply-link" data-thread="(\d+)" data-num="(\d+)">/';

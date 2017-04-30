@@ -9,6 +9,7 @@ use Doctrine\DBAL\Migrations;
 
 use App\Threader;
 use App\Authorizer;
+use App\Searcher;
 use App\ArchiveLinkController;
 use App\Router;
 
@@ -37,10 +38,14 @@ $container['Threader'] = function ($c) {
     return new Threader($c['EntityManager'], $c['Authorizer']);
 };
 
+$container['Searcher'] = function ($c) {
+    return new Searcher($c['EntityManager'], $c['Authorizer']);
+};
+
 $container['ArchiveLinkController'] = function ($c) {
     return new ArchiveLinkController($c['EntityManager'], $c['Authorizer']);
 };
 
 $container['Router'] = function ($c) {
-    return new Router($c['Threader'], $c['Authorizer'], $c['ArchiveLinkController']);
+    return new Router($c['Threader'], $c['Authorizer'], $c['Searcher'], $c['ArchiveLinkController']);
 };

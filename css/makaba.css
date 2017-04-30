@@ -1,6 +1,6 @@
 header, footer {padding: 10px;}
 .phpClubLogo {font-weight: bold; font-size: 48px; text-decoration: none;}
-.authorization-menu {float:right;}
+.authorization-menu {float:right; margin: 0; padding-left: 10px;}
 .authorization-menu li {display:inline-block; padding-right: 5px;}
 .config li {display: block; padding: 20px 10px; border-bottom: 1px solid #DDD}
 .config label {display:inline-block; width: 125px; margin-right: 10px;}
@@ -10,6 +10,7 @@ header, footer {padding: 10px;}
 .authorization-form label, .authorization-form input {display: block; width: 200px;}
 .authorization-form label, .authorization-form input[type="submit"] {margin: 10px auto;}
 .authorization-form input[type="submit"] {height: 36px;}
+.search-form {float: right;}
 .archive-links img {width: 16px;}
 .archive-link-form div {margin: 5px 0;}
 .archive-link-form ul {margin: 5px 0; padding-left: 10px;}

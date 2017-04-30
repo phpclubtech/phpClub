@@ -33,6 +33,20 @@ class Controller
         return false;
     }
 
+    public function getSearchQuery()
+    {
+        $url = $_SERVER['REQUEST_URI'];
+        $path = parse_url($url, PHP_URL_PATH);
+
+        $validatedSearchQuery = Validator::validateSearchLink($path);
+
+        if ($validatedSearchQuery) {
+            return $validatedSearchQuery;
+        }
+
+        return false;
+    }
+
     public function render($path, array $varibles = array())
     {
         extract($varibles);
