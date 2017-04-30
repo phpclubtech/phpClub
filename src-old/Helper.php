@@ -41,7 +41,7 @@ class Helper
                 $em->persist($reflink);
                 $em->flush();
 
-                Helper::insertChain($em, $forPost, $r, $depth + 1);   
+                Helper::insertChain($em, $forPost, $r, $depth + 1);
             }
         }
     }
@@ -93,16 +93,16 @@ class Helper
     public static function generateToken()
     {
         $token = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 32);
-        
+
         return $token;
     }
 
-    public static function getToken() 
+    public static function getToken()
     {
         if (isset($_COOKIE['token'])) {
             $token = $_COOKIE['token'];
         } else {
-            $token = $this->generateToken();
+            $token = self::generateToken();
         }
 
         return $token;
@@ -139,12 +139,12 @@ class Helper
         return "https://2ch.hk{$thumbpath}";
     }
 
-    public static function getSrcDirectroyPath($number)
+    public static function getSrcDirectoryPath($number)
     {
         return __DIR__ . "/../pr/src/{$number}";
     }
 
-    public static function getThumbDirectroyPath($number)
+    public static function getThumbDirectoryPath($number)
     {
         return __DIR__ . "/../pr/thumb/{$number}";
     }

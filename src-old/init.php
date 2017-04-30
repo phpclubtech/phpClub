@@ -20,7 +20,7 @@ $container['EntityManager'] = function () {
     $isDevMode = false;
 
     $config = parse_ini_file(__DIR__ . '/config.ini');
-
+    //test
     $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
     $metaConfig->setAutoGenerateProxyClasses(\Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
 

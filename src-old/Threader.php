@@ -62,8 +62,8 @@ class Threader extends Controller
                     $thread = new Thread();
                     $thread->setNumber($jsonthread->current_thread);
 
-                    mkdir(Helper::getSrcDirectoryPath());
-                    mkdir(Helper::getThumbDirectoryPath());
+                    mkdir(Helper::getSrcDirectoryPath($jsonthread->current_thread));
+                    mkdir(Helper::getThumbDirectoryPath($jsonthread->current_thread));
 
                     $this->em->persist($thread);
                     $this->em->flush();
