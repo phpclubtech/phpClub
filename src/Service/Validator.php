@@ -131,7 +131,7 @@ class Validator
 
     public static function validateLoginPost($post)
     {
-        $errors = array();
+        $errors = [];
 
         if (!Validator::validateEmail($post['email'])) {
             $errors['email'] = self::EMAIL_ERROR;

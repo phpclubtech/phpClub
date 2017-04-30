@@ -34,16 +34,3 @@
 </head>
 
 <body class="makaba  browser-ff pace-done">
-<header>
-    <a class="phpClubLogo" href="/">phpClub</a>
-
-    <div class="search-form">
-        <form method="get" name="search" action="/search">
-            <label>
-                <input type="text" name="q" value="<?= (isset($query)) ? htmlspecialchars($query, ENT_QUOTES) : '' ?>">
-            </label>
-            <input id="button" type="submit" value="Поиск">
-        </form>
-    </div>
-</header>
-<hr>

@@ -83,9 +83,7 @@ class Helper
 
     public static function generateHash($password, $salt)
     {
-        $hash = md5($password . $salt);
-
-        return $hash;
+        return md5($password . $salt);
     }
 
     public static function generateToken()

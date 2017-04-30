@@ -9,9 +9,14 @@
 namespace phpClub\Service;
 
 use Doctrine\ORM\EntityManager;
+use phpClub\Entity\User;
 
 class Authorizer
 {
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
 
     public function __construct(EntityManager $em)
     {
@@ -33,23 +38,17 @@ class Authorizer
         return false;
     }
 
-    public function register()
+    public function register(): array
     {
-        if ($this->isLoggedIn()) {
-            $this->redirect();
-
-            die();
-        }
-
-        $post = array();
-
-        $errors = array();
+        $post = $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $post['email'] = (isset($_POST['email']) and is_scalar($_POST['email'])) ? $_POST['email'] : '';
             $post['name'] = (isset($_POST['name']) and is_scalar($_POST['name'])) ? $_POST['name'] : '';
             $post['password'] = (isset($_POST['password']) and is_scalar($_POST['password'])) ? $_POST['password'] : '';
-            $post['retryPassword'] = (isset($_POST['retryPassword']) and is_scalar($_POST['retryPassword'])) ? $_POST['retryPassword'] : '';
+            $post['retryPassword'] = (isset($_POST['retryPassword']) and is_scalar($_POST['retryPassword']))
+                ? $_POST['retryPassword']
+                : '';
 
             $post['email'] = trim($post['email']);
             $post['name'] = trim($post['name']);
@@ -79,20 +78,12 @@ class Authorizer
             }
         }
 
-        $this->render('public/registration.php', compact('post', 'errors'));
+        return $errors;
     }
 
-    public function login()
+    public function login(): array
     {
-        if ($this->isLoggedIn()) {
-            $this->redirect();
-
-            die();
-        }
-
-        $post = array();
-
-        $errors = array();
+        $post = $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $post['email'] = (isset($_POST['email']) and is_scalar($_POST['email'])) ? $_POST['email'] : '';
@@ -113,10 +104,6 @@ class Authorizer
                         setcookie('id', $user->getId(), time() + $expires, '/', null, null, true);
                         setcookie('hash', $user->getHash(), time() + $expires, '/', null, null, true);
                         setcookie('token', Helper::generateToken(), time() + $expires, '/', null, null, true);
-
-                        $this->redirect();
-
-                        die();
                     } else {
                         $errors['email'] = Validator::NO_MATCHES;
                     }
@@ -126,33 +113,21 @@ class Authorizer
             }
         }
 
-        $this->render('public/login.php', compact('post', 'errors'));
+        return $errors;
     }
 
-    public function configurate()
+    public function configure(User $user): array
     {
-        $logged = $this->isLoggedIn();
-
-        if (!$logged) {
-            $this->redirect();
-
-            die();
-        }
-
-        $errors = array();
+        $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['name'])) {
                 $post['name'] = (is_scalar($_POST['name'])) ? $_POST['name'] : '';
 
                 if (Validator::validateName($post['name'])) {
-                    $logged->setName($post['name']);
+                    $user->setName($post['name']);
 
                     $this->em->flush();
-
-                    $this->redirect('/config/');
-
-                    die();
                 } else {
                     $errors['name'] = Validator::NAME_ERROR;
                 }
@@ -162,13 +137,9 @@ class Authorizer
                 $post['email'] = (is_scalar($_POST['email'])) ? $_POST['email'] : '';
 
                 if (Validator::validateEmail($post['email'])) {
-                    $logged->setEmail($post['email']);
+                    $user->setEmail($post['email']);
 
                     $this->em->flush();
-
-                    $this->redirect('/config/');
-
-                    die();
                 } else {
                     $errors['email'] = Validator::EMAIL_ERROR;
                 }
@@ -185,17 +156,13 @@ class Authorizer
                             $salt = Helper::generateSalt();
                             $hash = Helper::generateHash($post['password'], $salt);
 
-                            $logged->setHash($hash);
-                            $logged->setSalt($salt);
+                            $user->setHash($hash);
+                            $user->setSalt($salt);
 
                             $expires = 60 * 60 * 24 * 30 * 12 * 3;
-                            setcookie('hash', $logged->getHash(), time() + $expires, '/', null, null, true);
+                            setcookie('hash', $user->getHash(), time() + $expires, '/', null, null, true);
 
                             $this->em->flush();
-
-                            $this->redirect('/config/');
-
-                            die();
                         } else {
                             $errors['retryPassword'] = Validator::RETRY_PASSWORD_ERROR;
                         }
@@ -208,7 +175,7 @@ class Authorizer
             }
         }
 
-        $this->render('public/config.php', compact('logged', 'errors'));
+        return $errors;
     }
 
     public function logout()
@@ -219,11 +186,6 @@ class Authorizer
                 setcookie('hash', null, time()-1, '/');
                 setcookie('token', null, time()-1, '/');
             }
-
-            $this->redirect();
-
-            die();
         }
     }
-
 }

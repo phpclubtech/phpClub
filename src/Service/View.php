@@ -8,7 +8,7 @@
 
 namespace phpClub\Service;
 
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response;
 
 /**
  * Basic view implementation. Can render .phtml templates into PSR-7 Response objects.

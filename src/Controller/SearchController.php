@@ -8,8 +8,8 @@
 
 namespace phpClub\Controller;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response;
+use Slim\Http\Request;
 use phpClub\Service\View;
 use phpClub\Service\Searcher;
 
@@ -38,9 +38,8 @@ class SearchController
         $this->searcher = $searcher;
     }
 
-    public function searchAction(Request $request, Response $response, array $args = [])
+    public function searchAction(Request $request, Response $response, array $args = []): Response
     {
-        $searchQuery = $args['searchQuery'];
-        return $this->view->renderToResponse($response, 'searchResults', $this->searcher->search($searchQuery));
+        return $this->view->renderToResponse($response, 'searchResults', $this->searcher->search($args['searchQuery']));
     }
 }

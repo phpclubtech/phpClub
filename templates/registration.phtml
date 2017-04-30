@@ -1,0 +1,45 @@
+<?php include(__DIR__ . '/base/header.phtml') ?>
+
+<header class="mainheader">
+    <a class="phpClubLogo" href="/">phpClub</a>
+</header>
+
+<div class="container">
+    <form method="post" name="registration" action="/registration/" class="authorization-form">
+        <label>
+            Email
+            <input type="email" name="email" pattern=".+@.+\..+" required value="<?= (isset($post['email'])) ? htmlspecialchars($post['email'], ENT_QUOTES) : '' ?>">
+            <span class="form-error">
+                    <?= (array_key_exists('email', $errors) ? $errors['email'] : '' ) ?>
+                </span>
+        </label>
+
+        <label>
+            Имя
+            <input type="text" name="name" pattern="\D{1,20}" required value="<?= (isset($post['name'])) ? htmlspecialchars($post['name'], ENT_QUOTES) : '' ?>">
+            <span class="form-error">
+                    <?= (array_key_exists('name', $errors) ? $errors['name'] : '' ) ?>
+                </span>
+        </label>
+
+        <label>
+            Пароль
+            <input type="password" name="password" pattern="(.){6,20}" required>
+            <span class="form-error">
+                    <?= (array_key_exists('password', $errors) ? $errors['password'] : '' ) ?>
+                </span>
+        </label>
+        <label>
+            Повторите пароль
+            <input type="password" name="retryPassword" pattern="(.){6,20}" required>
+            <span class="form-error">
+                    <?= (array_key_exists('retryPassword', $errors) ? $errors['retryPassword'] : '' ) ?>
+                </span>
+        </label>
+
+        <input type="submit" name="input" value="Зарегистрироваться">
+    </form>
+</div>
+
+<?php include(__DIR__ . '/base/footer.phtml') ?>
+

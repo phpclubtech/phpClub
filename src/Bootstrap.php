@@ -12,12 +12,15 @@ use Slim\Container;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
-use phpClub\Service\View;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
+use phpClub\Controller\UsersController;
+use phpClub\Controller\ArchiveLinkController;
+use phpClub\Service\View;
 use phpClub\Service\Threader;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Searcher;
+use phpClub\Service\Linker;
 
 $slimConfig = [
     'settings' => [
@@ -64,14 +67,26 @@ $di['Searcher'] = function (Container $di): Searcher {
     return new Searcher($di->get('EntityManager'));
 };
 
+$di['Linker'] = function (Container $di): Linker {
+    return new Linker($di->get('EntityManager'));
+};
+
 
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
-    return new BoardController($di->get('Threader'), $di->get('View'));
+    return new BoardController($di->get('Threader'), $di->get('Authorizer'), $di->get('View'));
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
     return new SearchController($di->get('Searcher'), $di->get('View'));
+};
+
+$di['UsersController'] = function (Container $di): UsersController {
+    return new UsersController($di->get('Authorizer'), $di->get('View'));
+};
+
+$di['ArchiveLinkController'] = function (Container $di): ArchiveLinkController {
+    return new ArchiveLinkController($di->get('Authorizer'), $di->get('Linker'), $di->get('View'));
 };
 
 

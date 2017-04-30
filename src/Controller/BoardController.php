@@ -9,10 +9,11 @@
 namespace phpClub\Controller;
 
 use Slim\Exception\NotFoundException;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response;
+use Slim\Http\Request;
 use phpClub\Service\View;
 use phpClub\Service\Threader;
+use phpClub\Service\Authorizer;
 
 /**
  * Class MainPageController
@@ -22,20 +23,40 @@ use phpClub\Service\Threader;
  */
 class BoardController
 {
+    /**
+     * @var \phpClub\Service\View
+     */
     protected $view;
 
+    /**
+     * @var \phpClub\Service\Threader
+     */
     protected $threader;
 
-    public function __construct(Threader $threader, View $view)
+    /**
+     * @var \phpClub\Service\Authorizer
+     */
+    protected $authorizer;
+
+    public function __construct(Threader $threader, Authorizer $authorizer, View $view)
     {
         $this->view = $view;
 
         $this->threader = $threader;
+
+        $this->authorizer = $authorizer;
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): Response
     {
-        return $this->view->renderToResponse($response, 'board', ['threads' => $this->threader->getThreads()]);
+        return $this->view->renderToResponse(
+            $response,
+            'board',
+            [
+                'threads' => $this->threader->getThreads(),
+                'logged' => $this->authorizer->isLoggedIn()
+            ]
+        );
     }
 
     public function threadAction(Request $request, Response $response, array $args = []): Response
@@ -46,6 +67,12 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        return $this->view->renderToResponse($response, 'thread', ['thread' => $thread]);
+        return $this->view->renderToResponse(
+            $response,
+            'thread',
+            [
+                'thread' => $thread, 'logged' => $this->authorizer->isLoggedIn()
+            ]
+        );
     }
 }
