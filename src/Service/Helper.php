@@ -88,30 +88,22 @@ class Helper
 
     public static function generateToken()
     {
-        $token = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 32);
-
-        return $token;
+        return substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 32);
     }
 
     public static function getToken()
     {
-        if (isset($_COOKIE['token'])) {
-            $token = $_COOKIE['token'];
-        } else {
-            $token = self::generateToken();
-        }
-
-        return $token;
+        return (isset($_COOKIE['token'])) ? $_COOKIE['token'] : self::generateToken();
     }
 
     public static function getArchiveIconUrl($link)
     {
         if (preg_match("!^https?:\/\/2ch\.hk\/pr\/arch\/\d{4}-\d{2}-\d{2}\/res\/\d+\.html$!", $link)) {
-            return '/2ch.ico';
+            return '/media/images/2ch.ico';
         }
 
         if (preg_match("!^https?:\/\/arhivach\.org\/thread\/\d+\/?$!", $link)) {
-            return '/arhivach.ico';
+            return '/media/images/arhivach.ico';
         }
     }
 
