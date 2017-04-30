@@ -6,15 +6,23 @@ namespace App\Entities;
 **/
 class RefLink
 {
-
     /** @Id @Column(type="integer") @GeneratedValue **/
     protected $id;
 
-    /** @Column(type="integer") **/
+    /**
+    * @ManyToOne(targetEntity="App\Entities\Post")
+    * @JoinColumn(name="post", referencedColumnName="post")
+    */
     protected $post;
 
-    /** @Column(type="integer") **/
+    /**
+    * @ManyToOne(targetEntity="App\Entities\Post")
+    * @JoinColumn(name="reference", referencedColumnName="post")
+    */
     protected $reference;
+
+    /** @Column(type="integer") **/
+    protected $depth;
 
     public function getId()
     {
@@ -43,5 +51,17 @@ class RefLink
         $this->reference = $reference;
 
         return $this;
+    }
+
+    public function setDepth($depth)
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    public function getDepth()
+    {
+        return $this->depth;
     }
 }

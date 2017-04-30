@@ -10,6 +10,7 @@ use App\Helper;
 use App\Entities\Thread;
 use App\Entities\Post;
 use App\Entities\File;
+use App\Entities\LastPost;
 
 class Threader extends Controller
 {
@@ -80,16 +81,32 @@ class Threader extends Controller
                     $this->em->persist($post);
                     $this->em->flush();
 
-                    $reflinks = Validator::validateRefLinks($post->getComment());
+                    
+                    $limit = 3;
 
-                    foreach ($reflinks as $link) {
-                        $reflink = new RefLink();
-                        $reflink->setPost($post->getPost());
-                        $reflink->setReference($link);
+                    $lastPosts = $this->em->getRepository('App\Entities\LastPost')->findBy(['thread' => $thread->getNumber()]);
 
-                        $this->em->persist($reflink);
+                    if (count($lastPosts) < $limit) {
+                        $lastPost = new LastPost();
+                        $lastPost->setThread($thread);
+                        $lastPost->setPost($post);
+
+                        $this->em->persist($lastPost);
                         $this->em->flush();
-                    }
+                    } else {
+                        foreach ($lastPosts as $key => $lastPost) {
+                            if ($key == $limit - 1) {
+                                $lastPosts[$key]->setPost($post);
+                            } else {
+                                $lastPosts[$key]->setPost($lastPosts[$key + 1]->getPost());
+                            }
+
+                            $this->em->flush();
+                        }
+                    }                    
+
+
+                    Helper::insertChain($this->em, $post, $post);
 
 
                     foreach($jsonpost->files as $jsonfile) {
@@ -138,12 +155,12 @@ class Threader extends Controller
             $count = $countQuery->getSingleScalarResult();
 
             $opPost = $this->em->getRepository('App\Entities\Post')->findOneBy(array('post' => $thread->getNumber()));
-            $posts = $this->em->getRepository('App\Entities\Post')->findBy(array('thread' => $thread->getNumber()), array(), 3, $count - 3);
+            $lastPosts = $this->em->getRepository('App\Entities\LastPost')->findBy(array('thread' => $thread->getNumber()));
 
             $thread->addPost($opPost);
 
-            foreach ($posts as $post) {
-                $thread->addPost($post);
+            foreach ($lastPosts as $lastPost) {
+                $thread->addPost($lastPost->getPost());
             }
 
             $threads[$key] = $thread;
@@ -177,18 +194,14 @@ class Threader extends Controller
             $this->redirect();
         }
 
-        $chain = Helper::getChain($number, $this->em);
+        $chain = $this->em->getRepository('App\Entities\RefLink')->findBy(['post' => $number], ['reference' => "ASC"]);
 
         $posts = new \Doctrine\Common\Collections\ArrayCollection();
-        
-        foreach ($chain as $link) {
-            $post = $this->em->getRepository('App\Entities\Post')->findOneBy(array('post' => $link));
 
-            if (!$post) {
-                continue;
-            } 
-
-            $posts->add($post);
+        foreach ($chain as $reflink) {
+            if (!$posts->contains($reflink->getReference())) {
+                $posts->add($reflink->getReference());   
+            }
         }
 
         $this->render('public/chain.php', compact('logged', 'posts'));

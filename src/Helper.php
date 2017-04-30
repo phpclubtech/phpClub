@@ -3,8 +3,49 @@ namespace App;
 
 use \Doctrine\ORM\EntityManager;
 
+use App\Validator;
+
+use App\Entities\RefLink;
+
 class Helper
 {
+    public static function insertChain(EntityManager $em, $forPost, $reference, $depth = 0)
+    {
+        if ($depth == 0) {
+            $reflink = new Reflink();
+            $reflink->setPost($forPost);
+            $reflink->setReference($forPost);
+            $reflink->setDepth($depth);
+
+            $em->persist($reflink);
+            $em->flush();
+        }
+
+        $references = Validator::validateRefLinks($reference->getComment());
+
+        foreach ($references as $r) {
+            $r = $em->getRepository('App\Entities\Post')->find($r);
+
+            if ($r) {
+                $reflink = new RefLink();
+                $reflink->setPost($forPost);
+                $reflink->setReference($r);
+                $reflink->setDepth($depth + 1);
+                $em->persist($reflink);
+                $em->flush();
+
+                $reflink = new RefLink();
+                $reflink->setPost($r);
+                $reflink->setReference($forPost);
+                $reflink->setDepth($depth * -1 - 1);
+                $em->persist($reflink);
+                $em->flush();
+
+                Helper::insertChain($em, $forPost, $r, $depth + 1);   
+            }
+        }
+    }
+
     public static function getChain($number, EntityManager $em)
     {
         static $chain = [];
