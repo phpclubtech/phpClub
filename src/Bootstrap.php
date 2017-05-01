@@ -9,6 +9,8 @@
 require(__DIR__ . '/../vendor/autoload.php');
 
 use Slim\Container;
+use Slim\Http\Response;
+use Slim\Http\Request;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
@@ -91,13 +93,21 @@ $di['ArchiveLinkController'] = function (Container $di): ArchiveLinkController {
 
 
 /* Error handler for altering PHP errors output */
-$di['PHPErrorHandler'] = function (): callable {
-    return function (int $errno, string $errstr, string $errfile, int $errline): void {
+$di['PHPErrorHandler'] = function () {
+    return function (int $errno, string $errstr, string $errfile, int $errline) {
         if (!(error_reporting() & $errno)) {
             return;
         }
 
         throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+    };
+};
+
+$di['notFoundHandler'] = function (Container $di) {
+    return function (Request $request, Response $response) use ($di) {
+        return $di->get('View')
+            ->renderToResponse($response, 'notFound')
+            ->withStatus(404);
     };
 };
 

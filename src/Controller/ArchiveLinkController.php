@@ -14,6 +14,12 @@ use phpClub\Service\View;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Linker;
 
+/**
+ * Class ArchiveLinkController
+ *
+ * @package phpClub\Controller
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class ArchiveLinkController
 {
     /**

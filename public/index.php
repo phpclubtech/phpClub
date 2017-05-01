@@ -16,14 +16,12 @@ $application = new App($di);
 $application->get('/', 'BoardController:indexAction');
 $application->get('/pr/res/{thread:[0-9]+}.html', 'BoardController:threadAction');
 $application->get('/search/{searchQuery}', 'SearchController:searchAction');
-$application->get('/login/', 'UsersController:displayAuthAction');
-$application->get('/registration/', 'UsersController:displayRegistrationAction');
-$application->get('/config/', 'UsersController:displayConfigureAction');
 
-$application->post('/login/', 'UsersController:preformAuthAction');
-$application->post('/registration/', 'UsersController:preformRegistrationAction');
-$application->post('/config/', 'UsersController:preformConfigureAction');
-$application->post('/logout/', 'UsersController:preformLogOutAction');
+$application->map(['GET', 'POST'], '/login/', 'UsersController:authAction');
+$application->map(['GET', 'POST'], '/registration/', 'UsersController:registrationAction');
+$application->map(['GET', 'POST'], '/config/', 'UsersController:configureAction');
+
+$application->post('/logout/', 'UsersController:logOutAction');
 $application->post('/addarchivelink/', 'ArchiveLinkController:addLinkAction');
 $application->post('/removearchivelink/', 'ArchiveLinkController:removeLinkAction');
 

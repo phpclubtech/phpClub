@@ -40,21 +40,48 @@ class UsersController
         $this->authorizer = $authorizer;
     }
 
-    public function displayAuthAction(Request $request, Response $response, array $args = []): Response
+    protected function authGetRequest(Request $request, Response $response, array $args = []): Response
     {
         return ($this->authorizer->isLoggedIn())
             ? $response->withRedirect('/')
             : $this->view->renderToResponse($response, 'login', ['errors' => []]);
     }
 
-    public function displayRegistrationAction(Request $request, Response $response, array $args = []): Response
+    protected function authPostRequest(Request $request, Response $response, array $args = []): Response
+    {
+        if ($this->authorizer->isLoggedIn()) {
+            return $response->withRedirect('/');
+        }
+
+        // In the future, this will use POST body from $request instance
+        $errors = $this->authorizer->login();
+
+        return (empty($errors))
+            ? $response->withRedirect('/')
+            : $this->view->renderToResponse($response, 'login', ['errors' => $errors]);
+    }
+
+    protected function registrationGetRequest(Request $request, Response $response, array $args = []): Response
     {
         return ($this->authorizer->isLoggedIn())
             ? $response->withRedirect('/')
             : $this->view->renderToResponse($response, 'registration', ['errors' => []]);
     }
 
-    public function displayConfigureAction(Request $request, Response $response, array $args = []): Response
+    protected function registrationPostRequest(Request $request, Response $response, array $args = []): Response
+    {
+        if ($this->authorizer->isLoggedIn()) {
+            return $response->withRedirect('/');
+        }
+
+        $errors = $this->authorizer->register();
+
+        return (empty($errors))
+            ? $response->withRedirect('/')
+            : $this->view->renderToResponse($response, 'registration', ['errors' => $errors]);
+    }
+
+    protected function configureGetRequest(Request $request, Response $response, array $args = []): Response
     {
         $user = $this->authorizer->isLoggedIn();
         if (!$user) {
@@ -71,7 +98,7 @@ class UsersController
         );
     }
 
-    public function preformConfigureAction(Request $request, Response $response, array $args = []): Response
+    protected function configurePostRequest(Request $request, Response $response, array $args = []): Response
     {
         $user = $this->authorizer->isLoggedIn();
 
@@ -86,33 +113,28 @@ class UsersController
             : $this->view->renderToResponse($response, 'configure', ['errors' => $errors]);
     }
 
-    public function preformAuthAction(Request $request, Response $response, array $args = []): Response
+    public function authAction(Request $request, Response $response, array $args = []): Response
     {
-        if ($this->authorizer->isLoggedIn()) {
-            return $response->withRedirect('/');
-        }
-
-        $errors = $this->authorizer->login();
-
-        return (empty($errors))
-            ? $response->withRedirect('/')
-            : $this->view->renderToResponse($response, 'login', ['errors' => $errors]);
+        return $request->isPost()
+            ? $this->authPostRequest($request, $response, $args)
+            : $this->authGetRequest($request, $response, $args);
     }
 
-    public function preformRegistrationAction(Request $request, Response $response, array $args = []): Response
+    public function registrationAction(Request $request, Response $response, array $args = []): Response
     {
-        if ($this->authorizer->isLoggedIn()) {
-            return $response->withRedirect('/');
-        }
-
-        $errors = $this->authorizer->register();
-
-        return (empty($errors))
-            ? $response->withRedirect('/')
-            : $this->view->renderToResponse($response, 'registration', ['errors' => $errors]);
+        return $request->isPost()
+            ? $this->registrationPostRequest($request, $response, $args)
+            : $this->registrationGetRequest($request, $response, $args);
     }
 
-    public function preformLogOutAction(Request $request, Response $response, array $args = []): Response
+    public function configureAction(Request $request, Response $response, array $args = []): Response
+    {
+        return $request->isPost()
+            ? $this->configurePostRequest($request, $response, $args)
+            : $this->configureGetRequest($request, $response, $args);
+    }
+
+    public function logOutAction(Request $request, Response $response, array $args = []): Response
     {
         if ($this->authorizer->isLoggedIn()) {
             $this->authorizer->logout();
