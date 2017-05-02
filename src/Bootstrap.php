@@ -18,7 +18,7 @@ use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
 use phpClub\Controller\ArchiveLinkController;
-use phpClub\Service\View;
+use Slim\Views\PhpRenderer as View;
 use phpClub\Service\Threader;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Searcher;
@@ -88,7 +88,7 @@ $di['UsersController'] = function (Container $di): UsersController {
 };
 
 $di['ArchiveLinkController'] = function (Container $di): ArchiveLinkController {
-    return new ArchiveLinkController($di->get('Authorizer'), $di->get('Linker'), $di->get('View'));
+    return new ArchiveLinkController($di->get('Authorizer'), $di->get('Linker'));
 };
 
 

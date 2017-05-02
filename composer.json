@@ -8,6 +8,7 @@
         "pimple/pimple": "~3.0",
         "doctrine/orm": "*",
         "doctrine/migrations": "^1.5",
-        "slim/slim": "^3.8"
+        "slim/slim": "^3.8",
+        "slim/php-view": "^2.2"
     }
 }

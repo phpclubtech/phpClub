@@ -5,7 +5,7 @@
     <form id="posts-form">
         <div id="thread-<?= $thread->getNumber() ?>" class="thread">
             <?php foreach ($thread->getPosts() as $post) :?>
-                <?= $this->renderToHtml('post', ['post' => $post]) ?>
+                <?= $this->fetch('/post.phtml', ['post' => $post]) ?>
             <?php endforeach; ?>
         </div>
         <hr>

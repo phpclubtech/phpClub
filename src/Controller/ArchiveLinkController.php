@@ -10,7 +10,7 @@ namespace phpClub\Controller;
 
 use Slim\Http\Response;
 use Slim\Http\Request;
-use phpClub\Service\View;
+use Psr\Http\Message\ResponseInterface;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Linker;
 
@@ -23,11 +23,6 @@ use phpClub\Service\Linker;
 class ArchiveLinkController
 {
     /**
-     * @var \phpClub\Service\View
-     */
-    protected $view;
-
-    /**
      * @var \phpClub\Service\Authorizer
      */
     protected $authorizer;
@@ -37,16 +32,14 @@ class ArchiveLinkController
      */
     protected $linker;
 
-    public function __construct(Authorizer $authorizer, Linker $linker, View $view)
+    public function __construct(Authorizer $authorizer, Linker $linker)
     {
-        $this->view = $view;
-
         $this->authorizer = $authorizer;
 
         $this->linker = $linker;
     }
 
-    public function addLinkAction(Request $request, Response $response, array $args = []): Response
+    public function addLinkAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         if ($this->authorizer->isLoggedIn()) {
             return $response->withRedirect('/');
@@ -58,7 +51,7 @@ class ArchiveLinkController
         return $response->withRedirect($redirect);
     }
 
-    public function removeLinkAction(Request $request, Response $response, array $args = []): Response
+    public function removeLinkAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         if ($this->authorizer->isLoggedIn()) {
             return $response->withRedirect('/');
