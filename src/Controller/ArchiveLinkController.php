@@ -41,7 +41,7 @@ class ArchiveLinkController
 
     public function addLinkAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        if ($this->authorizer->isLoggedIn()) {
+        if (!$this->authorizer->isLoggedIn()) {
             return $response->withRedirect('/');
         }
 
@@ -53,11 +53,11 @@ class ArchiveLinkController
 
     public function removeLinkAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        if ($this->authorizer->isLoggedIn()) {
+        if (!$this->authorizer->isLoggedIn()) {
             return $response->withRedirect('/');
         }
 
-        $threadNumber = $this->linker->removeLink();
+        $threadNumber = $this->linker->removeLink((int)$args['archiveLinkID']);
         $redirect = ($threadNumber === false) ? '/' : "/pr/res/{$threadNumber}.html";
 
         return $response->withRedirect($redirect);

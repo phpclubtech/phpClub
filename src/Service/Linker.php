@@ -34,10 +34,11 @@ class Linker
                 : '';
 
             $post['archive-link'] = trim($post['archive-link']);
-            $linkRepository = $this->em->getRepository('phpClub\Entity\Thread');
+
+            $linkRepository = $this->em->getRepository('phpClub\Entity\ArchiveLink');
 
             if (Validator::validateArchiveLink($post['archive-link'])) {
-                $thread = $linkRepository->find($post['thread']);
+                $thread = $this->em->getRepository('phpClub\Entity\Thread')->find($post['thread']);
 
                 if ($thread) {
                     if (!$linkRepository->findOneBy(['link' => $post['archive-link']])) {
@@ -57,22 +58,17 @@ class Linker
         return false;
     }
 
-    public function removeLink()
+    public function removeLink(int $id)
     {
-        $url = $_SERVER['REQUEST_URI'];
-        $path = parse_url($url, PHP_URL_PATH);
+        $archiveLink = $this->em->getRepository('phpClub\Entity\ArchiveLink')->find($id);
 
-        if (preg_match('/\d+/', $path, $matches)) {
-            $archiveLink = $this->em->getRepository('phpClub\Entity\ArchiveLink')->find($matches[0]);
+        $threadNumber = $archiveLink->getThread()->getNumber();
 
-            $threadNumber = $archiveLink->getThread()->getNumber();
+        if ($archiveLink) {
+            $this->em->remove($archiveLink);
+            $this->em->flush();
 
-            if ($archiveLink) {
-                $this->em->remove($archiveLink);
-                $this->em->flush();
-
-                return $threadNumber;
-            }
+            return $threadNumber;
         }
 
         return false;

@@ -24,6 +24,6 @@ $application->map(['GET', 'POST'], '/config/', 'UsersController:configureAction'
 
 $application->post('/logout/', 'UsersController:logOutAction');
 $application->post('/addarchivelink/', 'ArchiveLinkController:addLinkAction');
-$application->post('/removearchivelink/', 'ArchiveLinkController:removeLinkAction');
+$application->get('/removearchivelink/{archiveLinkID:[0-9]+}', 'ArchiveLinkController:removeLinkAction');
 
 $application->run();
