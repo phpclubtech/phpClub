@@ -1,7 +1,10 @@
+/.idea/
 /vendor/
-/pr/src/**
-/pr/thumb/**
-/json/**
-!/json/.gitkeep
-!/pr/src/.gitkeep
-!/pr/thumb/.gitkeep
+
+!/public/json/.gitkeep
+!/public/pr/src/.gitkeep
+!/public/pr/thumb/.gitkeep
+
+/public/pr/src/**
+/public/pr/thumb/**
+/public/json/**
