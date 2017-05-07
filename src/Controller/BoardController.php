@@ -76,4 +76,21 @@ class BoardController
             ]
         );
     }
+
+    public function chainAction(Request $request, Response $response, array $args = []): ResponseInterface
+    {
+        try {
+            $chain = $this->threader->getChain((int)$args['post']);
+        } catch (\InvalidArgumentException $e) {
+            throw new NotFoundException($request, $response);
+        }
+
+        return $this->view->render(
+            $response,
+            '/chain.phtml',
+            [
+                'posts' => $chain, 'logged' => $this->authorizer->isLoggedIn()
+            ]
+        );
+    }
 }
