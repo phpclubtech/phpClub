@@ -41,6 +41,9 @@ class Searcher
 
             $posts->add($post);
         }
+
+        $posts = $posts->toArray();
+
         return $posts;
     }
 }

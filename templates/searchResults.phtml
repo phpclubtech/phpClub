@@ -5,7 +5,7 @@
     <form id="posts-form">
         <div class="thread">
             <?php foreach ($posts as $post) :?>
-                <?php $this->renderToHtml('post', ['post' => $post]); ?>
+                <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
             <?php endforeach; ?>
         </div>
         <hr>

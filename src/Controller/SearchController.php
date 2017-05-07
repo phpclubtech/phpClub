@@ -13,6 +13,7 @@ use Slim\Http\Request;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\PhpRenderer as View;
 use phpClub\Service\Searcher;
+use phpClub\Service\Authorizer;
 
 /**
  * Class SearchController
@@ -32,15 +33,26 @@ class SearchController
      */
     protected $searcher;
 
-    public function __construct(Searcher $searcher, View $view)
+    /**
+     * @var \phpClub\Service\Authorizer
+     */
+    protected $authorizer;
+
+    public function __construct(Searcher $searcher, Authorizer $authorizer, View $view)
     {
         $this->view = $view;
 
         $this->searcher = $searcher;
+
+        $this->authorizer = $authorizer;
     }
 
     public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        return $this->view->render($response, '/searchResults.phtml', $this->searcher->search($args['searchQuery']));
+
+        return $this->view->render($response, '/searchResults.phtml', [
+            'logged' => $this->authorizer->isLoggedIn(),
+            'posts' => $this->searcher->search($args['searchQuery'])
+        ]);
     }
 }

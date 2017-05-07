@@ -80,7 +80,7 @@ $di['BoardController'] = function (Container $di): BoardController {
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
-    return new SearchController($di->get('Searcher'), $di->get('View'));
+    return new SearchController($di->get('Searcher'), $di->get('Authorizer'), $di->get('View'));
 };
 
 $di['UsersController'] = function (Container $di): UsersController {
