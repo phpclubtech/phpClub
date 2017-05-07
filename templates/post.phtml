@@ -24,7 +24,7 @@
     <?php if ($post->isOpPost()) : ?>
         <span class="archive-links">
                     <?php foreach($post->getThread()->getArchiveLinks() as $archiveLink) :?>
-                        <a href="<?= $archiveLink->getLink() ?>"><img src="<?= Helper::getArchiveIconUrl($archiveLink->getLink())?>"></a>
+                        <a href="<?= $archiveLink->getLink() ?>"><img src="<?= \phpClub\Service\Helper::getArchiveIconUrl($archiveLink->getLink())?>"></a>
                     <?php endforeach; ?>
                 </span>
     <?php endif; ?>
