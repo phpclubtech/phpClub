@@ -204,6 +204,10 @@ class Threader
         $chain = $this->em->getRepository('phpClub\Entity\RefLink')
             ->findBy(['post' => $number], ['reference' => "ASC"]);
 
+        if ($chain === null) {
+            throw new \InvalidArgumentException("Chain with number {$number} does not exist in the system.");
+        }
+
         $posts = new ArrayCollection();
 
         foreach ($chain as $reflink) {
