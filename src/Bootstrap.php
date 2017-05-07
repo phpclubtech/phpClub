@@ -34,7 +34,7 @@ $di = new Container($slimConfig);
 
 /* General services section */
 $di['EntityManager'] = function (Container $di): EntityManager {
-    $paths = array(__DIR__ . "/Entities/");
+    $paths = array(__DIR__ . "/Entity/");
     $isDevMode = false;
 
     $config = $di->get('config');
