@@ -106,7 +106,7 @@ $di['PHPErrorHandler'] = function () {
 $di['notFoundHandler'] = function (Container $di) {
     return function (Request $request, Response $response) use ($di) {
         return $di->get('View')
-            ->renderToResponse($response, 'notFound')
+            ->render($response, '/notFound.phtml', [])
             ->withStatus(404);
     };
 };
