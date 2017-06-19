@@ -29,6 +29,7 @@ class Searcher
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         $posts = new ArrayCollection();
+        $ids = array();
 
         $query = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC");
         $query->bindValue(':search', $searchQuery);
@@ -37,11 +38,11 @@ class Searcher
         $results = $query->fetchAll();
 
         foreach ($results as $result) {
-            $post = $this->em->getRepository('phpClub\Entity\Post')->find($result['id']);
-
-            $posts->add($post);
+            $ids[]=$result['id'];
         }
 
+        $posts = $this->em->getRepository('phpClub\Entity\Post')->findBy(["id"=>$ids]);
+        
         $posts = $posts->toArray();
 
         return $posts;
