@@ -41,7 +41,7 @@ class Searcher
             $ids[]=$result['id'];
         }
 
-        $posts = $this->em->getRepository('phpClub\Entity\Post')->findBy(["id"=>$ids]);
+        $posts = $this->em->getRepository('phpClub\Entity\Post')->findBy(["post"=>$ids]);
         
         $posts = $posts->toArray();
 
