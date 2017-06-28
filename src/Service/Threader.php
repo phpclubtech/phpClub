@@ -150,7 +150,7 @@ class Threader
     {
         //$logged = $this->authorizer->isLoggedIn();
 
-        $threadsQuery = $this->em->createQuery('SELECT COUNT(p) as post_count, t.number FROM phpClub\Entity\Thread t  JOIN phpClub\Entity\Post p WHERE p.thread = t.number ORDER BY t.number DESC');
+        $threadsQuery = $this->em->createQuery('SELECT COUNT(p) as post_count, t.number FROM phpClub\Entity\Thread t  JOIN phpClub\Entity\Post p WHERE p.thread = t.number GROUP BY t.number ORDER BY t.number DESC');
         $threads = $threadsQuery->getArrayResult();
 
         foreach ($threads as $key => $value) {
