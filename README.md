@@ -7,4 +7,5 @@ Demonstration: http://phpclub.rf.gd/
 1. config db connection in `src/config.ini`
 1. run migrations `vendor/bin/doctrine-migrations migrations:migrate`
 1. `sudo a2enmod rewrite`, change `AllowOverride` from `None` to `All` in your apache config file
+1. disable `ONLY_FULL_GROUP_BY` , execute in SQL command line or phpmyadmin query `SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
 1. make cron task `*/5 * * * * php your/server/directory/update.php`
