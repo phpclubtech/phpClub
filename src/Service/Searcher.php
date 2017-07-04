@@ -31,7 +31,7 @@ class Searcher
         $posts = new ArrayCollection();
         $ids = array();
 
-        $query = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC");
+        $query = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT 1000");
         $query->bindValue(':search', $searchQuery);
         $query->execute();
 
@@ -41,9 +41,7 @@ class Searcher
             $ids[]=$result['id'];
         }
 
-        $posts = $this->em->getRepository('phpClub\Entity\Post')->findBy(["id"=>$ids]);
-        
-        $posts = $posts->toArray();
+        $posts = $this->em->getRepository('phpClub\Entity\Post')->findBy(["post"=>$ids]);
 
         return $posts;
     }
