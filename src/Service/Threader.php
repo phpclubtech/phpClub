@@ -14,6 +14,7 @@ use phpClub\Entity\Thread;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\Entity\LastPost;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 
 class Threader
 {
@@ -144,6 +145,8 @@ class Threader
                 file_put_contents(Helper::getJsonPath($jsonthread->current_thread), $json);
             }
         }
+        $cache = new FilesystemCache();
+        $cache->clear();
     }
 
     public function getThreads()
@@ -181,7 +184,7 @@ class Threader
     public function getThread(int $number)
     {
         $thread = $this->em->getRepository('phpClub\Entity\Thread')->find($number);
-
+        
         if ($thread === null) {
             throw new \InvalidArgumentException("Thread with number {$number} does not exist in the system.");
         }
