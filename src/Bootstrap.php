@@ -23,6 +23,8 @@ use phpClub\Service\Threader;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Searcher;
 use phpClub\Service\Linker;
+use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Cache\Simple\AbstractCache;
 
 $slimConfig = [
     'settings' => [
@@ -73,10 +75,14 @@ $di['Linker'] = function (Container $di): Linker {
     return new Linker($di->get('EntityManager'));
 };
 
+$di["Cache"] = function (Container $di): AbstractCache {
+    return new FilesystemCache();
+};
+
 
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
-    return new BoardController($di->get('Threader'), $di->get('Authorizer'), $di->get('View'));
+    return new BoardController($di->get('Threader'), $di->get('Authorizer'), $di->get('View') , $di->get('Cache'));
 };
 
 $di['SearchController'] = function (Container $di): SearchController {

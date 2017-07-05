@@ -15,7 +15,7 @@ use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\PhpRenderer as View;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Cache\Simple\AbstractCache;
 
 /**
  * Class MainPageController
@@ -40,7 +40,7 @@ class BoardController
      */
     protected $authorizer;
 
-    public function __construct(Threader $threader, Authorizer $authorizer, View $view)
+    public function __construct(Threader $threader, Authorizer $authorizer, View $view, AbstractCache $cache)
     {
         $this->view = $view;
 
@@ -48,7 +48,7 @@ class BoardController
 
         $this->authorizer = $authorizer;
 
-        $this->cache = new FilesystemCache();
+        $this->cache = $cache;
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
