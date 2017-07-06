@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
-use phpClub\ThreadParser\{ArhivachThread, DateConverter, ThreadHtmlParser};
+use phpClub\ThreadParser\Thread\ArhivachThread;
+use phpClub\ThreadParser\{DateConverter, ThreadHtmlParser};
 
 class ArhivachHtmlParserTest extends TestCase
 {

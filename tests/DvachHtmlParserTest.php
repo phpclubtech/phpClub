@@ -6,7 +6,8 @@ namespace Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Crawler;
-use phpClub\ThreadParser\{DvachThread, DateConverter, ThreadHtmlParser};
+use phpClub\ThreadParser\Thread\DvachThread;
+use phpClub\ThreadParser\{ThreadHtmlParser, DateConverter};
 
 class DvachHtmlParserTest extends TestCase
 {

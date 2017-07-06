@@ -6,6 +6,7 @@ namespace phpClub\ThreadParser;
 
 use Symfony\Component\DomCrawler\Crawler;
 use phpClub\ThreadParser\DTO\{File, Post};
+use phpClub\ThreadParser\Thread\ThreadInterface;
 
 class ThreadHtmlParser
 {

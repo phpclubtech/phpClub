@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\ThreadParser\Thread;
 
 use phpClub\ThreadParser\DTO\File;
 use Symfony\Component\DomCrawler\Crawler;
