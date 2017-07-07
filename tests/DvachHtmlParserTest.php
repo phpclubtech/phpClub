@@ -23,7 +23,8 @@ class DvachHtmlParserTest extends TestCase
 
     public function testGetPost()
     {
-        $post = $this->threadParser->getPost(new Crawler(file_get_contents(__DIR__ . '/fixtures/posts/post-thread-17.html')));
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/fixtures/posts/post-thread-17.html'));
+        $post = $posts[0];
         $this->assertEquals('Аноним', $post->author);
         $this->assertEquals('20/01/14 17:23:22', $post->date->format('d/m/y H:i:s'));
         $this->assertEquals('319724', $post->id);
@@ -31,7 +32,8 @@ class DvachHtmlParserTest extends TestCase
         $this->assertEquals('', $post->title);
         $this->assertCount(0, $post->files);
 
-        $post = $this->threadParser->getPost(new Crawler(file_get_contents(__DIR__ . '/fixtures/posts/post-thread-71.html')));
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/fixtures/posts/post-thread-71.html'));
+        $post = $posts[0];
         $this->assertEquals('пхп', $post->author);
         $this->assertEquals('24/02/16 17:11:57', $post->date->format('d/m/y H:i:s'));
         $this->assertEquals('665216', $post->id);

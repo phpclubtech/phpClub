@@ -37,19 +37,16 @@ class ThreadHtmlParser
             throw new \Exception('Posts not found');
         }
 
-        return $posts->each(\Closure::fromCallable([$this, 'getPost']));
-    }
-
-    public function getPost(Crawler $postNode): Post
-    {
-        return new Post(
-            $this->getId($postNode),
-            $this->getTitle($postNode),
-            $this->getAuthor($postNode),
-            $this->getDate($postNode),
-            $this->getText($postNode),
-            $this->getFiles($postNode)
-        );
+        return $posts->each(function (Crawler $postNode) {
+            return new Post(
+                $this->getId($postNode),
+                $this->getTitle($postNode),
+                $this->getAuthor($postNode),
+                $this->getDate($postNode),
+                $this->getText($postNode),
+                $this->getFiles($postNode)
+            );
+        });
     }
 
     private function getAuthor(Crawler $postNode): string
@@ -123,6 +120,8 @@ class ThreadHtmlParser
         $filesXPath = $this->thread->getFilesXPath();
         $filesNode = $postNode->filterXPath($filesXPath);
 
-        return $filesNode->each(\Closure::fromCallable([$this->thread, 'getFile']));
+        return $filesNode->each(function (Crawler $fileNode) {
+            return $this->thread->getFile($fileNode);
+        });
     }
 }
