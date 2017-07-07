@@ -6,7 +6,9 @@ namespace Tests;
 
 use PHPUnit\Framework\TestCase;
 use phpClub\ThreadParser\Thread\ArhivachThread;
-use phpClub\ThreadParser\{DateConverter, ThreadHtmlParser};
+use phpClub\ThreadParser\{
+    DateConverter, ThreadHtmlParser
+};
 
 class ArhivachHtmlParserTest extends TestCase
 {
@@ -47,6 +49,39 @@ class ArhivachHtmlParserTest extends TestCase
         $this->assertCount(3, $post->files);
     }
 
+    public function testThread90()
+    {
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/arhivach_fixtures/arhivach_thread_90.html'));
+        $post  = $posts[27];
+        $this->assertEquals('Аноним', $post->author);
+        $this->assertEquals('04/06/17 04:56:50', $post->date->format('d/m/y H:i:s'));
+        $this->assertEquals('1000752', $post->id);
+        $this->assertContains('rand() использует линейный ГПСЧ, который абсолютно предсказуем и имеет относительно небольшой период', $post->text);
+        $this->assertEquals('', $post->title);
+        $this->assertCount(0, $post->files);
+
+        $post = $posts[15];
+        $this->assertEquals('someApprentice', $post->author);
+        $this->assertEquals('03/06/17 20:05:31', $post->date->format('d/m/y H:i:s'));
+        $this->assertEquals('1000566', $post->id);
+        $this->assertContains('sudo searchd --config sphinx.conf', $post->text);
+        $this->assertEquals('', $post->title);
+        $this->assertCount(0, $post->files);
+
+        $post = $posts[306];
+        $this->assertEquals('Аноним', $post->author);
+        $this->assertEquals('14/06/17 09:46:46', $post->date->format('d/m/y H:i:s'));
+        $this->assertEquals('1005616', $post->id);
+        $this->assertContains('Для передачи параметров есть следующие способы:', $post->text);
+        $this->assertEquals('', $post->title);
+        $this->assertCount(4, $post->files);
+
+        $post = $posts[860];
+        $webm = $post->files[0];
+        $this->assertContains('.webm', $webm->fullName);
+        $this->assertNotEmpty($webm->thumbName);
+    }
+
     /**
      * @dataProvider provideThreadsHtml
      */
@@ -54,15 +89,18 @@ class ArhivachHtmlParserTest extends TestCase
     {
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToThreadHtml));
         $this->assertGreaterThan(100, count($threadArray));
-        $this->assertNotEmpty($threadArray[0]->author);
-        $this->assertNotEmpty($threadArray[0]->id);
-        $this->assertNotEmpty($threadArray[0]->text);
+        $opPost = $threadArray[0];
+        $this->assertNotEmpty($opPost->author);
+        $this->assertNotEmpty($opPost->id);
+        $this->assertNotEmpty($opPost->text);
+        $this->assertGreaterThan(3, $opPost->files);
     }
 
     public function provideThreadsHtml()
     {
         return [
             [__DIR__ . '/arhivach_fixtures/arhivach_thread_83.html'],
+            [__DIR__ . '/arhivach_fixtures/arhivach_thread_90.html'],
         ];
     }
 
