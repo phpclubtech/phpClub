@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use PHPUnit\Framework\TestCase;
+use phpClub\ThreadParser\DTO\Post;
 use phpClub\ThreadParser\Thread\DvachThread;
 use phpClub\ThreadParser\{ThreadHtmlParser, DateConverter};
 
@@ -19,7 +20,7 @@ class DvachHtmlParserTest extends TestCase
     {
         $this->threadParser = new ThreadHtmlParser(new DateConverter(), new DvachThread());
     }
-
+    
     public function testGetPost()
     {
         $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/dvach_fixtures/posts/post-thread-17.html'));
@@ -238,5 +239,18 @@ class DvachHtmlParserTest extends TestCase
         $this->assertCount(1, $posts[7]->files);
 
         $this->assertContains('будет идти потоковое видео?', end($posts)->text);
+    }
+
+    public function testWebmParsing()
+    {
+        $pathToHtml = __DIR__ . '/dvach_fixtures/66.html';
+        $posts = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+
+        $postWithWebm = current(array_filter($posts, function (Post $post) {
+            return $post->id == 610463;
+        }));
+
+        $this->assertContains('.webm', $postWithWebm->files[0]->fullName);
+        $this->assertNotEmpty($postWithWebm->files[0]->thumbName);
     }
 }
