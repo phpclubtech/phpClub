@@ -44,7 +44,7 @@ class DvachThread implements ThreadInterface
 
     public function getFilesXPath(): string
     {
-        return '//div[@class="images "]/figure[@class="image "]';
+        return '//div[starts-with(@class, "images")]/figure[starts-with(@class, "image")]';
     }
 
     public function getFile(Crawler $fileNode): File
@@ -56,7 +56,7 @@ class DvachThread implements ThreadInterface
 
     private function extractOnClickJsArgs(Crawler $fileNode): array
     {
-        $argsXPath = '//div[@class="image-link"]/a/@onclick';
+        $argsXPath = '//div[@class="image-link"]/a/@onclick | //a[@name="expandfunc"]/@onclick';
         $argsNode  = $fileNode->filterXPath($argsXPath);
 
         if (!count($argsNode)) {

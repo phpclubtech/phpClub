@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DomCrawler\Crawler;
 use phpClub\ThreadParser\Thread\DvachThread;
 use phpClub\ThreadParser\{ThreadHtmlParser, DateConverter};
 
@@ -116,7 +115,7 @@ class DvachHtmlParserTest extends TestCase
         ];
     }
 
-    public function testFiles()
+    public function testFilesThread80()
     {
         $pathToHtml  = __DIR__ . '/fixtures/pr-thread-80/825576.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
@@ -143,6 +142,35 @@ class DvachHtmlParserTest extends TestCase
         $this->assertEquals('14719368905542s.jpg', $files[2]->thumbName);
 
         $this->assertCount(2, $threadArray[1]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+    }
+
+    public function testFilesCount()
+    {
+        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-77/753595.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(4, $threadArray[0]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-60/551625.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(4, $threadArray[0]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/50/pr-thread-50.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(4, $threadArray[0]->files);
+        $this->assertCount(3, $threadArray[1]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/40/pr-thread-40.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(4, $threadArray[0]->files);
+        $this->assertCount(2, $threadArray[1]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/32/pr-thread-32.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(3, $threadArray[0]->files);
+        $this->assertCount(3, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
     }
 }
