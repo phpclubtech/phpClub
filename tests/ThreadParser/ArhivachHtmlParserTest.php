@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\ThreadParser;
 
 use PHPUnit\Framework\TestCase;
 use phpClub\ThreadParser\Thread\ArhivachThread;
-use phpClub\ThreadParser\{
-    DateConverter, ThreadHtmlParser
-};
+use phpClub\ThreadParser\{DateConverter, ThreadHtmlParser};
 
 class ArhivachHtmlParserTest extends TestCase
 {
@@ -24,7 +22,7 @@ class ArhivachHtmlParserTest extends TestCase
 
     public function testThread83()
     {
-        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/arhivach_fixtures/arhivach_thread_83.html'));
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/arhivach_fixtures/83.html'));
         $post  = $posts[16];
         $this->assertEquals('Аноним', $post->author);
         $this->assertEquals('24/11/16 23:34:24', $post->date->format('d/m/y H:i:s'));
@@ -51,7 +49,7 @@ class ArhivachHtmlParserTest extends TestCase
 
     public function testThread90()
     {
-        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/arhivach_fixtures/arhivach_thread_90.html'));
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/arhivach_fixtures/90.html'));
         $post  = $posts[27];
         $this->assertEquals('Аноним', $post->author);
         $this->assertEquals('04/06/17 04:56:50', $post->date->format('d/m/y H:i:s'));
@@ -99,14 +97,14 @@ class ArhivachHtmlParserTest extends TestCase
     public function provideThreadsHtml()
     {
         return [
-            [__DIR__ . '/arhivach_fixtures/arhivach_thread_83.html'],
-            [__DIR__ . '/arhivach_fixtures/arhivach_thread_90.html'],
+            [__DIR__ . '/arhivach_fixtures/83.html'],
+            [__DIR__ . '/arhivach_fixtures/90.html'],
         ];
     }
 
     public function testFiles()
     {
-        $pathToHtml  = __DIR__ . '/arhivach_fixtures/arhivach_thread_83.html';
+        $pathToHtml  = __DIR__ . '/arhivach_fixtures/83.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $files       = $threadArray[0]->files;
 

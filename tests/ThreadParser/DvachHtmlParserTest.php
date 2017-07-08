@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\ThreadParser;
 
 use PHPUnit\Framework\TestCase;
 use phpClub\ThreadParser\Thread\DvachThread;
@@ -22,7 +22,7 @@ class DvachHtmlParserTest extends TestCase
 
     public function testGetPost()
     {
-        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/fixtures/posts/post-thread-17.html'));
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/dvach_fixtures/posts/post-thread-17.html'));
         $post = $posts[0];
         $this->assertEquals('Аноним', $post->author);
         $this->assertEquals('20/01/14 17:23:22', $post->date->format('d/m/y H:i:s'));
@@ -31,7 +31,7 @@ class DvachHtmlParserTest extends TestCase
         $this->assertEquals('', $post->title);
         $this->assertCount(0, $post->files);
 
-        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/fixtures/posts/post-thread-71.html'));
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/dvach_fixtures/posts/post-thread-71.html'));
         $post = $posts[0];
         $this->assertEquals('пхп', $post->author);
         $this->assertEquals('24/02/16 17:11:57', $post->date->format('d/m/y H:i:s'));
@@ -56,32 +56,32 @@ class DvachHtmlParserTest extends TestCase
     public function provideThreadsHtml()
     {
         return [
-            [__DIR__ . '/fixtures/pr-thread-1/236463.html'],
-            [__DIR__ . '/fixtures/pr-thread-2/247752.html'],
-            [__DIR__ . '/fixtures/pr-thread-3/268546.html'],
-            [__DIR__ . '/fixtures/pr-thread-6/293537.html'],
-            [__DIR__ . '/fixtures/pr-thread-10/313971.html'],
-            [__DIR__ . '/fixtures/pr-thread-15/pr-thread-15-gcache.html'],
-            [__DIR__ . '/fixtures/pr-thread-17/319643.html'],
-            [__DIR__ . '/fixtures/18/pr-thread-18.html'],
-            [__DIR__ . '/fixtures/19/pr-thread-19.html'],
-            [__DIR__ . '/fixtures/20/pr-thread-20.html'],
-            [__DIR__ . '/fixtures/21/pr-thread-21.html'],
-            [__DIR__ . '/fixtures/22/pr-thread-22.html'],
-            [__DIR__ . '/fixtures/23/pr-thread-23.html'],
-            [__DIR__ . '/fixtures/24/pr-thread-24.html'],
-            [__DIR__ . '/fixtures/26/pr-thread-26.html'],
-            [__DIR__ . '/fixtures/27/pr-thread-27.html'],
-            [__DIR__ . '/fixtures/28/pr-thread-28.html'],
-            [__DIR__ . '/fixtures/29/pr-thread-29.html'],
-            [__DIR__ . '/fixtures/30/pr-thread-30.html'],
-            [__DIR__ . '/fixtures/31/pr-thread-31.html'],
-            [__DIR__ . '/fixtures/40/pr-thread-40.html'],
-            [__DIR__ . '/fixtures/32/pr-thread-32.html'],
-            [__DIR__ . '/fixtures/50/pr-thread-50.html'],
-            [__DIR__ . '/fixtures/pr-thread-60/551625.html'],
-            [__DIR__ . '/fixtures/pr-thread-77/753595.html'],
-            [__DIR__ . '/fixtures/pr-thread-80/825576.html'],
+            [__DIR__ . '/dvach_fixtures/1.html'],
+            [__DIR__ . '/dvach_fixtures/2.html'],
+            [__DIR__ . '/dvach_fixtures/3.html'],
+            [__DIR__ . '/dvach_fixtures/6.html'],
+            [__DIR__ . '/dvach_fixtures/10.html'],
+            [__DIR__ . '/dvach_fixtures/15.html'],
+            [__DIR__ . '/dvach_fixtures/17.html'],
+            [__DIR__ . '/dvach_fixtures/18.html'],
+            [__DIR__ . '/dvach_fixtures/19.html'],
+            [__DIR__ . '/dvach_fixtures/20.html'],
+            [__DIR__ . '/dvach_fixtures/21.html'],
+            [__DIR__ . '/dvach_fixtures/22.html'],
+            [__DIR__ . '/dvach_fixtures/23.html'],
+            [__DIR__ . '/dvach_fixtures/24.html'],
+            [__DIR__ . '/dvach_fixtures/26.html'],
+            [__DIR__ . '/dvach_fixtures/27.html'],
+            [__DIR__ . '/dvach_fixtures/28.html'],
+            [__DIR__ . '/dvach_fixtures/29.html'],
+            [__DIR__ . '/dvach_fixtures/30.html'],
+            [__DIR__ . '/dvach_fixtures/31.html'],
+            [__DIR__ . '/dvach_fixtures/40.html'],
+            [__DIR__ . '/dvach_fixtures/32.html'],
+            [__DIR__ . '/dvach_fixtures/50.html'],
+            [__DIR__ . '/dvach_fixtures/60.html'],
+            [__DIR__ . '/dvach_fixtures/77.html'],
+            [__DIR__ . '/dvach_fixtures/80.html'],
         ];
     }
 
@@ -98,19 +98,19 @@ class DvachHtmlParserTest extends TestCase
     {
         return [
             [
-                __DIR__ . '/fixtures/pr-thread-80/825576.html',
+                __DIR__ . '/dvach_fixtures/80.html',
                 'Клуб изучающих PHP 80: Последний летний.'
             ],
             [
-                __DIR__ . '/fixtures/pr-thread-6/293537.html',
+                __DIR__ . '/dvach_fixtures/6.html',
                 'Клуб PHP для начинающих (6)'
             ],
             [
-                __DIR__ . '/fixtures/pr-thread-2/247752.html',
+                __DIR__ . '/dvach_fixtures/2.html',
                 ''
             ],
             [
-                __DIR__ . '/fixtures/31/pr-thread-31.html',
+                __DIR__ . '/dvach_fixtures/31.html',
                 'Клуб изучения PHP 31',
             ]
         ];
@@ -118,7 +118,7 @@ class DvachHtmlParserTest extends TestCase
 
     public function testFilesThread80()
     {
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-80/825576.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/80.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $files       = $threadArray[0]->files;
 
@@ -148,77 +148,77 @@ class DvachHtmlParserTest extends TestCase
 
     public function testFilesCount()
     {
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-1/236463.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/1.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(0, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
         $this->assertCount(1, $threadArray[3]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-3/268546.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/3.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(0, $threadArray[2]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-6/293537.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/6.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(1, $threadArray[1]->files);
         $this->assertCount(0, end($threadArray)->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-10/313971.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/10.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(1, $threadArray[1]->files);
         $this->assertCount(1, $threadArray[2]->files);
         $this->assertCount(0, $threadArray[3]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-15/pr-thread-15-gcache.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/15.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(1, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-77/753595.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/77.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(4, $threadArray[0]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-60/551625.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/60.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(4, $threadArray[0]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/50/pr-thread-50.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/50.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(4, $threadArray[0]->files);
         $this->assertCount(3, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/40/pr-thread-40.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/40.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(4, $threadArray[0]->files);
         $this->assertCount(2, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/32/pr-thread-32.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/32.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(3, $threadArray[0]->files);
         $this->assertCount(3, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/29/pr-thread-29.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/29.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(1, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/27/pr-thread-27.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/27.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(1, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
         $this->assertCount(1, $threadArray[3]->files);
 
-        $pathToHtml  = __DIR__ . '/fixtures/20/pr-thread-20.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/20.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(1, $threadArray[0]->files);
         $this->assertCount(1, $threadArray[1]->files);
@@ -228,7 +228,7 @@ class DvachHtmlParserTest extends TestCase
 
     public function testThreadFromGoogleCache()
     {
-        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-15/pr-thread-15-gcache.html';
+        $pathToHtml  = __DIR__ . '/dvach_fixtures/15.html';
         $posts = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertGreaterThan(600, count($posts));
 
