@@ -44,7 +44,8 @@ class DvachThread implements ThreadInterface
 
     public function getFilesXPath(): string
     {
-        return '//div[starts-with(@class, "images")]/figure[starts-with(@class, "image")]';
+        return '//div[starts-with(@class, "images")]/figure[starts-with(@class, "image")]
+                | //span[starts-with(@id, "exlink_")]';
     }
 
     public function getFile(Crawler $fileNode): File

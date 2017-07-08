@@ -147,6 +147,31 @@ class DvachHtmlParserTest extends TestCase
 
     public function testFilesCount()
     {
+        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-1/236463.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(0, $threadArray[1]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+        $this->assertCount(1, $threadArray[3]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-3/268546.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-6/293537.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(1, $threadArray[1]->files);
+        $this->assertCount(0, end($threadArray)->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/pr-thread-10/313971.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(1, $threadArray[1]->files);
+        $this->assertCount(1, $threadArray[2]->files);
+        $this->assertCount(0, $threadArray[3]->files);
+
         $pathToHtml  = __DIR__ . '/fixtures/pr-thread-77/753595.html';
         $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
         $this->assertCount(4, $threadArray[0]->files);
@@ -172,5 +197,25 @@ class DvachHtmlParserTest extends TestCase
         $this->assertCount(3, $threadArray[0]->files);
         $this->assertCount(3, $threadArray[1]->files);
         $this->assertCount(0, $threadArray[2]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/29/pr-thread-29.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(1, $threadArray[1]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/27/pr-thread-27.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(1, $threadArray[1]->files);
+        $this->assertCount(0, $threadArray[2]->files);
+        $this->assertCount(1, $threadArray[3]->files);
+
+        $pathToHtml  = __DIR__ . '/fixtures/20/pr-thread-20.html';
+        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $this->assertCount(1, $threadArray[0]->files);
+        $this->assertCount(1, $threadArray[1]->files);
+        $this->assertCount(1, $threadArray[2]->files);
+        $this->assertCount(0, $threadArray[3]->files);
     }
 }
