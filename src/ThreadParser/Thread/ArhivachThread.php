@@ -53,7 +53,14 @@ class ArhivachThread implements ThreadInterface
             throw new \Exception("Unable to parse file, HTML: {$fileNode->html()}");
         }
 
-        list(, $fullName, $width, $height) = $this->extractOnClickJsArgs($fileNode->attr('onclick'));
+        $onClickArgs = preg_split("/','|',|,|\)/", $fileNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
+
+        // Hack for old arhivach threads
+        if (strpos($onClickArgs[1], 'abload.de') !== false) {
+            return new File($onClickArgs[1], str_replace('/img/', '/thumb/', $onClickArgs[1]), 0, 0);
+        }
+
+        list(, $fullName, $width, $height) = $onClickArgs;
 
         $thumbXPath = '//div[@class="post_image"]/img';
         $thumbNode = $fileNode->filterXPath($thumbXPath);
@@ -65,16 +72,5 @@ class ArhivachThread implements ThreadInterface
         $thumbName = $thumbNode->attr('src');
 
         return new File($fullName, $thumbName, (int) $width, (int) $height);
-    }
-
-    private function extractOnClickJsArgs(string $onClickJsString): array
-    {
-        $onClickArgs = explode(',', $onClickJsString);
-
-        $onClickArgs = array_map(function (string $arg) {
-            return trim($arg,"'");
-        }, $onClickArgs);
-
-        return $onClickArgs;
     }
 }

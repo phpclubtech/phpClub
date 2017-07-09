@@ -80,6 +80,31 @@ class ArhivachHtmlParserTest extends TestCase
         $this->assertNotEmpty($webm->thumbName);
     }
 
+    public function testThread25()
+    {
+        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/arhivach_fixtures/25.html'));
+
+        $post = $posts[8];
+        $this->assertEquals('!xnn2uE3AU.', $post->author);
+        $this->assertEquals('09/06/14 14:49:35', $post->date->format('d/m/y H:i:s'));
+        $this->assertEquals('360403', $post->id);
+        $this->assertContains('http://brainstorage.me/jobs?q=haskell', $post->text);
+        $this->assertEquals('', $post->title);
+        $this->assertCount(1, $post->files);
+        $this->assertNotEmpty($post->files[0]->fullName);
+        $this->assertNotEmpty($post->files[0]->thumbName);
+
+        $post = $posts[53];
+        $this->assertEquals('Аноним', $post->author);
+        $this->assertEquals('10/06/14 16:44:24', $post->date->format('d/m/y H:i:s'));
+        $this->assertEquals('360614', $post->id);
+        $this->assertContains('Аноны, помогите!', $post->text);
+        $this->assertEquals('', $post->title);
+        $this->assertCount(1, $post->files);
+        $this->assertNotEmpty($post->files[0]->fullName);
+        $this->assertNotEmpty($post->files[0]->thumbName);
+    }
+
     /**
      * @dataProvider provideThreadsHtml
      */
@@ -97,6 +122,7 @@ class ArhivachHtmlParserTest extends TestCase
     public function provideThreadsHtml()
     {
         return [
+            [__DIR__ . '/arhivach_fixtures/25.html'],
             [__DIR__ . '/arhivach_fixtures/83.html'],
             [__DIR__ . '/arhivach_fixtures/90.html'],
         ];

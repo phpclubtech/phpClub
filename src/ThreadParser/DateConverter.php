@@ -42,7 +42,7 @@ class DateConverter
 
         $withEngMonths = strtr($date, $rusToEng);
 
-        return preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths);
+        return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths));
     }
 }
 
