@@ -1,0 +1,3 @@
+tests/ThreadParser/* linguist-vendored
+tests/ThreadParser/* linguist-generated=true
+public/media/js/swag.js linguist-generated=true
