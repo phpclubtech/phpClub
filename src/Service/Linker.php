@@ -10,17 +10,15 @@ namespace phpClub\Service;
 
 use Doctrine\ORM\EntityManager;
 use phpClub\Entity\ArchiveLink;
+use phpClub\Repository\ArchiveLinkRepository;
+use phpClub\Repository\ThreadRepository;
 
 class Linker
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    public function __construct(EntityManager $em)
+    public function __construct(ArchiveLinkRepository $archiveLinkRepository, ThreadRepository $threadRepository)
     {
-        $this->em = $em;
+        $this->archiveLinkRepository = $archiveLinkRepository;
+        $this->threadRepository = $threadRepository;
     }
 
     public function addLink()
@@ -35,10 +33,10 @@ class Linker
 
             $post['archive-link'] = trim($post['archive-link']);
 
-            $linkRepository = $this->em->getRepository('phpClub\Entity\ArchiveLink');
+            $linkRepository = $this->archiveLinkRepository;
 
             if (Validator::validateArchiveLink($post['archive-link'])) {
-                $thread = $this->em->getRepository('phpClub\Entity\Thread')->find($post['thread']);
+                $thread = $this->threadRepository->find($post['thread']);
 
                 if ($thread) {
                     if (!$linkRepository->findOneBy(['link' => $post['archive-link']])) {
@@ -46,8 +44,8 @@ class Linker
                         $archiveLink->setThread($thread);
                         $archiveLink->setLink($post['archive-link']);
 
-                        $this->em->persist($archiveLink);
-                        $this->em->flush();
+                        $this->archiveLinkRepository($archiveLink);
+                        $this->archiveLinkRepository();
 
                         return $thread->getNumber();
                     }
@@ -60,13 +58,13 @@ class Linker
 
     public function removeLink(int $id)
     {
-        $archiveLink = $this->em->getRepository('phpClub\Entity\ArchiveLink')->find($id);
+        $archiveLink = $this->$this->archiveLinkRepository->find($id);
 
         $threadNumber = $archiveLink->getThread()->getNumber();
 
         if ($archiveLink) {
-            $this->em->remove($archiveLink);
-            $this->em->flush();
+            $this->archiveLinkRepository->remove($archiveLink);
+            $this->archiveLinkRepository->flush();
 
             return $threadNumber;
         }

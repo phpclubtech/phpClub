@@ -3,8 +3,9 @@ namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
+/** 
 * @Entity @Table(name="threads")
+* @Entity(repositoryClass="phpClub\Repository\ThreadRepository")
 **/
 class Thread
 {

@@ -1,7 +1,10 @@
 <?php
 namespace phpClub\Entity;
 
-/** @Entity @Table(name="lastposts") **/
+/** 
+* @Entity @Table(name="lastposts") 
+* @Entity(repositoryClass="phpClub\Repository\LastPostRepository") 
+**/
 class LastPost
 {
     /** @Id @Column(type="integer") @GeneratedValue **/

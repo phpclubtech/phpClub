@@ -1,12 +1,13 @@
 <?php
 namespace phpClub\Service;
 
-use \Doctrine\ORM\EntityManager;
 use phpClub\Entity\RefLink;
+use phpClub\Repository\PostRepository;
+use phpClub\Repository\RefLinkRepository;
 
 class Helper
 {
-    public static function insertChain(EntityManager $em, $forPost, $reference, $depth = 0)
+    public static function insertChain(RefLinkRepository $refLinkRepository, PostRepository $postRepository, $forPost, $reference, $depth = 0)
     {
         if ($depth == 0) {
             $reflink = new Reflink();
@@ -14,52 +15,52 @@ class Helper
             $reflink->setReference($forPost);
             $reflink->setDepth($depth);
 
-            $em->persist($reflink);
-            $em->flush();
+            $refLinkRepository->persist($reflink);
+            $refLinkRepository->flush();
         }
 
         $references = Validator::validateRefLinks($reference->getComment());
 
         foreach ($references as $r) {
-            $r = $em->getRepository('phpClub\Entity\Post')->find($r);
+            $r = $postRepository->find($r);
 
             if ($r) {
                 $reflink = new RefLink();
                 $reflink->setPost($forPost);
                 $reflink->setReference($r);
                 $reflink->setDepth($depth + 1);
-                $em->persist($reflink);
-                $em->flush();
+                $refLinkRepository->persist($reflink);
+                $refLinkRepository->flush();
 
                 $reflink = new RefLink();
                 $reflink->setPost($r);
                 $reflink->setReference($forPost);
                 $reflink->setDepth($depth * -1 - 1);
-                $em->persist($reflink);
-                $em->flush();
+                $refLinkRepository->persist($reflink);
+                $refLinkRepository->flush();
 
-                Helper::insertChain($em, $forPost, $r, $depth + 1);
+                Helper::insertChain($refLinkRepository, $postRepository, $forPost, $r, $depth + 1);
             }
         }
     }
 
-    public static function getChain($number, EntityManager $em)
+    public static function getChain($number, RefLinkRepository $refLinkRepository)
     {
         static $chain = [];
 
         if (!in_array($number, $chain)) {
             $chain[] = $number;
 
-            $links = $em->getRepository('phpClub\Entity\RefLink')->findBy(['post' => $number]);
+            $links = $refLinkRepository->findBy(['post' => $number]);
 
             foreach ($links as $link) {
-                Helper::getChain($link->getReference(), $em);
+                Helper::getChain($link->getReference(), $refLinkRepository);
             }
 
-            $links = $em->getRepository('phpClub\Entity\RefLink')->findBy(['reference' => $number]);
+            $links = $refLinkRepository->findBy(['reference' => $number]);
 
             foreach ($links as $link) {
-                Helper::getChain($link->getPost(), $em);
+                Helper::getChain($link->getPost(), $refLinkRepository);
             }
         }
 

@@ -3,6 +3,7 @@ namespace phpClub\Entity;
 
 /**
 * @Entity @Table(name="refmap")
+* @Entity(repositoryClass="phpClub\Repository\RefLinkRepository")
 **/
 class RefLink
 {

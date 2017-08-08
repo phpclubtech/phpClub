@@ -1,7 +1,10 @@
 <?php
 namespace phpClub\Entity;
 
-/** @Entity @Table(name="archivelinks") **/
+/** 
+* @Entity @Table(name="archivelinks") 
+* @Entity(repositoryClass="phpClub\Repository\ArchiveLinkRepository") 
+**/
 class ArchiveLink
 {
     /** @Id @Column(type="integer") @GeneratedValue **/

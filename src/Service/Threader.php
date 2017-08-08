@@ -9,28 +9,33 @@
 namespace phpClub\Service;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
-use phpClub\Entity\Thread;
 use phpClub\Entity\File;
-use phpClub\Entity\Post;
 use phpClub\Entity\LastPost;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
+use phpClub\Repository\FileRepository;
+use phpClub\Repository\LastPostRepository;
+use phpClub\Repository\PostRepository;
+use phpClub\Repository\RefLinkRepository;
+use phpClub\Repository\ThreadRepository;
 use Symfony\Component\Cache\Simple\FilesystemCache;
 
 class Threader
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    /**
      * @var \phpClub\Service\Authorizer
      */
     protected $authorizer;
 
-    public function __construct(EntityManager $em, Authorizer $authorizer)
-    {
-        $this->em = $em;
+    public function __construct(ThreadRepository $threadRepository, PostRepository $postRepository,
+        LastPostRepository $lastPostRepository, RefLinkRepository $refLinkRepository,
+        FileRepository $fileRepository, Authorizer $authorizer) {
+
+        $this->threadRepository   = $threadRepository;
+        $this->postRepository     = $postRepository;
+        $this->lastPostRepository = $lastPostRepository;
+        $this->refLinkRepository  = $refLinkRepository;
+        $this->fileRepository     = $fileRepository;
 
         $this->authorizer = $authorizer;
     }
@@ -58,14 +63,14 @@ class Threader
                     throw new \Exception("Invalid thread file");
                 }
 
-                $json = file_get_contents(Helper::getThreadUrl($someThread->num));
+                $json       = file_get_contents(Helper::getThreadUrl($someThread->num));
                 $jsonthread = json_decode($json);
 
                 if (!$jsonthread) {
                     throw new \Exception("Failed decoding thread json file");
                 }
 
-                $thread = $this->em->getRepository('phpClub\Entity\Thread')->find($jsonthread->current_thread);
+                $thread = $this->threadRepository->find($jsonthread->current_thread);
 
                 if (!$thread) {
                     $thread = new Thread();
@@ -74,12 +79,12 @@ class Threader
                     mkdir(Helper::getSrcDirectoryPath($jsonthread->current_thread));
                     mkdir(Helper::getThumbDirectoryPath($jsonthread->current_thread));
 
-                    $this->em->persist($thread);
-                    $this->em->flush();
+                    $this->threadRepository->persist($thread);
+                    $this->threadRepository->flush();
                 }
 
                 foreach ($jsonthread->threads['0']->posts as $jsonpost) {
-                    if ($this->em->getRepository('phpClub\Entity\Post')->find($jsonpost->num)) {
+                    if ($this->postRepository->find($jsonpost->num)) {
                         continue;
                     }
 
@@ -87,22 +92,20 @@ class Threader
                     $post->setThread($thread);
                     $post->fillData($jsonpost);
 
-                    $this->em->persist($post);
-                    $this->em->flush();
-
+                    $this->postRepository->persist($post);
+                    $this->postRepository->flush();
 
                     $limit = 3;
 
-                    $lastPosts = $this->em->getRepository('phpClub\Entity\LastPost')
-                        ->findBy(['thread' => $thread->getNumber()]);
+                    $lastPosts = $this->lastPostRepository->findBy(['thread' => $thread->getNumber()]);
 
                     if (count($lastPosts) < $limit) {
                         $lastPost = new LastPost();
                         $lastPost->setThread($thread);
                         $lastPost->setPost($post);
 
-                        $this->em->persist($lastPost);
-                        $this->em->flush();
+                        $this->lastPostRepository->persist($lastPost);
+                        $this->lastPostRepository->flush();
                     } else {
                         foreach ($lastPosts as $key => $lastPost) {
                             if ($key == $limit - 1) {
@@ -111,11 +114,11 @@ class Threader
                                 $lastPosts[$key]->setPost($lastPosts[$key + 1]->getPost());
                             }
 
-                            $this->em->flush();
+                            $this->lastPostRepository->flush();
                         }
                     }
 
-                    Helper::insertChain($this->em, $post, $post);
+                    Helper::insertChain($this->refLinkRepository, $this->postRepository, $post, $post);
 
                     foreach ($jsonpost->files as $jsonfile) {
                         if ($jsonfile->displayname == 'Стикер') {
@@ -126,10 +129,10 @@ class Threader
                         $file->setPost($post);
                         $file->fillData($jsonfile);
 
-                        $this->em->persist($file);
-                        $this->em->flush();
+                        $this->fileRepository->persist($file);
+                        $this->fileRepository->flush();
 
-                        $content = file_get_contents(Helper::getSrcUrl($file->getPath()));
+                        $content   = file_get_contents(Helper::getSrcUrl($file->getPath()));
                         $thumbnail = file_get_contents(Helper::getThumbUrl($file->getThumbnail()));
 
                         if (!$content or !$thumbnail) {
@@ -153,21 +156,19 @@ class Threader
     {
         //$logged = $this->authorizer->isLoggedIn();
 
-        $threadsQuery = $this->em->createQuery('SELECT COUNT(p) as post_count, t.number FROM phpClub\Entity\Thread t  JOIN phpClub\Entity\Post p WHERE p.thread = t.number GROUP BY t.number ORDER BY t.number DESC');
+        $threadsQuery = $this->threadRepository->getPostCount();
+        //exit(var_dump($threadsQuery));
         $threads = $threadsQuery->getArrayResult();
 
         foreach ($threads as $key => $value) {
             $thread = new Thread();
             $thread->setNumber($value['number']);
-            
+
             $count = $value["post_count"];
-            
-            $opPost = $this->em
-                ->getRepository('phpClub\Entity\Post')
-                ->findOneBy(['post' => $thread->getNumber()]);
-            $lastPosts = $this->em
-                ->getRepository('phpClub\Entity\LastPost')
-                ->findBy(['thread' => $thread->getNumber()]);
+
+            $opPost = $this->postRepository->findOneBy(['post' => $thread->getNumber()]);
+
+            $lastPosts = $this->lastPostRepository->findBy(['thread' => $thread->getNumber()]);
 
             $thread->addPost($opPost);
 
@@ -183,8 +184,8 @@ class Threader
 
     public function getThread(int $number)
     {
-        $thread = $this->em->getRepository('phpClub\Entity\Thread')->find($number);
-        
+        $thread = $this->threadRepository->find($number);
+
         if ($thread === null) {
             throw new \InvalidArgumentException("Thread with number {$number} does not exist in the system.");
         }
@@ -199,11 +200,10 @@ class Threader
         // $number = $this->getChainQuery();
 
         /*if (!$number) {
-            $this->redirect();
+        $this->redirect();
         }*/
 
-        $chain = $this->em->getRepository('phpClub\Entity\RefLink')
-            ->findBy(['post' => $number], ['reference' => "ASC"]);
+        $chain = $this->refLinkRepository->findBy(['post' => $number], ['reference' => "ASC"]);
 
         if ($chain === null) {
             throw new \InvalidArgumentException("Chain with number {$number} does not exist in the system.");

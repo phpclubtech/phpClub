@@ -5,6 +5,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
 * @Entity @Table(name="posts")
+* @Entity(repositoryClass="phpClub\Repository\PostRepository")
 **/
 class Post
 {

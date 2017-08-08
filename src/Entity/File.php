@@ -3,6 +3,7 @@ namespace phpClub\Entity;
 
 /**
 * @Entity @Table(name="files")
+* @Entity(repositoryClass="phpClub\Repository\FileRepository")
 **/
 class File
 {

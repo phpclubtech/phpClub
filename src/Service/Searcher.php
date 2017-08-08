@@ -10,17 +10,13 @@ namespace phpClub\Service;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
+use phpClub\Repository\PostRepository;
 
 class Searcher
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    public function __construct(EntityManager $em)
+    public function __construct(PostRepository $postRepository)
     {
-        $this->em = $em;
+        $this->postRepository = $postRepository;
     }
 
     public function search(string $searchQuery)
@@ -41,7 +37,7 @@ class Searcher
             $ids[]=$result['id'];
         }
 
-        $posts = $this->em->getRepository('phpClub\Entity\Post')->findBy(["post"=>$ids]);
+        $posts = $this->postRepository->findBy(["post"=>$ids]);
 
         return $posts;
     }

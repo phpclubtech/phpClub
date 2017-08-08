@@ -6,25 +6,32 @@
  * Time: 2:05 PM
  */
 
-require(__DIR__ . '/../vendor/autoload.php');
+require __DIR__ . '/../vendor/autoload.php';
 
-use Slim\Container;
-use Slim\Http\Response;
-use Slim\Http\Request;
-use Doctrine\ORM\Tools\Setup;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
+use phpClub\Controller\ArchiveLinkController;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
-use phpClub\Controller\ArchiveLinkController;
-use Slim\Views\PhpRenderer as View;
-use phpClub\Service\Threader;
+use phpClub\Entity\File;
+use phpClub\Entity\LastPost;
+use phpClub\Entity\Post;
+use phpClub\Entity\RefLink;
+use phpClub\Entity\Thread;
+use phpClub\Entity\User;
+use phpClub\Entity\ArchiveLink;
 use phpClub\Service\Authorizer;
-use phpClub\Service\Searcher;
 use phpClub\Service\Linker;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use phpClub\Service\Searcher;
+use phpClub\Service\Threader;
+use Slim\Container;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Views\PhpRenderer as View;
 use Symfony\Component\Cache\Simple\AbstractCache;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 
 $slimConfig = [
     'settings' => [
@@ -35,8 +42,8 @@ $slimConfig = [
 $di = new Container($slimConfig);
 
 /* General services section */
-$di['EntityManager'] = function (Container $di): EntityManager {
-    $paths = array(__DIR__ . "/Entity/");
+$di['EntityManager'] = function (Container $di): EntityManager{
+    $paths     = array(__DIR__ . "/Entity/");
     $isDevMode = false;
 
     $config = $di->get('config');
@@ -49,10 +56,9 @@ $di['EntityManager'] = function (Container $di): EntityManager {
     return $entityManager;
 };
 
-$di['config'] = function (): array {
+$di['config'] = function (): array{
     return parse_ini_file(__DIR__ . '/../config/config.ini');
 };
-
 
 /* Application services section */
 $di['View'] = function (): View {
@@ -60,29 +66,32 @@ $di['View'] = function (): View {
 };
 
 $di['Threader'] = function (Container $di): Threader {
-    return new Threader($di->get('EntityManager'), $di->get('Authorizer'));
+    return new Threader($di->get('EntityManager')->getRepository(Thread::class),
+        $di->get('EntityManager')->getRepository(Post::class),
+        $di->get('EntityManager')->getRepository(LastPost::class),
+        $di->get('EntityManager')->getRepository(RefLink::class),
+        $di->get('EntityManager')->getRepository(File::class), $di->get('Authorizer'));
 };
 
 $di['Authorizer'] = function (Container $di): Authorizer {
-    return new Authorizer($di->get('EntityManager'));
+    return new Authorizer($di->get('EntityManager')->getRepository(User::class));
 };
 
 $di['Searcher'] = function (Container $di): Searcher {
-    return new Searcher($di->get('EntityManager'));
+    return new Searcher($di->get('EntityManager')->getRepository(Post::class));
 };
 
 $di['Linker'] = function (Container $di): Linker {
-    return new Linker($di->get('EntityManager'));
+    return new Linker($di->get('EntityManager')->getRepository(ArchiveLink::class, Thread::class));
 };
 
 $di["Cache"] = function (Container $di): AbstractCache {
     return new FilesystemCache();
 };
 
-
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
-    return new BoardController($di->get('Threader'), $di->get('Authorizer'), $di->get('View') , $di->get('Cache'));
+    return new BoardController($di->get('Threader'), $di->get('Authorizer'), $di->get('View'), $di->get('Cache'));
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
@@ -96,7 +105,6 @@ $di['UsersController'] = function (Container $di): UsersController {
 $di['ArchiveLinkController'] = function (Container $di): ArchiveLinkController {
     return new ArchiveLinkController($di->get('Authorizer'), $di->get('Linker'));
 };
-
 
 /* Error handler for altering PHP errors output */
 $di['PHPErrorHandler'] = function () {

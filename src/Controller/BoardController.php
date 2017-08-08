@@ -53,7 +53,7 @@ class BoardController
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        $template = $this->getOrSetCache('/board.phtml', ['threads' => $this->threader->getThreads(), 'logged' => $this->authorizer->isLoggedIn()], 'bord_index' . $this->authorizer->isLoggedIn());
+        $template = $this->getOrSetCache('/board.phtml', ['threads' => $this->threader->getThreads(), 'logged' => $this->authorizer->isLoggedIn()], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 
         return $this->renderHtml($response, $template);
     }
@@ -66,7 +66,7 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        $template = $this->getOrSetCache('/thread.phtml', ['thread' => $thread, 'logged' => $this->authorizer->isLoggedIn()], 'thread_' . (int) $args['thread'] . '_' . $this->authorizer->isLoggedIn());
+        $template = $this->getOrSetCache('/thread.phtml', ['thread' => $thread, 'logged' => $this->authorizer->isLoggedIn()], 'thread_' . (int) $args['thread'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 
         return $this->renderHtml($response, $template);
     }
@@ -79,7 +79,7 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        $template = $this->getOrSetCache('/chain.phtml', ['posts' => $chain, 'logged' => $this->authorizer->isLoggedIn()], 'chain' . (int) $args['post'] . '_' . $this->authorizer->isLoggedIn());
+        $template = $this->getOrSetCache('/chain.phtml', ['posts' => $chain, 'logged' => $this->authorizer->isLoggedIn()], 'chain' . (int) $args['post'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 
         return $this->renderHtml($response, $template);
     }
