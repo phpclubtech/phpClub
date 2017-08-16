@@ -44,8 +44,8 @@ class Linker
                         $archiveLink->setThread($thread);
                         $archiveLink->setLink($post['archive-link']);
 
-                        $this->archiveLinkRepository($archiveLink);
-                        $this->archiveLinkRepository();
+                        $this->archiveLinkRepository->persist($archiveLink);
+                        $this->archiveLinkRepository->flush();
 
                         return $thread->getNumber();
                     }

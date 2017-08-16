@@ -7,4 +7,3 @@ class ArchiveLinkRepository extends BaseEntityRepository
 {
 
 }
-ы

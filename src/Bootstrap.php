@@ -82,7 +82,10 @@ $di['Searcher'] = function (Container $di): Searcher {
 };
 
 $di['Linker'] = function (Container $di): Linker {
-    return new Linker($di->get('EntityManager')->getRepository(ArchiveLink::class, Thread::class));
+    return new Linker(
+        $di->get('EntityManager')->getRepository(ArchiveLink::class),
+        $di->get('EntityManager')->getRepository(Thread::class)
+    );
 };
 
 $di["Cache"] = function (Container $di): AbstractCache {
