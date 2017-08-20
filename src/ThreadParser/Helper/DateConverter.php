@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\ThreadParser\Helper;
 
 class DateConverter
 {
+    /**
+     * @return \DateTimeImmutable
+     * @throws \Exception
+     */
     public function toDateTime(string $date): \DateTimeImmutable
     {
         $normalized = $this->normalizeDate($date);
@@ -23,6 +27,10 @@ class DateConverter
         throw new \Exception("Unable to parse date: {$date}");
     }
 
+    /**
+     * @param string $date
+     * @return string
+     */
     private function normalizeDate(string $date): string
     {
         $rusToEng = [

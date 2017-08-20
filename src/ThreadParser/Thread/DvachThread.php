@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\Thread;
 
-use phpClub\ThreadParser\DTO\File;
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
 use Symfony\Component\DomCrawler\Crawler;
 
 class DvachThread implements ThreadInterface
@@ -48,11 +49,11 @@ class DvachThread implements ThreadInterface
                 | //span[starts-with(@id, "exlink_")]';
     }
 
-    public function getFile(Crawler $fileNode): File
+    public function extractFile(Crawler $fileNode, Post $post): File
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
 
-        return new File($fullName, $thumbName, (int) $width, (int) $height);
+        return File::create($fullName, $thumbName, (int) $width, (int) $height, $post);
     }
 
     private function extractOnClickJsArgs(Crawler $fileNode): array

@@ -16,7 +16,6 @@ use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
 use phpClub\Entity\File;
-use phpClub\Entity\LastPost;
 use phpClub\Entity\Post;
 use phpClub\Entity\RefLink;
 use phpClub\Entity\Thread;
@@ -26,6 +25,7 @@ use phpClub\Service\Authorizer;
 use phpClub\Service\Linker;
 use phpClub\Service\Searcher;
 use phpClub\Service\Threader;
+use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -49,6 +49,10 @@ $di['EntityManager'] = function (Container $di): EntityManager{
     $config = $di->get('config');
 
     $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+
+    $namingStrategy = new \Doctrine\ORM\Mapping\UnderscoreNamingStrategy();
+    $metaConfig->setNamingStrategy($namingStrategy);
+
     $metaConfig->setAutoGenerateProxyClasses(AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
 
     $entityManager = EntityManager::create($config, $metaConfig);
@@ -61,16 +65,28 @@ $di['config'] = function (): array{
 };
 
 /* Application services section */
-$di['View'] = function (): View {
-    return new View(__DIR__ . '/../templates');
+$di['DropboxClient'] = function ($di) {
+    return new \Spatie\Dropbox\Client($di['config']['dropbox_token']);
 };
 
-$di['Threader'] = function (Container $di): Threader {
-    return new Threader($di->get('EntityManager')->getRepository(Thread::class),
-        $di->get('EntityManager')->getRepository(Post::class),
-        $di->get('EntityManager')->getRepository(LastPost::class),
-        $di->get('EntityManager')->getRepository(RefLink::class),
-        $di->get('EntityManager')->getRepository(File::class), $di->get('Authorizer'));
+$di['Guzzle'] = function () {
+    return new GuzzleHttp\Client();
+};
+
+$di['EventManager'] = function () {
+    return new Zend\EventManager\EventManager();
+};
+
+$di['DvachApiClient'] = function ($di) {
+    return new DvachApiClient($di['Guzzle'], $di['EventManager']);
+};
+
+$di['DvachApiClient.cacheable'] = function ($di) {
+    return DvachApiClient::createCacheable($di['EventManager']);
+};
+
+$di['View'] = function (): View {
+    return new View(__DIR__ . '/../templates');
 };
 
 $di['Authorizer'] = function (Container $di): Authorizer {

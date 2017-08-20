@@ -4,49 +4,44 @@ namespace phpClub\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /** 
-* @Entity @Table(name="threads")
 * @Entity(repositoryClass="phpClub\Repository\ThreadRepository")
 **/
 class Thread
 {
-
     /** @Id @Column(type="integer") **/
-    protected $number;
+    private $id;
     
-    /** @OneToMany(targetEntity="phpClub\Entity\Post", mappedBy="thread") **/
-    public $posts;
+    /** @OneToMany(targetEntity="phpClub\Entity\Post", mappedBy="thread", cascade={"persist", "remove"}) **/
+    private $posts;
 
     /** @OneToMany(targetEntity="phpClub\Entity\ArchiveLink", mappedBy="thread") **/
-    public $archiveLinks;
+    private $archiveLinks;
 
-    public function __construct()
+    /**
+     * @param $id
+     * @param Post[] $posts
+     * @param ArchiveLink[] $archiveLinks
+     */
+    public function __construct($id, array $posts = [], array $archiveLinks = [])
     {
-        $this->posts = new ArrayCollection();
-        $this->archiveLinks = new ArrayCollection();
-    }
-
-    public function getNumber()
-    {
-        return $this->number;
-    }
-
-    public function setNumber($number)
-    {
-        $this->number = $number;
+        $this->id = $id;
+        $this->posts = new ArrayCollection($posts);
+        $this->archiveLinks = new ArrayCollection($archiveLinks);
     }
 
     public function addPost(Post $post)
     {
-        $this->posts[] = $post;
-
-        return $this;
+        $this->posts->add($post);
     }
 
-    public function removePost(Post $post)
+    public function getId()
     {
-        $this->posts->removeElement($post);
+        return $this->id;
     }
 
+    /**
+     * @return Post[]|ArrayCollection
+     */
     public function getPosts()
     {
         return $this->posts;
@@ -62,6 +57,8 @@ class Thread
     public function removeArchiveLink(ArchiveLink $archiveLink)
     {
         $this->archiveLinks->removeElement($archiveLink);
+        
+        return $this;
     }
 
     public function getArchiveLinks()

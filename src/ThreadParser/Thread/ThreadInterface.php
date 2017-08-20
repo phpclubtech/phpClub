@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\Thread;
 
-use phpClub\ThreadParser\DTO\File;
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
 use Symfony\Component\DomCrawler\Crawler;
 
 interface ThreadInterface
@@ -23,5 +24,5 @@ interface ThreadInterface
 
     public function getFilesXPath(): string;
 
-    public function getFile(Crawler $fileNode): File;
+    public function extractFile(Crawler $fileNode, Post $post): File;
 }

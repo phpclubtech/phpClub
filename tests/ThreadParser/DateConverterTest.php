@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use PHPUnit\Framework\TestCase;
-use phpClub\ThreadParser\DateConverter;
+use phpClub\ThreadParser\Helper\DateConverter;
 
 class DateConverterTest extends TestCase
 {

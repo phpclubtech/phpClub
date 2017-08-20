@@ -2,28 +2,21 @@
 namespace phpClub\Entity;
 
 /**
-* @Entity @Table(name="refmap")
 * @Entity(repositoryClass="phpClub\Repository\RefLinkRepository")
 **/
 class RefLink
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
-    protected $id;
+    private $id;
 
-    /**
-    * @ManyToOne(targetEntity="phpClub\Entity\Post")
-    * @JoinColumn(name="post", referencedColumnName="post")
-    */
-    protected $post;
+    /** @ManyToOne(targetEntity="phpClub\Entity\Post") */
+    private $post;
 
-    /**
-    * @ManyToOne(targetEntity="phpClub\Entity\Post")
-    * @JoinColumn(name="reference", referencedColumnName="post")
-    */
-    protected $reference;
+    /** @ManyToOne(targetEntity="phpClub\Entity\Post") */
+    private $reference;
 
     /** @Column(type="integer") **/
-    protected $depth;
+    private $depth;
 
     public function getId()
     {

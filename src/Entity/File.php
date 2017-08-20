@@ -1,183 +1,104 @@
 <?php
+
+declare(strict_types=1);
+
 namespace phpClub\Entity;
 
 /**
-* @Entity @Table(name="files")
 * @Entity(repositoryClass="phpClub\Repository\FileRepository")
 **/
 class File
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
-    protected $id;
+    private $id;
+
+    /** @Column(type="string", nullable=true) **/
+    private $relativePath;
+
+    /** @Column(type="string", nullable=true) **/
+    private $thumbnailRelativePath;
+
+    /** @Column(type="string", nullable=true) **/
+    private $remoteUrl;
+
+    /** @Column(type="string", nullable=true) **/
+    private $thumbnailRemoteUrl;
+
+    /** @Column(type="integer", nullable=true) **/
+    private $size;
+
+    /** @Column(type="integer") **/
+    private $width;
+
+    /** @Column(type="integer") **/
+    private $height;
 
     /**
-    * @ManyToOne(targetEntity="phpClub\Entity\Post", inversedBy="files")
-    * @JoinColumn(name="post", referencedColumnName="post")
-    **/
-    protected $post;
+     * @ManyToOne(targetEntity="phpClub\Entity\Post", inversedBy="files")
+     * @JoinColumn(nullable=false)
+     **/
+    private $post;
 
-    /** @Column(type="string") **/
-    protected $displayname;
+    public static function create(
+        string $path,
+        string $thumbnailPath,
+        int $width,
+        int $height,
+        Post $post,
+        int $size = 0
+    ): self {
+        $file = new self();
 
-    /** @Column(type="time", nullable=true) **/
-    protected $duration;
-
-    /** @Column(type="string") **/
-    protected $fullname;
-
-    /** @Column(type="integer") **/
-    protected $height;
-
-    /** @Column(type="string") **/
-    protected $md5;
-
-    /** @Column(type="string") **/
-    protected $name;
-
-    /** @Column(type="integer") **/
-    protected $nsfw;
-
-    /** @Column(type="string") **/
-    protected $path;
-
-    /** @Column(type="integer") **/
-    protected $size;
-
-    /** @Column(type="string") **/
-    protected $thumbnail;
-
-    /** @Column(type="integer") **/
-    protected $tn_height;
-
-    /** @Column(type="integer") **/
-    protected $tn_width;
-
-    /** @Column(type="integer") **/
-    protected $type;
-
-    /** @Column(type="integer") **/
-    protected $width;
-
-    public function fillData($json)
-    {
-        $allowed = [
-            'displayname',
-            'duration',
-            'fullname',
-            'height',
-            'md5',
-            'name',
-            'nsfw',
-            'path',
-            'size',
-            'thumbnail',
-            'tn_height',
-            'tn_width',
-            'type',
-            'width'
-        ];
-
-        foreach ($allowed as $field) {
-            if (property_exists($json, $field)) {
-                if ($field == 'duration') {
-                    $this->$field = new \DateTime($json->$field);
-
-                    continue;
-                }
-
-                $this->$field = $json->$field;
-            }
+        if (filter_var($path, FILTER_VALIDATE_URL)) {
+            $file->remoteUrl = $path;
+            $file->thumbnailRemoteUrl = $thumbnailPath;
+        } else {
+            $file->relativePath = $path;
+            $file->thumbnailRelativePath = $thumbnailPath;
         }
+
+        $file->width = $width;
+        $file->height = $height;
+        $file->post = $post;
+        $file->size = $size;
+        
+        return $file;
     }
-    
-    public function getPost()
+
+    public function isRemote(): bool
+    {
+        return $this->remoteUrl !== null;
+    }
+
+    public function changeRemoteUrl(string $remoteUrl, string $thumbnailRemoteUrl)
+    {
+        $this->remoteUrl = $remoteUrl;
+        $this->thumbnailRemoteUrl = $thumbnailRemoteUrl;
+    }
+
+    public function getRelativePath() 
+    {
+        return $this->relativePath;
+    }
+
+    public function getThumbnailRelativePath() 
+    {
+        return $this->thumbnailRelativePath;
+    }
+
+    public function getRemoteUrl()
+    {
+        return $this->remoteUrl;
+    }
+
+    public function getThumbnailRemoteUrl()
+    {
+        return $this->thumbnailRemoteUrl;
+    }
+
+    public function getPost(): Post
     {
         return $this->post;
-    }
-
-    public function setPost($post)
-    {
-        $this->post = $post;
-    }
-
-    public function getDisplayname()
-    {
-        return $this->displayname;
-    }
-
-    public function setDisplayname($displayname)
-    {
-        $this->displayname = $displayname;
-    }
-
-    public function getDuration()
-    {
-        return $this->duration;
-    }
-
-    public function setDuration($duration)
-    {
-        $this->duration = $duration;
-    }
-
-    public function getFullname()
-    {
-        return $this->fullname;
-    }
-
-    public function setFullname($fullname)
-    {
-        $this->fullname = $fullname;
-    }
-
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    public function setHeight($height)
-    {
-        $this->height = $height;
-    }
-
-    public function getMd5()
-    {
-        return $this->md5;
-    }
-
-    public function setMd5($md5)
-    {
-        $this->md5 = $md5;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function getNsfw()
-    {
-        return $this->nsfw;
-    }
-
-    public function setNsfw($nsfw)
-    {
-        $this->nsfw = $nsfw;
-    }
-
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    public function setPath($path)
-    {
-        $this->path = $path;
     }
 
     public function getSize()
@@ -185,58 +106,18 @@ class File
         return $this->size;
     }
 
-    public function setSize($size)
-    {
-        $this->size = $size;
-    }
-
-    public function getThumbnail()
-    {
-        return $this->thumbnail;
-    }
-
-    public function setThumbnail($thumbnail)
-    {
-        $this->thumbnail = $thumbnail;
-    }
-
-    public function getTn_height()
-    {
-        return $this->tn_height;
-    }
-
-    public function setTn_height($tn_height)
-    {
-        $this->tn_height = $tn_height;
-    }
-
-    public function getTn_width()
-    {
-        return $this->tn_width;
-    }
-
-    public function setTn_width($tn_width)
-    {
-        $this->tn_width = $tn_width;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
     public function getWidth()
     {
         return $this->width;
     }
 
-    public function setWidth($width)
+    public function getHeight()
     {
-        $this->width = $width;
+        return $this->height;
+    }
+
+    public function setSize($size)
+    {
+        $this->size = $size;
     }
 }

@@ -2,7 +2,6 @@
 namespace phpClub\Entity;
 
 /**
-* @Entity @Table(name="users")
 * @Entity(repositoryClass="phpClub\Repository\UserRepository")
 **/
 class User

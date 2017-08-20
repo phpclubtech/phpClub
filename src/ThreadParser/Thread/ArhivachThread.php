@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\Thread;
 
-use phpClub\ThreadParser\DTO\File;
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ArhivachThread implements ThreadInterface
@@ -44,7 +45,7 @@ class ArhivachThread implements ThreadInterface
         return '//span[@class="post_comment"]/div[@class="post_image_block"]';
     }
 
-    public function getFile(Crawler $fileNode): File
+    public function extractFile(Crawler $fileNode, Post $post): File
     {
         $fileXPath = '//a[@class="expand_image"]';
         $fileNode = $fileNode->filterXPath($fileXPath);
@@ -57,7 +58,7 @@ class ArhivachThread implements ThreadInterface
 
         // Hack for old arhivach threads
         if (strpos($onClickArgs[1], 'abload.de') !== false) {
-            return new File($onClickArgs[1], str_replace('/img/', '/thumb/', $onClickArgs[1]), 0, 0);
+            return File::create($onClickArgs[1], str_replace('/img/', '/thumb/', $onClickArgs[1]), 0, 0, $post);
         }
 
         list(, $fullName, $width, $height) = $onClickArgs;
@@ -71,6 +72,6 @@ class ArhivachThread implements ThreadInterface
 
         $thumbName = $thumbNode->attr('src');
 
-        return new File($fullName, $thumbName, (int) $width, (int) $height);
+        return File::create($fullName, $thumbName, (int) $width, (int) $height, $post);
     }
 }

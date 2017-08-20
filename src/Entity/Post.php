@@ -4,59 +4,87 @@ namespace phpClub\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
-* @Entity @Table(name="posts")
 * @Entity(repositoryClass="phpClub\Repository\PostRepository")
 **/
 class Post
 {
-    /**
-    * @ManyToOne(targetEntity="phpClub\Entity\Thread", inversedBy="posts")
-    * @JoinColumn(name="thread", referencedColumnName="number")
-    **/
-    protected $thread;
-
     /** @Id @Column(type="integer") **/
-    protected $post;
+    private $id;
 
     /** @Column(type="text") **/
-    protected $comment;
+    private $text;
+
+    /** @Column(type="date") **/
+    private $date;
+
+    /** @Column(type="string", nullable=true) **/
+    private $email;
+
+    /** @Column(type="boolean") */
+    private $isOpPost;
 
     /** @Column(type="string") **/
-    protected $date;
+    private $title;
 
     /** @Column(type="string") **/
-    protected $email;
+    private $author;
+    
+    /** @OneToMany(targetEntity="phpClub\Entity\File", mappedBy="post", cascade={"persist", "remove"}) **/
+    private $files;
+    
+    /**
+     * @ManyToOne(targetEntity="phpClub\Entity\Thread", inversedBy="posts")
+     * @JoinColumn(nullable=false)
+     **/
+    private $thread;
 
-    /** @Column(type="string") **/
-    protected $name;
-
-    /** @Column(type="string") **/
-    protected $subject;
-
-    /** @OneToMany(targetEntity="phpClub\Entity\File", mappedBy="post") **/
-    public $files;
-
-    public function __construct()
-    {
-        $this->files = new ArrayCollection();
+    public function __construct(
+        $id,
+        string $title,
+        string $author,
+        \DateTimeImmutable $date,
+        string $text,
+        Thread $thread,
+        array $files = [],
+        bool $isOpPost = false,
+        string $email = null
+    ) {
+        $this->id = $id;
+        $this->text = $text;
+        $this->date = $date;
+        $this->email = $email;
+        $this->isOpPost = $isOpPost;
+        $this->title = $title;
+        $this->author = $author;
+        $this->thread = $thread;
+        $this->files = $files ?: new ArrayCollection();
     }
 
-    public function fillData($json)
+    public function getId()
     {
-        $allowed = [
-            'num' => 'post',
-            'comment' => 'comment',
-            'date' => 'date',
-            'email' => 'email',
-            'name' => 'name',
-            'subject' => 'subject'
-        ];
+        return $this->id;
+    }
 
-        foreach ($allowed as $field => $property) {
-            if (property_exists($json, $field)) {
-                $this->$property = $json->$field;
-            }
+    public function addFile(File $file)
+    {
+        $this->files->add($file);
+    }
+
+    public function addFiles(array $files)
+    {
+        foreach ($files as $file) {
+            $this->addFile($file);
         }
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function getAuthor()
+    {
+        return $this->author;
     }
 
     public function getThread()
@@ -64,29 +92,9 @@ class Post
         return $this->thread;
     }
 
-    public function setThread($thread)
+    public function getText()
     {
-        $this->thread = $thread;
-    }
-
-    public function getPost()
-    {
-        return $this->post;
-    }
-
-    public function setPost($post)
-    {
-        $this->post = $post;
-    }
-
-    public function getComment()
-    {
-        return $this->comment;
-    }
-
-    public function setComment($comment)
-    {
-        $this->comment = $comment;
+        return $this->text;
     }
 
     public function getDate()
@@ -94,64 +102,21 @@ class Post
         return $this->date;
     }
 
-    public function setDate($date)
-    {
-        $this->date = $date;
-    }
-
     public function getEmail()
     {
         return $this->email;
     }
 
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
-    }
-
-    public function addFile(File $file)
-    {
-        $this->files[] = $file;
-
-        return $this;
-    }
-
-    public function removeFile(File $file)
-    {
-        $this->files->removeElement($file);
-    }
-
+    /**
+     * @return File[]|ArrayCollection
+     */
     public function getFiles()
     {
         return $this->files;
     }
-    
-    public function isOpPost()
-    {
-        if ($this->thread->getNumber() == $this->post) {
-            return true;
-        }
 
-        return false;
+    public function isOpPost(): bool
+    {
+        return $this->isOpPost;
     }
 }
