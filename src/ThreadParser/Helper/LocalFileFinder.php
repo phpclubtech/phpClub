@@ -23,14 +23,14 @@ class LocalFileFinder
         $this->oldThreadsRoot = $oldThreadsRoot;
     }
 
-    public function findAbsolutePathForFile(File $file): string
+    public function findAbsolutePath(File $file): string
     {
         assert(!$file->isRemote());
 
         return '';
     }
 
-    public function findThumbAbsolutePathForFile(File $file): string
+    public function findThumbAbsolutePath(File $file): string
     {
         assert(!$file->isRemote());
 

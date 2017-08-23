@@ -46,31 +46,26 @@ class DropboxFileStorage implements FileStorageInterface
 
     /**
      * @param File $file
-     * @throws \Exception
+     * @return void
      */
     public function put(File $file)
     {
-        if ($file->isRemote()) {
-            if ($this->alreadyUploaded($file)) {
-                return;
-            }
-
-            $resourceName = $file->getRemoteUrl();
-            $thumbResourceName = $file->getThumbnailRemoteUrl();
-        } else {
-            $resourceName = $this->fileFinder->findAbsolutePathForFile($file);
-            $thumbResourceName = $this->fileFinder->findThumbAbsolutePathForFile($file);
+        if ($file->isRemote() && $this->alreadyUploaded($file)) {
+            return;
         }
+
+        $resourceName = $file->getRemoteUrl() ?: $this->fileFinder->findAbsolutePath($file);
+        $thumbResourceName = $file->getThumbnailRemoteUrl() ?: $this->fileFinder->findThumbAbsolutePath($file);
         
-        $uploadAs = $this->uploadPathHelper->generateUploadPath($file);
-        $thumbUploadAs = $this->uploadPathHelper->generateThumbUploadPath($file);
+        $uploadAs = $this->uploadPathHelper->generateRelativePath($file);
+        $thumbUploadAs = $this->uploadPathHelper->generateRelativeThumbPath($file);
 
         // When fopen fails, PHP normally raises a warning. Function try_fopen throws an exception instead
         $this->dropboxClient->upload($uploadAs, \GuzzleHttp\Psr7\try_fopen($resourceName, 'r'));
         $this->dropboxClient->upload($thumbUploadAs, \GuzzleHttp\Psr7\try_fopen($thumbResourceName, 'r'));
 
-        $newRemoteUrl = $this->getSharedLink($uploadAs);
-        $newThumbRemoteUrl = $this->getSharedLink($thumbUploadAs);
+        $newRemoteUrl = $this->createSharedLink($uploadAs);
+        $newThumbRemoteUrl = $this->createSharedLink($thumbUploadAs);
 
         $file->changeRemoteUrl($newRemoteUrl, $newThumbRemoteUrl);
     }
@@ -83,7 +78,7 @@ class DropboxFileStorage implements FileStorageInterface
     private function alreadyUploaded(File $file): bool
     {
         try {
-            $uploadPath = $this->uploadPathHelper->generateUploadPath($file);
+            $uploadPath = $this->uploadPathHelper->generateRelativePath($file);
             return !! $this->dropboxClient->getMetadata($uploadPath);
         } catch (BadRequest $e) {
             return false;
@@ -95,7 +90,7 @@ class DropboxFileStorage implements FileStorageInterface
      * @return string
      * @throws \Exception
      */
-    private function getSharedLink(string $saveAs): string
+    private function createSharedLink(string $saveAs): string
     {
         $responseArray = $this->dropboxClient->createSharedLinkWithSettings($saveAs, [
             'requested_visibility' => 'public',
