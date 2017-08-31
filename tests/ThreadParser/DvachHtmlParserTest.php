@@ -53,7 +53,7 @@ class DvachHtmlParserTest extends TestCase
     {
         $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
         $posts = $thread->getPosts();
-        // It is enough to check only posts count, because $threadParser throws an exception when parsing goes wrong
+        // It is enough to check only posts count, because $threadParser throws an exception when parsing fails
         $this->assertGreaterThan(500, $posts->count());
         $this->assertNotEmpty($posts->first()->getAuthor());
         $this->assertNotEmpty($posts->first()->getId());

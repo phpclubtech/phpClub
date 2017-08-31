@@ -1,7 +1,8 @@
 {
     "autoload": {
         "psr-4": {
-            "phpClub\\": "src/"
+            "phpClub\\": "src/",
+            "Tests\\": "tests/"
         }
     },
     "require": {
@@ -20,6 +21,8 @@
         "Kevinrob/guzzle-cache-middleware": "^2.1"
     },
     "scripts": {
-        "test": "vendor/bin/phpunit --bootstrap vendor/autoload.php tests/ --stop-on-failure --colors=always"
+        "test": "vendor/bin/phpunit --bootstrap vendor/autoload.php tests/ --stop-on-failure --colors=always",
+        "diff": "vendor/bin/doctrine-migrations migrations:diff",
+        "migrate": "vendor/bin/doctrine-migrations migrations:migrate"
     }
 }

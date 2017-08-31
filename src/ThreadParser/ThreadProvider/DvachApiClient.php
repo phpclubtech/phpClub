@@ -25,6 +25,7 @@ class DvachApiClient
     const POST_TEXT = 'comment';
     const THREAD_TITLE = 'subject';
     const THREAD_NUMBER = 'num';
+    const FILE_ORIGINAL_NAME = 'fullname';
 
     /**
      * @var Client
@@ -159,6 +160,7 @@ class DvachApiClient
             $fileArray['width'],
             $fileArray['height'],
             $post,
+            $fileArray['fullname'],
             $fileArray['size']
         );
     }

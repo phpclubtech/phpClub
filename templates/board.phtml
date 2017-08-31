@@ -1,10 +1,13 @@
-<?php include(__DIR__ . '/base/header.phtml') ?>
-<?php include(__DIR__ . '/base/boardHeader.phtml') ?>
+<?php
+/** @var \phpClub\Entity\Thread[] $threads */
+require __DIR__ . '/base/header.phtml';
+require __DIR__ . '/base/boardHeader.phtml';
+?>
 
 <?php foreach ($threads as $thread) : ?>
     <section class="posts">
         <form id="posts-form">
-            <div id="thread-<?= $thread->getNumber() ?>" class="thread">
+            <div id="thread-<?= $thread->getId() ?>" class="thread">
                 <?php foreach ($thread->getPosts() as $post) :?>
                     <?= $this->fetch('/post.phtml', ['threads' => $threads, 'post' => $post]) ?>
                 <?php endforeach; ?>
@@ -14,4 +17,4 @@
     </section>
 <?php endforeach ?>
 
-<?php include(__DIR__ . '/base/footer.phtml') ?>
+<?php require __DIR__ . '/base/footer.phtml' ?>

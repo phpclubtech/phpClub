@@ -11,7 +11,7 @@ class Thread
     /** @Id @Column(type="integer") **/
     private $id;
     
-    /** @OneToMany(targetEntity="phpClub\Entity\Post", mappedBy="thread", cascade={"persist", "remove"}) **/
+    /** @OneToMany(targetEntity="phpClub\Entity\Post", mappedBy="thread", cascade={"all"}) **/
     private $posts;
 
     /** @OneToMany(targetEntity="phpClub\Entity\ArchiveLink", mappedBy="thread") **/

@@ -39,13 +39,19 @@ class File
      **/
     private $post;
 
+    /**
+     * @Column(type="string", nullable=true)
+     */
+    private $originalName;
+
     public static function create(
         string $path,
         string $thumbnailPath,
         int $width,
         int $height,
         Post $post,
-        int $size = 0
+        string $originalName = null,
+        int $size = null
     ): self {
         $file = new self();
 
@@ -61,22 +67,31 @@ class File
         $file->height = $height;
         $file->post = $post;
         $file->size = $size;
+        $file->originalName = $originalName;
         
         return $file;
     }
 
     public function isRemote(): bool
     {
-        return $this->remoteUrl !== null;
+        return !! $this->remoteUrl;
     }
 
     public function changeRemoteUrl(string $remoteUrl, string $thumbnailRemoteUrl)
     {
         $this->remoteUrl = $remoteUrl;
         $this->thumbnailRemoteUrl = $thumbnailRemoteUrl;
+        $this->relativePath = $this->thumbnailRelativePath = null;
     }
 
-    public function getRelativePath() 
+    public function changeRelativePath(string $relativePath, string $thumbnailRelativePath)
+    {
+        $this->relativePath = $relativePath;
+        $this->thumbnailRelativePath = $thumbnailRelativePath;
+        $this->remoteUrl = $this->thumbnailRemoteUrl = null;
+    }
+
+    public function getRelativePath()
     {
         return $this->relativePath;
     }
@@ -106,18 +121,18 @@ class File
         return $this->size;
     }
 
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->width;
     }
 
-    public function getHeight()
+    public function getHeight(): int
     {
         return $this->height;
     }
 
-    public function setSize($size)
+    public function getName(): string
     {
-        $this->size = $size;
+        return $this->originalName ?: basename($this->relativePath) ?: basename($this->remoteUrl);
     }
 }

@@ -10,6 +10,7 @@ namespace phpClub\Controller;
 
 use phpClub\Service\Authorizer;
 use phpClub\Service\Threader;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
@@ -40,15 +41,17 @@ class BoardController
      */
     protected $authorizer;
 
-    public function __construct(Threader $threader, Authorizer $authorizer, View $view, AbstractCache $cache)
+    public function __construct(Authorizer $authorizer, View $view, AbstractCache $cache, ContainerInterface $container)
     {
         $this->view = $view;
 
-        $this->threader = $threader;
+        //$this->threader = $threader;
 
         $this->authorizer = $authorizer;
 
         $this->cache = $cache;
+
+        $this->threadRepository = $container->get('ThreadRepository');
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
@@ -60,13 +63,17 @@ class BoardController
 
     public function threadAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        try {
-            $thread = $this->threader->getThread((int) $args['thread']);
-        } catch (\InvalidArgumentException $e) {
+        $thread = $this->threadRepository->find($args['thread']);
+
+        if (!$thread) {
             throw new NotFoundException($request, $response);
         }
 
-        $template = $this->getOrSetCache('/thread.phtml', ['thread' => $thread, 'logged' => $this->authorizer->isLoggedIn()], 'thread_' . (int) $args['thread'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
+        $template = $this->getOrSetCache('/thread.phtml', [
+            'thread' => $thread,
+            'logged' => $this->authorizer->isLoggedIn()],
+            'thread_' . (int) $args['thread'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false)
+        );
 
         return $this->renderHtml($response, $template);
     }

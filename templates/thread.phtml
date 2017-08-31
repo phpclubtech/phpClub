@@ -1,9 +1,13 @@
-<?php include(__DIR__ . '/base/header.phtml') ?>
-<?php include(__DIR__ . '/base/boardHeader.phtml') ?>
+<?php
+/** @var \phpClub\Entity\Thread $thread */
+$title = $thread->getPosts()->first()->getTitle();
+require __DIR__ . '/base/header.phtml';
+require __DIR__ . '/base/boardHeader.phtml';
+?>
 
 <section class="posts">
     <form id="posts-form">
-        <div id="thread-<?= $thread->getNumber() ?>" class="thread">
+        <div id="thread-<?= $thread->getId() ?>" class="thread">
             <?php foreach ($thread->getPosts() as $post) :?>
                 <?= $this->fetch('/post.phtml', ['post' => $post]) ?>
             <?php endforeach; ?>
@@ -17,7 +21,7 @@
     <?php if ($logged) : ?>
         <span class="archive-link-form">
                 <form method="post" name="archive-link" action="/addarchivelink/">
-                    <input type="hidden" name="thread" value="<?= $thread->getNumber() ?>" required>
+                    <input type="hidden" name="thread" value="<?= $thread->getId() ?>" required>
                     Добавить архив: <input type="text" name="archive-link">
                     <input type="submit" name="submit" value="Ок">
                 </form>

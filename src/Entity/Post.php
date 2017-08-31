@@ -29,7 +29,7 @@ class Post
     /** @Column(type="string") **/
     private $author;
     
-    /** @OneToMany(targetEntity="phpClub\Entity\File", mappedBy="post", cascade={"persist", "remove"}) **/
+    /** @OneToMany(targetEntity="phpClub\Entity\File", mappedBy="post", cascade={"all"}) **/
     private $files;
     
     /**

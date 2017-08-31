@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: main
- * Date: 4/30/2017
- * Time: 2:05 PM
- */
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -69,6 +63,10 @@ $di['DropboxClient'] = function ($di) {
     return new \Spatie\Dropbox\Client($di['config']['dropbox_token']);
 };
 
+$di['ThreadRepository'] = function (Container $di) {
+    return $di->get('EntityManager')->getRepository(Thread::class);
+};
+
 $di['Guzzle'] = function () {
     return new GuzzleHttp\Client();
 };
@@ -85,8 +83,15 @@ $di['DvachApiClient.cacheable'] = function ($di) {
     return DvachApiClient::createCacheable($di['EventManager']);
 };
 
-$di['View'] = function (): View {
-    return new View(__DIR__ . '/../templates');
+$di['UrlGenerator'] = function (Container $di) {
+    return new \phpClub\Service\UrlGenerator($di->get('router'));
+};
+
+$di['View'] = function (Container $di): View {
+    return new View(__DIR__ . '/../templates', [
+        // Shared variables
+        'urlGenerator' => $di['UrlGenerator'],
+    ]);
 };
 
 $di['Authorizer'] = function (Container $di): Authorizer {
@@ -110,7 +115,7 @@ $di["Cache"] = function (Container $di): AbstractCache {
 
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
-    return new BoardController($di->get('Threader'), $di->get('Authorizer'), $di->get('View'), $di->get('Cache'));
+    return new BoardController($di->get('Authorizer'), $di->get('View'), $di->get('Cache'), $di);
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
