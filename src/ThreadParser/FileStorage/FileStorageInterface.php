@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\ThreadParser\FileStorage;
 
 use phpClub\Entity\File;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace phpClub\ThreadParser\FileStorage;
 
 use phpClub\Entity\File;
-use phpClub\ThreadParser\Helper\{LocalFileFinder, UploadPathHelper};
+use phpClub\ThreadParser\Helper\{LocalFileFinder};
 use Spatie\Dropbox\Client as DropboxClient;
 use Spatie\Dropbox\Exceptions\BadRequest;
 
@@ -25,23 +25,13 @@ class DropboxFileStorage implements FileStorageInterface
     private $fileFinder;
     
     /**
-     * @var UploadPathHelper
-     */
-    private $uploadPathHelper;
-
-    /**
      * @param DropboxClient $dropboxClient
      * @param LocalFileFinder $fileFinder
-     * @param UploadPathHelper $uploadPathHelper
      */
-    public function __construct(
-        DropboxClient $dropboxClient,
-        LocalFileFinder $fileFinder,
-        UploadPathHelper $uploadPathHelper
-    ) {
+    public function __construct(DropboxClient $dropboxClient, LocalFileFinder $fileFinder)
+    {
         $this->dropboxClient = $dropboxClient;
         $this->fileFinder = $fileFinder;
-        $this->uploadPathHelper = $uploadPathHelper;
     }
 
     /**
@@ -56,16 +46,13 @@ class DropboxFileStorage implements FileStorageInterface
 
         $resourceName = $file->getRemoteUrl() ?: $this->fileFinder->findAbsolutePath($file);
         $thumbResourceName = $file->getThumbnailRemoteUrl() ?: $this->fileFinder->findThumbAbsolutePath($file);
-        
-        $uploadAs = $this->uploadPathHelper->generateRelativePath($file);
-        $thumbUploadAs = $this->uploadPathHelper->generateRelativeThumbPath($file);
 
         // When fopen fails, PHP normally raises a warning. Function try_fopen throws an exception instead
-        $this->dropboxClient->upload($uploadAs, \GuzzleHttp\Psr7\try_fopen($resourceName, 'r'));
-        $this->dropboxClient->upload($thumbUploadAs, \GuzzleHttp\Psr7\try_fopen($thumbResourceName, 'r'));
+        $this->dropboxClient->upload($file->getRelativePath(), \GuzzleHttp\Psr7\try_fopen($resourceName, 'r'));
+        $this->dropboxClient->upload($file->getThumbnailRelativePath(), \GuzzleHttp\Psr7\try_fopen($thumbResourceName, 'r'));
 
-        $newRemoteUrl = $this->createSharedLink($uploadAs);
-        $newThumbRemoteUrl = $this->createSharedLink($thumbUploadAs);
+        $newRemoteUrl = $this->createSharedLink($file->getRelativePath());
+        $newThumbRemoteUrl = $this->createSharedLink($file->getThumbnailRelativePath());
 
         $file->changeRemoteUrl($newRemoteUrl, $newThumbRemoteUrl);
     }
@@ -78,8 +65,7 @@ class DropboxFileStorage implements FileStorageInterface
     private function alreadyUploaded(File $file): bool
     {
         try {
-            $uploadPath = $this->uploadPathHelper->generateRelativePath($file);
-            return !! $this->dropboxClient->getMetadata($uploadPath);
+            return !! $this->dropboxClient->getMetadata($file->getRelativePath());
         } catch (BadRequest $e) {
             return false;
         }

@@ -62,8 +62,7 @@ class DvachApiClientTest extends TestCase
         $mockHandler = new MockHandler($responses);
         $stack = HandlerStack::create($mockHandler);
         $client = new Client(['handler' => $stack]);
-        $eventManager = $this->createMock(EventManagerInterface::class);
 
-        return new DvachApiClient($client, $eventManager);
+        return new DvachApiClient($client);
     }
 }

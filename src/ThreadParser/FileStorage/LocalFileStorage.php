@@ -6,15 +6,14 @@ namespace phpClub\ThreadParser\FileStorage;
 
 use phpClub\Entity\File;
 use phpClub\ThreadParser\Helper\LocalFileFinder;
-use phpClub\ThreadParser\Helper\UploadPathHelper;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LocalFileStorage implements FileStorageInterface
 {
     /**
-     * @var UploadPathHelper
+     * @var string
      */
-    private $uploadPathHelper;
+    private $uploadRoot;
 
     /**
      * @var Filesystem
@@ -27,18 +26,15 @@ class LocalFileStorage implements FileStorageInterface
     private $fileFinder;
 
     /**
-     * @param UploadPathHelper $uploadPathHelper
-     * @param LocalFileFinder $fileFinder
      * @param Filesystem $filesystem
+     * @param LocalFileFinder $fileFinder
+     * @param string $uploadRoot
      */
-    public function __construct(
-        UploadPathHelper $uploadPathHelper,
-        LocalFileFinder $fileFinder,
-        Filesystem $filesystem
-    ) {
-        $this->uploadPathHelper = $uploadPathHelper;
+    public function __construct(Filesystem $filesystem, LocalFileFinder $fileFinder, string $uploadRoot)
+    {
         $this->filesystem = $filesystem;
         $this->fileFinder = $fileFinder;
+        $this->uploadRoot = $uploadRoot;
     }
 
     /**
@@ -47,17 +43,22 @@ class LocalFileStorage implements FileStorageInterface
      */
     public function put(File $file)
     {
-        $uploadAs = $this->uploadPathHelper->generateAbsolutePath($file);
-        $thumbUploadAs = $this->uploadPathHelper->generateAbsoluteThumbPath($file);
+        $saveAs = $this->uploadRoot . '/' . $file->getRelativePath();
         
-        $this->filesystem->copy(
-            $file->getRemoteUrl() ?: $this->fileFinder->findAbsolutePath($file),
-            $uploadAs
-        );
+        if (!$this->filesystem->exists($saveAs)) {
+            $this->filesystem->copy(
+                $file->getRemoteUrl() ?: $this->fileFinder->findAbsolutePath($file),
+                $saveAs
+            );
+        }
 
-        $this->filesystem->copy(
-            $file->getThumbnailRemoteUrl() ?: $this->fileFinder->findThumbAbsolutePath($file),
-            $thumbUploadAs
-        );
+        $thumbSaveAs = $this->uploadRoot . '/' . $file->getThumbnailRelativePath();
+        
+        if (!$this->filesystem->exists($thumbSaveAs)) {
+            $this->filesystem->copy(
+                $file->getThumbnailRemoteUrl() ?: $this->fileFinder->findThumbAbsolutePath($file),
+                $thumbSaveAs
+            );
+        }
     }
 }

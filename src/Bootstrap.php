@@ -19,6 +19,7 @@ use phpClub\Service\Authorizer;
 use phpClub\Service\Linker;
 use phpClub\Service\Searcher;
 use phpClub\Service\Threader;
+use phpClub\ThreadParser\FileStorage\LocalFileStorage;
 use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
 use Slim\Container;
 use Slim\Http\Request;
@@ -65,6 +66,14 @@ $di['DropboxClient'] = function ($di) {
 
 $di['ThreadRepository'] = function (Container $di) {
     return $di->get('EntityManager')->getRepository(Thread::class);
+};
+
+$di['LocalFileStorage'] = function (Container $di) {
+    return new LocalFileStorage(new Symfony\Component\Filesystem\Filesystem(), $di['LocalFileFinder'], __DIR__ . '/../public');
+};
+
+$di['LocalFileFinder'] = function (Container $di) {
+    return new \phpClub\ThreadParser\Helper\LocalFileFinder($di['config']['old_threads_root']);
 };
 
 $di['Guzzle'] = function () {

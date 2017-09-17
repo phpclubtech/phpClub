@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,6 +25,9 @@ class Post
 
     /** @Column(type="boolean") */
     private $isOpPost;
+    
+    /** @Column(type="boolean") */
+    private $isFirstPost;
 
     /** @Column(type="string") **/
     private $title;
@@ -31,7 +37,7 @@ class Post
     
     /** @OneToMany(targetEntity="phpClub\Entity\File", mappedBy="post", cascade={"all"}) **/
     private $files;
-    
+
     /**
      * @ManyToOne(targetEntity="phpClub\Entity\Thread", inversedBy="posts")
      * @JoinColumn(nullable=false)
@@ -53,11 +59,12 @@ class Post
         $this->text = $text;
         $this->date = $date;
         $this->email = $email;
-        $this->isOpPost = $isOpPost;
         $this->title = $title;
         $this->author = $author;
         $this->thread = $thread;
+        $this->isOpPost = $isOpPost;
         $this->files = $files ?: new ArrayCollection();
+        $this->isFirstPost = $thread->getPosts()->isEmpty() || $id === $thread->getPosts()->first()->getId();
     }
 
     public function getId()
@@ -117,6 +124,11 @@ class Post
 
     public function isOpPost(): bool
     {
-        return $this->isOpPost;
+        return !! $this->isOpPost;
+    }
+
+    public function isFirstPost(): bool
+    {
+        return $this->isFirstPost;
     }
 }

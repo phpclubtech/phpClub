@@ -58,9 +58,6 @@ class File
         if (filter_var($path, FILTER_VALIDATE_URL)) {
             $file->remoteUrl = $path;
             $file->thumbnailRemoteUrl = $thumbnailPath;
-        } else {
-            $file->relativePath = $path;
-            $file->thumbnailRelativePath = $thumbnailPath;
         }
 
         $file->width = $width;
@@ -68,7 +65,9 @@ class File
         $file->post = $post;
         $file->size = $size;
         $file->originalName = $originalName;
-        
+        $file->relativePath = $post->getThread()->getId() . '/' . basename($path);
+        $file->thumbnailRelativePath = $post->getThread()->getId() . '/thumb/' . basename($thumbnailPath);
+
         return $file;
     }
 
@@ -81,14 +80,6 @@ class File
     {
         $this->remoteUrl = $remoteUrl;
         $this->thumbnailRemoteUrl = $thumbnailRemoteUrl;
-        $this->relativePath = $this->thumbnailRelativePath = null;
-    }
-
-    public function changeRelativePath(string $relativePath, string $thumbnailRelativePath)
-    {
-        $this->relativePath = $relativePath;
-        $this->thumbnailRelativePath = $thumbnailRelativePath;
-        $this->remoteUrl = $this->thumbnailRemoteUrl = null;
     }
 
     public function getRelativePath()

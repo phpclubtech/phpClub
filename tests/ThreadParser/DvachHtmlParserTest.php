@@ -20,7 +20,7 @@ class DvachHtmlParserTest extends TestCase
 
     public function setUp()
     {
-        $this->threadParser = new ThreadHtmlParser(new EventManager(), new DateConverter(), new DvachThread());
+        $this->threadParser = new ThreadHtmlParser(new DateConverter(), new DvachThread());
     }
 
     public function testGetPost()
@@ -134,22 +134,22 @@ class DvachHtmlParserTest extends TestCase
         $this->assertCount(4, $files);
 
         // Image 1
-        $this->assertEquals('14719368905530.png', $files[0]->getRelativePath());
+        $this->assertEquals('825576/14719368905530.png', $files[0]->getRelativePath());
         $this->assertEquals(500, $files[0]->getHeight());
         $this->assertEquals(500, $files[0]->getWidth());
-        $this->assertEquals('14719368905530s.jpg', $files[0]->getThumbnailRelativePath());
+        $this->assertEquals('825576/thumb/14719368905530s.jpg', $files[0]->getThumbnailRelativePath());
 
         // Image 2
-        $this->assertEquals('14719368905541.jpg', $files[1]->getRelativePath());
+        $this->assertEquals('825576/14719368905541.jpg', $files[1]->getRelativePath());
         $this->assertEquals(166, $files[1]->getHeight());
         $this->assertEquals(250, $files[1]->getWidth());
-        $this->assertEquals('14719368905541s.jpg', $files[1]->getThumbnailRelativePath());
+        $this->assertEquals('825576/thumb/14719368905541s.jpg', $files[1]->getThumbnailRelativePath());
 
         // Image 3
-        $this->assertEquals('14719368905542.jpg', $files[2]->getRelativePath());
+        $this->assertEquals('825576/14719368905542.jpg', $files[2]->getRelativePath());
         $this->assertEquals(250, $files[2]->getHeight());
         $this->assertEquals(175, $files[2]->getWidth());
-        $this->assertEquals('14719368905542s.jpg', $files[2]->getThumbnailRelativePath());
+        $this->assertEquals('825576/thumb/14719368905542s.jpg', $files[2]->getThumbnailRelativePath());
 
         $this->assertCount(2, $posts[1]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());

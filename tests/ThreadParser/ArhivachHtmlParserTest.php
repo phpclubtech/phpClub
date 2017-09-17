@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
+use phpClub\Entity\File;
 use phpClub\ThreadParser\Thread\ArhivachThread;
 use phpClub\ThreadParser\ThreadProvider\ThreadHtmlParser;
 use phpClub\ThreadParser\Helper\DateConverter;
@@ -19,7 +20,7 @@ class ArhivachHtmlParserTest extends TestCase
 
     public function setUp()
     {
-        $this->threadParser = new ThreadHtmlParser(new EventManager(), new DateConverter(), new ArhivachThread());
+        $this->threadParser = new ThreadHtmlParser(new DateConverter(), new ArhivachThread());
     }
 
     public function testThread83()
@@ -138,6 +139,7 @@ class ArhivachHtmlParserTest extends TestCase
         $pathToHtml  = __DIR__ . '/arhivach_fixtures/83.html';
         $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
         $posts = $thread->getPosts();
+        /** @var File[] $files */
         $files = $posts->first()->getFiles();
 
         $this->assertCount(4, $files);

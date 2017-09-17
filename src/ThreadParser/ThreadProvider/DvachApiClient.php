@@ -33,41 +33,24 @@ class DvachApiClient
     private $client;
 
     /**
-     * @var EventManagerInterface
-     */
-    private $eventManager;
-
-    /**
      * @param Client $client
-     * @param EventManagerInterface $eventManager
      */
-    public function __construct(Client $client, EventManagerInterface $eventManager)
+    public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->eventManager = $eventManager;
     }
 
     /**
-     * @param EventManagerInterface $eventManager
      * @param int $ttl TTL in seconds
      * @return DvachApiClient
      */
-    public static function createCacheable(EventManagerInterface $eventManager, int $ttl = 3600): self
+    public static function createCacheable(int $ttl = 3600): self
     {
         $stack = HandlerStack::create();
+        $cacheStorage = new DoctrineCacheStorage(new FilesystemCache('/tmp/'));
+        $stack->push(new CacheMiddleware(new GreedyCacheStrategy($cacheStorage, $ttl)));
 
-        $stack->push(
-            new CacheMiddleware(
-                new GreedyCacheStrategy(
-                    new DoctrineCacheStorage(
-                        new FilesystemCache('/tmp/')
-                    ),
-                    $ttl
-                )
-            )
-        );
-
-        return new self(new Client(['handler' => $stack]), $eventManager);
+        return new self(new Client(['handler' => $stack]));
     }
 
     /**
@@ -139,9 +122,7 @@ class DvachApiClient
         );
 
         foreach ($postArray['files'] as $fileArray) {
-            $file = $this->extractFile($fileArray, $post);
-            $this->eventManager->trigger(Event::FILE_EXTRACTED, $file);
-            $post->addFile($file);
+            $post->addFile($this->extractFile($fileArray, $post));
         }
 
         return $post;
@@ -160,7 +141,7 @@ class DvachApiClient
             $fileArray['width'],
             $fileArray['height'],
             $post,
-            $fileArray['fullname'],
+            $fileArray['fullname'] ?? $fileArray['name'],
             $fileArray['size']
         );
     }

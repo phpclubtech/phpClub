@@ -14,11 +14,6 @@ use Zend\EventManager\EventManagerInterface;
 class ThreadHtmlParser
 {
     /**
-     * @var EventManagerInterface
-     */
-    private $eventManager;
-
-    /**
      * @var DateConverter
      */
     private $dateConverter;
@@ -29,18 +24,29 @@ class ThreadHtmlParser
     private $thread;
 
     /**
-     * @param EventManagerInterface $eventManager
      * @param DateConverter $dateConverter
      * @param ThreadInterface $thread
      */
-    public function __construct(
-        EventManagerInterface $eventManager,
-        DateConverter $dateConverter,
-        ThreadInterface $thread
-    ) {
-        $this->eventManager  = $eventManager;
+    public function __construct(DateConverter $dateConverter, ThreadInterface $thread)
+    {
         $this->dateConverter = $dateConverter;
         $this->thread        = $thread;
+    }
+
+    /**
+     * @param string $threadsFolder
+     * @return Thread[]
+     * @throws \Exception
+     */
+    public function parseAllThreads(string $threadsFolder)
+    {
+        $threadHtmls = glob(rtrim($threadsFolder, '/') . '/*.html');
+
+        if (!$threadHtmls) {
+            throw new \Exception('No threads found in ' . $threadsFolder);
+        }
+
+        return array_map([$this, 'extractThread'], $threadHtmls);
     }
 
     /**
@@ -177,9 +183,7 @@ class ThreadHtmlParser
         $fileNodes = $postNode->filterXPath($filesXPath);
 
         return $fileNodes->each(function (Crawler $fileNode) use ($post) {
-            $file = $this->thread->extractFile($fileNode, $post);
-            $this->eventManager->trigger(Event::FILE_EXTRACTED, $file);
-            return $file;
+            return $this->thread->extractFile($fileNode, $post);
         });
     }
 }
