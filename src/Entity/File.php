@@ -11,95 +11,59 @@ class File
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
     private $id;
-
-    /** @Column(type="string", nullable=true) **/
-    private $relativePath;
-
-    /** @Column(type="string", nullable=true) **/
-    private $thumbnailRelativePath;
-
-    /** @Column(type="string", nullable=true) **/
-    private $remoteUrl;
-
-    /** @Column(type="string", nullable=true) **/
-    private $thumbnailRemoteUrl;
+        
+    /**
+     * @var string
+     * @Column(type="string")
+     */
+    private $path;
+    
+    /**
+     * @var string
+     * @Column(type="string")
+     */
+    private $thumbPath;
 
     /** @Column(type="integer", nullable=true) **/
     private $size;
 
-    /** @Column(type="integer") **/
+    /** @Column(type="integer", nullable=true) **/
     private $width;
 
-    /** @Column(type="integer") **/
+    /** @Column(type="integer", nullable=true) **/
     private $height;
 
     /**
-     * @ManyToOne(targetEntity="phpClub\Entity\Post", inversedBy="files")
+     * The client-provided file name
+     *
+     * @var string
+     * @Column(type="string", nullable=true)
+     */
+    private $clientName;
+
+    /**
+     * @var Post
+     * @ManyToOne(targetEntity="Post", inversedBy="files")
      * @JoinColumn(nullable=false)
      **/
     private $post;
 
-    /**
-     * @Column(type="string", nullable=true)
-     */
-    private $originalName;
-
-    public static function create(
+    public function __construct(
         string $path,
-        string $thumbnailPath,
-        int $width,
-        int $height,
+        string $thumbPath,
         Post $post,
-        string $originalName = null,
-        int $size = null
-    ): self {
-        $file = new self();
-
-        if (filter_var($path, FILTER_VALIDATE_URL)) {
-            $file->remoteUrl = $path;
-            $file->thumbnailRemoteUrl = $thumbnailPath;
-        }
-
-        $file->width = $width;
-        $file->height = $height;
-        $file->post = $post;
-        $file->size = $size;
-        $file->originalName = $originalName;
-        $file->relativePath = $post->getThread()->getId() . '/' . basename($path);
-        $file->thumbnailRelativePath = $post->getThread()->getId() . '/thumb/' . basename($thumbnailPath);
-
-        return $file;
-    }
-
-    public function isRemote(): bool
-    {
-        return !! $this->remoteUrl;
-    }
-
-    public function changeRemoteUrl(string $remoteUrl, string $thumbnailRemoteUrl)
-    {
-        $this->remoteUrl = $remoteUrl;
-        $this->thumbnailRemoteUrl = $thumbnailRemoteUrl;
-    }
-
-    public function getRelativePath()
-    {
-        return $this->relativePath;
-    }
-
-    public function getThumbnailRelativePath() 
-    {
-        return $this->thumbnailRelativePath;
-    }
-
-    public function getRemoteUrl()
-    {
-        return $this->remoteUrl;
-    }
-
-    public function getThumbnailRemoteUrl()
-    {
-        return $this->thumbnailRemoteUrl;
+        int $height,
+        int $width,
+        int $size = null,
+        string $clientName = null
+    ) {
+        $this->path = $path;
+        $this->thumbPath = $thumbPath;
+        $this->post = $post;
+        $this->height = $height;
+        $this->width = $width;
+        $this->size = $size;
+        $this->clientName = $clientName;
     }
 
     public function getPost(): Post
@@ -107,14 +71,9 @@ class File
         return $this->post;
     }
 
-    public function getSize()
+    public function getSize(): int
     {
         return $this->size;
-    }
-
-    public function getWidth(): int
-    {
-        return $this->width;
     }
 
     public function getHeight(): int
@@ -122,8 +81,29 @@ class File
         return $this->height;
     }
 
+    public function getWidth(): int
+    {
+        return $this->width;
+    }
+
+    public function getPath(): string 
+    {
+        return $this->path;
+    }
+
+    public function getThumbPath(): string
+    {
+        return $this->thumbPath;
+    }
+
     public function getName(): string
     {
-        return $this->originalName ?: basename($this->relativePath) ?: basename($this->remoteUrl);
+        return $this->clientName ?: basename($this->path);
+    }
+
+    public function updatePaths(string $path, string $thumbPath): void
+    {
+        $this->path = $path;
+        $this->thumbPath = $thumbPath;
     }
 }

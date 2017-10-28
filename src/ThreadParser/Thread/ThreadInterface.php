@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\Thread;
 
-use phpClub\Entity\File;
-use phpClub\Entity\Post;
+use phpClub\Entity\{File, Post};
 use Symfony\Component\DomCrawler\Crawler;
 
 interface ThreadInterface

@@ -21,7 +21,6 @@ class User
     /** @Column(type="string") **/
     protected $salt;
 
-
     public function getId()
     {
         return $this->id;

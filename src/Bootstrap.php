@@ -9,24 +9,25 @@ use phpClub\Controller\ArchiveLinkController;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
-use phpClub\Entity\File;
-use phpClub\Entity\Post;
-use phpClub\Entity\RefLink;
-use phpClub\Entity\Thread;
-use phpClub\Entity\User;
+use phpClub\Entity\{Post, Thread, User};
 use phpClub\Entity\ArchiveLink;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Linker;
 use phpClub\Service\Searcher;
-use phpClub\Service\Threader;
-use phpClub\ThreadParser\FileStorage\LocalFileStorage;
+use phpClub\ThreadParser\Command\ImportThreadsCommand;
+use phpClub\ThreadParser\FileStorage\{DropboxFileStorage, LocalFileStorage};
+use phpClub\ThreadParser\ThreadImporter;
 use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
 use Slim\Container;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Slim\Http\{Request, Response};
 use Slim\Views\PhpRenderer as View;
 use Symfony\Component\Cache\Simple\AbstractCache;
 use Symfony\Component\Cache\Simple\FilesystemCache;
+use Doctrine\Common\Cache\FilesystemCache as DoctrineCache;
+use Kevinrob\GuzzleCache\CacheMiddleware;
+use GuzzleHttp\{HandlerStack, Client};
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 
 $slimConfig = [
     'settings' => [
@@ -37,7 +38,7 @@ $slimConfig = [
 $di = new Container($slimConfig);
 
 /* General services section */
-$di['EntityManager'] = function (Container $di): EntityManager{
+$di['EntityManager'] = function (Container $di): EntityManager {
     $paths     = array(__DIR__ . "/Entity/");
     $isDevMode = false;
 
@@ -55,7 +56,7 @@ $di['EntityManager'] = function (Container $di): EntityManager{
     return $entityManager;
 };
 
-$di['config'] = function (): array{
+$di['config'] = function (): array {
     return parse_ini_file(__DIR__ . '/../config/config.ini');
 };
 
@@ -64,32 +65,42 @@ $di['DropboxClient'] = function ($di) {
     return new \Spatie\Dropbox\Client($di['config']['dropbox_token']);
 };
 
+$di['DropboxFileStorage'] = function ($di) {
+    return new DropboxFileStorage($di['DropboxClient']);
+};
+
 $di['ThreadRepository'] = function (Container $di) {
     return $di->get('EntityManager')->getRepository(Thread::class);
 };
 
 $di['LocalFileStorage'] = function (Container $di) {
-    return new LocalFileStorage(new Symfony\Component\Filesystem\Filesystem(), $di['LocalFileFinder'], __DIR__ . '/../public');
+    return new LocalFileStorage(new Symfony\Component\Filesystem\Filesystem(), __DIR__ . '/../public');
 };
 
-$di['LocalFileFinder'] = function (Container $di) {
-    return new \phpClub\ThreadParser\Helper\LocalFileFinder($di['config']['old_threads_root']);
+$di['ThreadImporter'] = function (Container $di) {
+    // TODO: use file_storage from config
+    return new ThreadImporter($di['LocalFileStorage'], $di['EntityManager'], $di['ThreadRepository']);
+};
+
+$di['ImportThreadsCommand'] = function (Container $di) {
+    return new ImportThreadsCommand($di['ThreadImporter'], $di['DvachApiClient']);
 };
 
 $di['Guzzle'] = function () {
-    return new GuzzleHttp\Client();
+    return new Client();
 };
 
-$di['EventManager'] = function () {
-    return new Zend\EventManager\EventManager();
+$di['Guzzle.cacheable'] = function () {
+    $ttl = 3600;
+    $stack = HandlerStack::create();
+    $cacheStorage = new DoctrineCacheStorage(new DoctrineCache('/tmp/'));
+    $stack->push(new CacheMiddleware(new GreedyCacheStrategy($cacheStorage, $ttl)));
+
+    return new Client(['handler' => $stack]);
 };
 
 $di['DvachApiClient'] = function ($di) {
-    return new DvachApiClient($di['Guzzle'], $di['EventManager']);
-};
-
-$di['DvachApiClient.cacheable'] = function ($di) {
-    return DvachApiClient::createCacheable($di['EventManager']);
+    return new DvachApiClient($di['Guzzle.cacheable']);
 };
 
 $di['UrlGenerator'] = function (Container $di) {

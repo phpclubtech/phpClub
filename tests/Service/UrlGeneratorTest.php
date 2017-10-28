@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Service;
 
+use Tests\AbstractTestCase;
 use phpClub\Service\UrlGenerator;
 use Slim\Router;
 
@@ -42,11 +43,5 @@ class UrlGeneratorTest extends AbstractTestCase
     public function testToChain()
     {
         $this->assertNotEmpty($this->urlGenerator->toChain($this->createPost(3)));
-    }
-
-    public function testToFile()
-    {
-        $this->assertNotEmpty($this->urlGenerator->toFile($this->createFile(3)));
-        $this->assertNotEmpty($this->urlGenerator->toThumbFile($this->createFile(3)));
     }
 }

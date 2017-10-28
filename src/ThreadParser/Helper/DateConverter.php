@@ -7,6 +7,7 @@ namespace phpClub\ThreadParser\Helper;
 class DateConverter
 {
     /**
+     * @param string $date
      * @return \DateTimeImmutable
      * @throws \Exception
      */
@@ -14,7 +15,7 @@ class DateConverter
     {
         $normalized = $this->normalizeDate($date);
 
-        $dateTime = \DateTimeImmutable::createFromFormat(' d M Y H:i:s', $normalized);
+        $dateTime = \DateTimeImmutable::createFromFormat('d M Y H:i:s', $normalized);
         if ($dateTime !== false) {
             return $dateTime;
         }
@@ -49,7 +50,7 @@ class DateConverter
         ];
 
         $withEngMonths = strtr($date, $rusToEng);
-
+        
         return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths));
     }
 }

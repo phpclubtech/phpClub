@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\FileStorage;
 
-use phpClub\Entity\File;
-use phpClub\ThreadParser\Helper\{LocalFileFinder};
-use Spatie\Dropbox\Client as DropboxClient;
+use Spatie\Dropbox\Client;
 use Spatie\Dropbox\Exceptions\BadRequest;
+use function GuzzleHttp\Psr7\try_fopen;
 
 class DropboxFileStorage implements FileStorageInterface
 {
@@ -15,70 +14,59 @@ class DropboxFileStorage implements FileStorageInterface
     const PREVIEW_PARAM = '?dl=0';
 
     /**
-     * @var DropboxClient
+     * @var Client
      */
     private $dropboxClient;
 
     /**
-     * @var LocalFileFinder
+     * @param Client $dropboxClient
      */
-    private $fileFinder;
-    
-    /**
-     * @param DropboxClient $dropboxClient
-     * @param LocalFileFinder $fileFinder
-     */
-    public function __construct(DropboxClient $dropboxClient, LocalFileFinder $fileFinder)
+    public function __construct(Client $dropboxClient)
     {
         $this->dropboxClient = $dropboxClient;
-        $this->fileFinder = $fileFinder;
     }
 
     /**
-     * @param File $file
-     * @return void
+     * @param string $path
+     * @param string $directory
+     * @return string
+     * @throws \Exception
      */
-    public function put(File $file)
+    public function put(string $path, string $directory): string
     {
-        if ($file->isRemote() && $this->alreadyUploaded($file)) {
-            return;
-        }
-
-        $resourceName = $file->getRemoteUrl() ?: $this->fileFinder->findAbsolutePath($file);
-        $thumbResourceName = $file->getThumbnailRemoteUrl() ?: $this->fileFinder->findThumbAbsolutePath($file);
-
+        $saveAs = '/' . $directory . '/' . basename($path);
+        
         // When fopen fails, PHP normally raises a warning. Function try_fopen throws an exception instead
-        $this->dropboxClient->upload($file->getRelativePath(), \GuzzleHttp\Psr7\try_fopen($resourceName, 'r'));
-        $this->dropboxClient->upload($file->getThumbnailRelativePath(), \GuzzleHttp\Psr7\try_fopen($thumbResourceName, 'r'));
+        $this->dropboxClient->upload($saveAs, try_fopen($path, 'r'));
 
-        $newRemoteUrl = $this->createSharedLink($file->getRelativePath());
-        $newThumbRemoteUrl = $this->createSharedLink($file->getThumbnailRelativePath());
-
-        $file->changeRemoteUrl($newRemoteUrl, $newThumbRemoteUrl);
+        return $this->createSharedLink($saveAs);
     }
 
     /**
      * @see https://stackoverflow.com/questions/31292106/how-to-check-whether-a-file-already-exists-in-dropbox
-     * @param File $file
+     * @param string $path
+     * @param string $directory
      * @return bool
      */
-    private function alreadyUploaded(File $file): bool
+    public function isFileExist(string $path, string $directory): bool
     {
         try {
-            return !! $this->dropboxClient->getMetadata($file->getRelativePath());
+            return !! $this->dropboxClient->getMetadata('/' . $directory . '/'. basename($path));
         } catch (BadRequest $e) {
             return false;
         }
     }
 
     /**
-     * @param string $saveAs
+     * Creates a publicly accessible link
+     *
+     * @param string $savedAs
      * @return string
      * @throws \Exception
      */
-    private function createSharedLink(string $saveAs): string
+    private function createSharedLink(string $savedAs): string
     {
-        $responseArray = $this->dropboxClient->createSharedLinkWithSettings($saveAs, [
+        $responseArray = $this->dropboxClient->createSharedLinkWithSettings($savedAs, [
             'requested_visibility' => 'public',
         ]);
 

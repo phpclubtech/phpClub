@@ -155,30 +155,26 @@ class Threader
     public function getThreads()
     {
         //$logged = $this->authorizer->isLoggedIn();
-
-        $threadsQuery = $this->threadRepository->getPostCount();
-        //exit(var_dump($threadsQuery));
+        $threadsQuery = $this->em->createQuery('SELECT COUNT(p) as post_count, t.number FROM phpClub\Entity\Thread t  JOIN phpClub\Entity\Post p WHERE p.thread = t.number GROUP BY t.number ORDER BY t.number DESC');
         $threads = $threadsQuery->getArrayResult();
-
         foreach ($threads as $key => $value) {
             $thread = new Thread();
             $thread->setNumber($value['number']);
 
             $count = $value["post_count"];
 
-            $opPost = $this->postRepository->findOneBy(['post' => $thread->getNumber()]);
-
-            $lastPosts = $this->lastPostRepository->findBy(['thread' => $thread->getNumber()]);
-
+            $opPost = $this->em
+                ->getRepository('phpClub\Entity\Post')
+                ->findOneBy(['post' => $thread->getNumber()]);
+            $lastPosts = $this->em
+                ->getRepository('phpClub\Entity\LastPost')
+                ->findBy(['thread' => $thread->getNumber()]);
             $thread->addPost($opPost);
-
             foreach ($lastPosts as $lastPost) {
                 $thread->addPost($lastPost->getPost());
             }
-
             $threads[$key] = $thread;
         }
-
         return $threads;
     }
 

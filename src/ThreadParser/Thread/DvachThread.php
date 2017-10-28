@@ -52,8 +52,8 @@ class DvachThread implements ThreadInterface
     public function extractFile(Crawler $fileNode, Post $post): File
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
-
-        return File::create($fullName, $thumbName, (int) $width, (int) $height, $post);
+        
+        return new File($fullName, $thumbName, $post, (int) $height, (int) $width);
     }
 
     private function extractOnClickJsArgs(Crawler $fileNode): array

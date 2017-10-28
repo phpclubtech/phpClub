@@ -9,7 +9,7 @@ class ArchiveLink
     /** @Id @Column(type="integer") @GeneratedValue **/
     protected $id;
 
-    /** @ManyToOne(targetEntity="phpClub\Entity\Thread", inversedBy="posts") **/
+    /** @ManyToOne(targetEntity="Thread", inversedBy="posts") **/
     protected $thread;
 
     /** @Column(type="string") **/

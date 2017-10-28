@@ -56,7 +56,10 @@ class BoardController
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        $template = $this->getOrSetCache('/board.phtml', ['threads' => $this->threader->getThreads(), 'logged' => $this->authorizer->isLoggedIn()], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
+        $template = $this->getOrSetCache('/board.phtml', [
+            'threads' => $this->threader->getThreads(),
+            'logged' => $this->authorizer->isLoggedIn()
+        ], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 
         return $this->renderHtml($response, $template);
     }

@@ -4,61 +4,51 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\FileStorage;
 
-use phpClub\Entity\File;
-use phpClub\ThreadParser\Helper\LocalFileFinder;
 use Symfony\Component\Filesystem\Filesystem;
 
 class LocalFileStorage implements FileStorageInterface
 {
-    /**
-     * @var string
-     */
-    private $uploadRoot;
-
     /**
      * @var Filesystem
      */
     private $filesystem;
 
     /**
-     * @var LocalFileFinder
+     * @var string
      */
-    private $fileFinder;
+    private $uploadRoot;
 
     /**
      * @param Filesystem $filesystem
-     * @param LocalFileFinder $fileFinder
      * @param string $uploadRoot
      */
-    public function __construct(Filesystem $filesystem, LocalFileFinder $fileFinder, string $uploadRoot)
+    public function __construct(Filesystem $filesystem, string $uploadRoot)
     {
         $this->filesystem = $filesystem;
-        $this->fileFinder = $fileFinder;
         $this->uploadRoot = $uploadRoot;
     }
 
     /**
-     * @param File $file
-     * @return void
+     * @param string $path
+     * @param string $directory
+     * @return string
      */
-    public function put(File $file)
+    public function put(string $path, string $directory): string
     {
-        $saveAs = $this->uploadRoot . '/' . $file->getRelativePath();
-        
-        if (!$this->filesystem->exists($saveAs)) {
-            $this->filesystem->copy(
-                $file->getRemoteUrl() ?: $this->fileFinder->findAbsolutePath($file),
-                $saveAs
-            );
-        }
+        $relativePath = '/' . $directory . '/' . basename($path);
 
-        $thumbSaveAs = $this->uploadRoot . '/' . $file->getThumbnailRelativePath();
-        
-        if (!$this->filesystem->exists($thumbSaveAs)) {
-            $this->filesystem->copy(
-                $file->getThumbnailRemoteUrl() ?: $this->fileFinder->findThumbAbsolutePath($file),
-                $thumbSaveAs
-            );
-        }
+        $this->filesystem->copy($path, $this->uploadRoot . $relativePath);
+
+        return $relativePath;
+    }
+
+    /**
+     * @param string $path
+     * @param string $directory
+     * @return bool
+     */
+    public function isFileExist(string $path, string $directory): bool
+    {
+        return $this->filesystem->exists($this->uploadRoot . '/' . $directory . '/' . basename($path));
     }
 }

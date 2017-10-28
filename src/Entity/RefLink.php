@@ -9,10 +9,10 @@ class RefLink
     /** @Id @Column(type="integer") @GeneratedValue **/
     private $id;
 
-    /** @ManyToOne(targetEntity="phpClub\Entity\Post") */
+    /** @ManyToOne(targetEntity="Post") */
     private $post;
 
-    /** @ManyToOne(targetEntity="phpClub\Entity\Post") */
+    /** @ManyToOne(targetEntity="Post") */
     private $reference;
 
     /** @Column(type="integer") **/

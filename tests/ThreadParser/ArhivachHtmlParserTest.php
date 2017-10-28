@@ -9,7 +9,6 @@ use phpClub\ThreadParser\Thread\ArhivachThread;
 use phpClub\ThreadParser\ThreadProvider\ThreadHtmlParser;
 use phpClub\ThreadParser\Helper\DateConverter;
 use PHPUnit\Framework\TestCase;
-use Zend\EventManager\EventManager;
 
 class ArhivachHtmlParserTest extends TestCase
 {
@@ -20,7 +19,7 @@ class ArhivachHtmlParserTest extends TestCase
 
     public function setUp()
     {
-        $this->threadParser = new ThreadHtmlParser(new DateConverter(), new ArhivachThread());
+        $this->threadParser = new ThreadHtmlParser(new ArhivachThread(), new DateConverter());
     }
 
     public function testThread83()
@@ -81,8 +80,8 @@ class ArhivachHtmlParserTest extends TestCase
 
         $post = $posts[860];
         $webm = $post->getFiles()->first();
-        $this->assertContains('.webm', $webm->getRemoteUrl());
-        $this->assertNotEmpty($webm->getThumbnailRemoteUrl());
+        $this->assertContains('.webm', $webm->getPath());
+        $this->assertNotEmpty($webm->getThumbPath());
     }
 
     public function testThread25()
@@ -97,8 +96,8 @@ class ArhivachHtmlParserTest extends TestCase
         $this->assertContains('http://brainstorage.me/jobs?q=haskell', $post->getText());
         $this->assertEquals('', $post->getTitle());
         $this->assertCount(1, $post->getFiles());
-        $this->assertNotEmpty($post->getFiles()->first()->getRemoteUrl());
-        $this->assertNotEmpty($post->getFiles()->first()->getThumbnailRemoteUrl());
+        $this->assertNotEmpty($post->getFiles()->first()->getPath());
+        $this->assertNotEmpty($post->getFiles()->first()->getThumbPath());
 
         $post = $posts[53];
         $this->assertEquals('Аноним', $post->getAuthor());
@@ -107,8 +106,8 @@ class ArhivachHtmlParserTest extends TestCase
         $this->assertContains('Аноны, помогите!', $post->getText());
         $this->assertEquals('', $post->getTitle());
         $this->assertCount(1, $post->getFiles());
-        $this->assertNotEmpty($post->getFiles()->first()->getRemoteUrl());
-        $this->assertNotEmpty($post->getFiles()->first()->getThumbnailRemoteUrl());
+        $this->assertNotEmpty($post->getFiles()->first()->getPath());
+        $this->assertNotEmpty($post->getFiles()->first()->getThumbPath());
     }
 
     /**
@@ -145,22 +144,22 @@ class ArhivachHtmlParserTest extends TestCase
         $this->assertCount(4, $files);
 
         // Image 1
-        $this->assertEquals('https://arhivach.org/storage2/7/11/71139561f22f2ea253a15d6f442457f6.png', $files[0]->getRemoteUrl());
+        $this->assertEquals('https://arhivach.org/storage2/7/11/71139561f22f2ea253a15d6f442457f6.png', $files[0]->getPath());
         $this->assertEquals(500, $files[0]->getWidth());
         $this->assertEquals(500, $files[0]->getHeight());
-        $this->assertEquals('https://arhivach.org/storage2/t/71139561f22f2ea253a15d6f442457f6.png', $files[0]->getThumbnailRemoteUrl());
+        $this->assertEquals('https://arhivach.org/storage2/t/71139561f22f2ea253a15d6f442457f6.png', $files[0]->getThumbPath());
 
         // Image 2
-        $this->assertEquals('https://arhivach.org/storage2/8/63/8631bf83d67be92f483f5cff54c2ed5b.jpg', $files[1]->getRemoteUrl());
+        $this->assertEquals('https://arhivach.org/storage2/8/63/8631bf83d67be92f483f5cff54c2ed5b.jpg', $files[1]->getPath());
         $this->assertEquals(1024, $files[1]->getWidth());
         $this->assertEquals(683, $files[1]->getHeight());
-        $this->assertEquals('https://arhivach.org/storage2/t/8631bf83d67be92f483f5cff54c2ed5b.jpg', $files[1]->getThumbnailRemoteUrl());
+        $this->assertEquals('https://arhivach.org/storage2/t/8631bf83d67be92f483f5cff54c2ed5b.jpg', $files[1]->getThumbPath());
 
         // Image 3
-        $this->assertEquals('https://arhivach.org/storage2/1/b5/1b529b966894cfc14379bc5a0fea5455.png', $files[2]->getRemoteUrl());
+        $this->assertEquals('https://arhivach.org/storage2/1/b5/1b529b966894cfc14379bc5a0fea5455.png', $files[2]->getPath());
         $this->assertEquals(853, $files[2]->getWidth());
         $this->assertEquals(480, $files[2]->getHeight());
-        $this->assertEquals('https://arhivach.org/storage2/t/1b529b966894cfc14379bc5a0fea5455.png', $files[2]->getThumbnailRemoteUrl());
+        $this->assertEquals('https://arhivach.org/storage2/t/1b529b966894cfc14379bc5a0fea5455.png', $files[2]->getThumbPath());
 
         $this->assertCount(1, $posts[1]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());

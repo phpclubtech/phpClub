@@ -14,11 +14,14 @@
         "symfony/dom-crawler": "^3.3",
         "symfony/filesystem": "^3.3",
         "guzzlehttp/guzzle": "^6.3",
-        "spatie/dropbox-api": "^1.6"
+        "spatie/dropbox-api": "^1.6",
+        "evenement/evenement": "^3.0",
+        "symfony/console": "^3.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2",
-        "Kevinrob/guzzle-cache-middleware": "^2.1"
+        "Kevinrob/guzzle-cache-middleware": "^2.1",
+        "mikey179/vfsStream": "^1.6"
     },
     "scripts": {
         "test": "vendor/bin/phpunit --bootstrap vendor/autoload.php tests/ --stop-on-failure --colors=always",

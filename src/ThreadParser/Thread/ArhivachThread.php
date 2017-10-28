@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\Thread;
 
-use phpClub\Entity\File;
-use phpClub\Entity\Post;
+use phpClub\Entity\{File, Post};
 use Symfony\Component\DomCrawler\Crawler;
 
 class ArhivachThread implements ThreadInterface
@@ -54,14 +53,12 @@ class ArhivachThread implements ThreadInterface
             throw new \Exception("Unable to parse file, HTML: {$fileNode->html()}");
         }
 
-        $onClickArgs = preg_split("/','|',|,|\)/", $fileNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
+        list(, $filePath, $width, $height) = preg_split("/','|',|,|\)/", $fileNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
 
-        // Hack for old arhivach threads
-        if (strpos($onClickArgs[1], 'abload.de') !== false) {
-            return File::create($onClickArgs[1], str_replace('/img/', '/thumb/', $onClickArgs[1]), 0, 0, $post);
+        if ($this->isOldArhivachThread($filePath)) {
+            // Hack for old arhivach threads
+            return new File($filePath, str_replace('/img/', '/thumb/', $filePath), $post, 0, 0);
         }
-
-        list(, $fullName, $width, $height) = $onClickArgs;
 
         $thumbXPath = '//div[@class="post_image"]/img';
         $thumbNode = $fileNode->filterXPath($thumbXPath);
@@ -70,8 +67,11 @@ class ArhivachThread implements ThreadInterface
             throw new \Exception("Unable to parse thumb, HTML: {$thumbNode->html()}");
         }
 
-        $thumbName = $thumbNode->attr('src');
-
-        return File::create($fullName, $thumbName, (int) $width, (int) $height, $post);
+        return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width);
+    }
+    
+    private function isOldArhivachThread(string $fileName): bool 
+    {
+        return strpos($fileName, 'abload.de') !== false;
     }
 }

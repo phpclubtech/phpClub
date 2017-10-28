@@ -8,3 +8,6 @@
 /public/pr/src/**
 /public/pr/thumb/**
 /public/json/**
+/public/*
+!/public/index.php
+!/public/media

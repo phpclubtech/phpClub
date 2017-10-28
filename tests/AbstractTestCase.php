@@ -28,6 +28,13 @@ abstract class AbstractTestCase extends TestCase
 
     public function createFile($id): File
     {
-        return File::create("img{$id}.png", "img-thumb{$id}.png", 100, 200, $this->createPost($id));
+        return new File(
+            __DIR__ . '/FileStorage/1.png',
+            __DIR__ . '/FileStorage/2.png',
+            $this->createPost($id),
+            100,
+            200,
+            120
+        );
     }
 }

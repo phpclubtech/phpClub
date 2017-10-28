@@ -4,49 +4,47 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\ThreadProvider;
 
-use phpClub\ThreadParser\Event;
 use phpClub\ThreadParser\Helper\DateConverter;
 use phpClub\Entity\{File, Post, Thread};
 use phpClub\ThreadParser\Thread\ThreadInterface;
 use Symfony\Component\DomCrawler\Crawler;
-use Zend\EventManager\EventManagerInterface;
 
 class ThreadHtmlParser
 {
-    /**
-     * @var DateConverter
-     */
-    private $dateConverter;
-
     /**
      * @var ThreadInterface
      */
     private $thread;
 
     /**
+     * @var DateConverter
+     */
+    private $dateConverter;
+
+    /**
      * @param DateConverter $dateConverter
      * @param ThreadInterface $thread
      */
-    public function __construct(DateConverter $dateConverter, ThreadInterface $thread)
+    public function __construct(ThreadInterface $thread, DateConverter $dateConverter)
     {
-        $this->dateConverter = $dateConverter;
         $this->thread        = $thread;
+        $this->dateConverter = $dateConverter;
     }
 
     /**
-     * @param string $threadsFolder
+     * @param string $threadsDir
      * @return Thread[]
      * @throws \Exception
      */
-    public function parseAllThreads(string $threadsFolder)
+    public function parseThreadsFromDir(string $threadsDir): array
     {
-        $threadHtmls = glob(rtrim($threadsFolder, '/') . '/*.html');
+        $threadHtmls = glob($threadsDir . '/*/*.htm*');
 
         if (!$threadHtmls) {
-            throw new \Exception('No threads found in ' . $threadsFolder);
+            throw new \Exception('No threads found in ' . $threadsDir);
         }
 
-        return array_map([$this, 'extractThread'], $threadHtmls);
+        return array_map([$this, 'extractPostsFromThread'], $threadHtmls);
     }
 
     /**
@@ -59,7 +57,7 @@ class ThreadHtmlParser
         $threadCrawler = new Crawler($threadHtml);
 
         $postsXPath = $this->thread->getPostsXPath();
-        
+
         $firstPostXPath = $threadCrawler->filterXPath($postsXPath . '[1]');
         $thread = new Thread($this->extractId($firstPostXPath));
 

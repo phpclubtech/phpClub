@@ -8,8 +8,8 @@ use phpClub\Service\Helper;
 
 ?>
 
-<div id="post-<?= $post->getId() ?>" class="<?= ($post->isOpPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
-    <div class="post <?= ($post->isOpPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getId() ?>"" data-num="<?= $post->getId() ?>"">
+<div id="post-<?= $post->getId() ?>" class="<?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
+    <div class="post <?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getId() ?>"" data-num="<?= $post->getId() ?>"">
 
     <div class="post-details" id="post-details-<?= $post->getId() ?>"">
     <input name="delete" class="turnmeoff" value="<?= $post->getId() ?>"" type="checkbox">
@@ -25,13 +25,13 @@ use phpClub\Service\Helper;
                 </span>
             </span>
 
-    <?php if (isset($threads) and $post->isOpPost()) : ?>
+    <?php if (isset($threads) and $post->isFirstPost()) : ?>
         <span class="desktop">
                 [<a class="orange" href="<?= $urlGenerator->toThread($post->getThread()) ?>.html">Просмотреть</a>]
                 </span>
     <?php endif; ?>
 
-    <?php if ($post->isOpPost()) : ?>
+    <?php if ($post->isFirstPost()) : ?>
         <span class="archive-links">
             <?php foreach($post->getThread()->getArchiveLinks() as $archiveLink) :?>
                 <a href="<?= $archiveLink->getLink() ?>"><img src="<?= Helper::getArchiveIconUrl($archiveLink->getLink())?>"></a>
@@ -48,14 +48,14 @@ use phpClub\Service\Helper;
         <?php foreach($post->getFiles() as $file) :?>
             <figure class="image">
                 <figcaption class="file-attr">
-                    <a class="desktop" target="_blank" href="<?= $urlGenerator->toFile($file) ?>" id="title-<?= $post->getId() ?>" title="<?= $file->getName() ?>"><?= $file->getName() ?></a>
+                    <a class="desktop" target="_blank" href="<?= $file->getPath() ?>" id="title-<?= $post->getId() ?>" title="<?= $file->getName() ?>"><?= $file->getName() ?></a>
 
                     <span class="filesize">(<?= $file->getSize() ?>, <?= $file->getWidth() ?>x<?= $file->getHeight() ?>)</span>
                 </figcaption>
 
                 <div id="exlink-<?= $post->getId() ?>-" class="image-link">
-                    <a href="<?= $urlGenerator->toFile($file) ?>" target="_blank" onclick="return expand('<?= $post->getId() ?>-','<?= $urlGenerator->toFile($file) ?>', '<?= $urlGenerator->toThumbFile($file) ?>', '<?= $file->getWidth() ?>', '<?= $file->getHeight() ?>')">
-                        <img src="<?= $urlGenerator->toThumbFile($file) ?>" alt="<?= $file->getHeight() ?>x<?=$file->getWidth() ?>" class="img preview">
+                    <a href="<?= $file->getPath() ?>" target="_blank" onclick="return expand('<?= $post->getId() ?>-','<?= $file->getPath() ?>', '<?= $file->getThumbPath() ?>', '<?= $file->getWidth() ?>', '<?= $file->getHeight() ?>')">
+                        <img src="<?= $file->getThumbPath() ?>" alt="<?= $file->getHeight() ?>x<?=$file->getWidth() ?>" class="img preview">
                     </a>
                 </div>
             </figure>
@@ -70,7 +70,7 @@ use phpClub\Service\Helper;
 <div id="refmap-<?= $post->getId() ?>" class="ABU-refmap" style="display: none;"><em>Ответы: </em></div>
 
 
-<?php if (isset($threads) and $post->isOpPost()) : ?>
+<?php if (isset($threads) and $post->isFirstPost()) : ?>
     <div class="oppost-options-mob mobile">
         <div class="hide-view">
             <a href="/pr/res/<?= $post->getThread()->getId() ?>.html" class="button-mob">В тред</a>
@@ -80,6 +80,6 @@ use phpClub\Service\Helper;
 </div>
 </div>
 
-<?php if (isset($threads) and $post->isOpPost()) : ?>
+<?php if (isset($threads) and $post->isFirstPost()) : ?>
     <span class="mess-post desktop">Нажмите <a href="/pr/res/<?= $post->getThread()->getId() ?>.html">Просмотреть</a>, чтобы посмотреть.</span>
 <?php endif; ?>

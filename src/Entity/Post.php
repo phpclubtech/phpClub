@@ -35,11 +35,11 @@ class Post
     /** @Column(type="string") **/
     private $author;
     
-    /** @OneToMany(targetEntity="phpClub\Entity\File", mappedBy="post", cascade={"all"}) **/
+    /** @OneToMany(targetEntity="File", mappedBy="post", cascade={"all"}) **/
     private $files;
 
     /**
-     * @ManyToOne(targetEntity="phpClub\Entity\Thread", inversedBy="posts")
+     * @ManyToOne(targetEntity="Thread", inversedBy="posts")
      * @JoinColumn(nullable=false)
      **/
     private $thread;
@@ -63,7 +63,7 @@ class Post
         $this->author = $author;
         $this->thread = $thread;
         $this->isOpPost = $isOpPost;
-        $this->files = $files ?: new ArrayCollection();
+        $this->files = new ArrayCollection($files);
         $this->isFirstPost = $thread->getPosts()->isEmpty() || $id === $thread->getPosts()->first()->getId();
     }
 

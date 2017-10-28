@@ -4,28 +4,18 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\ThreadProvider;
 
-use phpClub\Entity\{File, Post, Thread};
-use GuzzleHttp\{Client, HandlerStack};
-use Doctrine\Common\Cache\FilesystemCache;
-use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
-use phpClub\ThreadParser\Event;
-use Zend\EventManager\EventManagerInterface;
+use phpClub\Entity\{Thread, Post, File};
+use GuzzleHttp\Client;
 
 class DvachApiClient
 {
     const BASE_URL = 'https://2ch.hk';
-    const THREAD_CATALOG_URL = 'https://2ch.hk/pr/catalog.json';
 
     // Fixes 2ch.hk API poor naming
     const POST_AUTHOR = 'name';
-    const POST_NUMBER = 'num';
     const POST_TITLE = 'subject';
     const POST_TEXT = 'comment';
     const THREAD_TITLE = 'subject';
-    const THREAD_NUMBER = 'num';
-    const FILE_ORIGINAL_NAME = 'fullname';
 
     /**
      * @var Client
@@ -41,29 +31,16 @@ class DvachApiClient
     }
 
     /**
-     * @param int $ttl TTL in seconds
-     * @return DvachApiClient
-     */
-    public static function createCacheable(int $ttl = 3600): self
-    {
-        $stack = HandlerStack::create();
-        $cacheStorage = new DoctrineCacheStorage(new FilesystemCache('/tmp/'));
-        $stack->push(new CacheMiddleware(new GreedyCacheStrategy($cacheStorage, $ttl)));
-
-        return new self(new Client(['handler' => $stack]));
-    }
-
-    /**
      * @return Thread[]
      */
     public function getAlivePhpThreads(): array
     {
-        $responseBody = $this->client->get(self::THREAD_CATALOG_URL)->getBody();
+        $responseBody = $this->client->get(self::BASE_URL . '/pr/catalog.json')->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
         $threads = $responseJson['threads'];
 
         $phpThreadsArray = array_filter($threads, [$this, 'looksLikePhpThread']);
-        $phpThreads = array_map([$this, 'extractThread'], $phpThreadsArray);
+        $phpThreads      = array_map([$this, 'extractThread'], $phpThreadsArray);
 
         return $phpThreads;
     }
@@ -74,7 +51,7 @@ class DvachApiClient
      */
     private function looksLikePhpThread(array $threadArray): bool
     {
-        return !! preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
+        return !!preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
     }
 
     /**
@@ -84,8 +61,8 @@ class DvachApiClient
      */
     private function extractThread(array $phpThread): Thread
     {
-        $threadId = $phpThread[self::THREAD_NUMBER];
-        $threadUrl = "https://2ch.hk/pr/res/{$threadId}.json";
+        $threadId = $phpThread['num'];
+        $threadUrl = self::BASE_URL . "/pr/res/{$threadId}.json";
 
         $responseBody = $this->client->get($threadUrl)->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
@@ -93,9 +70,9 @@ class DvachApiClient
         $postsArray = $responseJson['threads'][0]['posts'] ?? null;
 
         if ($postsArray === null) {
-            throw new \Exception("2ch.hk API has changed, path threads[0].posts is not exists");
+            throw new \Exception('2ch.hk API has changed, path threads[0].posts is not exists');
         }
-        
+
         $thread = new Thread($threadId);
 
         foreach ($postsArray as $postArray) {
@@ -113,7 +90,7 @@ class DvachApiClient
     private function extractPost(array $postArray, Thread $thread): Post
     {
         $post = new Post(
-            $postArray[self::POST_NUMBER],
+            $postArray['num'],
             $postArray[self::POST_TITLE],
             $postArray[self::POST_AUTHOR],
             (new \DateTimeImmutable())->setTimestamp($postArray['timestamp']),
@@ -124,7 +101,7 @@ class DvachApiClient
         foreach ($postArray['files'] as $fileArray) {
             $post->addFile($this->extractFile($fileArray, $post));
         }
-
+        
         return $post;
     }
 
@@ -135,14 +112,14 @@ class DvachApiClient
      */
     private function extractFile(array $fileArray, Post $post): File
     {
-        return File::create(
+        return new File(
             self::BASE_URL . $fileArray['path'],
             self::BASE_URL . $fileArray['thumbnail'],
-            $fileArray['width'],
-            $fileArray['height'],
             $post,
-            $fileArray['fullname'] ?? $fileArray['name'],
-            $fileArray['size']
+            $fileArray['height'],
+            $fileArray['width'],
+            $fileArray['size'],
+            $fileArray['fullname'] ?? $fileArray['name']
         );
     }
 }

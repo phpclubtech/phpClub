@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\ThreadParser;
+namespace Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
 use phpClub\ThreadParser\Helper\DateConverter;

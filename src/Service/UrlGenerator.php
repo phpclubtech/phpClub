@@ -24,16 +24,6 @@ class UrlGenerator
         return $this->router->pathFor('thread', ['id' => $thread->getId()]);
     }
 
-    public function toFile(File $file): string
-    {
-        return $file->isRemote() ? $file->getRemoteUrl() : $file->getRelativePath();
-    }
-
-    public function toThumbFile(File $file): string
-    {
-        return $file->isRemote() ? $file->getThumbnailRemoteUrl() : $file->getThumbnailRelativePath();
-    }
-
     public function toPostAnchor(Post $post): string
     {
         return $this->router->pathFor('thread', ['id' => $post->getThread()->getId()]) . '.html#' . $post->getId();
