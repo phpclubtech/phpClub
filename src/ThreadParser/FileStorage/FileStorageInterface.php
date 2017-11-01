@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser\FileStorage;
 
-use phpClub\Entity\FileReference;
-use phpClub\ThreadParser\Dto\File as FileDto;
-
 interface FileStorageInterface
 {
     /**

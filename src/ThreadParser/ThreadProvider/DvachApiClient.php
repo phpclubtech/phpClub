@@ -9,8 +9,6 @@ use GuzzleHttp\Client;
 
 class DvachApiClient
 {
-    const BASE_URL = 'https://2ch.hk';
-
     // Fixes 2ch.hk API poor naming
     const POST_AUTHOR = 'name';
     const POST_TITLE = 'subject';
@@ -35,7 +33,7 @@ class DvachApiClient
      */
     public function getAlivePhpThreads(): array
     {
-        $responseBody = $this->client->get(self::BASE_URL . '/pr/catalog.json')->getBody();
+        $responseBody = $this->client->get('https://2ch.hk/pr/catalog.json')->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
         $threads = $responseJson['threads'];
 
@@ -62,9 +60,8 @@ class DvachApiClient
     private function extractThread(array $phpThread): Thread
     {
         $threadId = $phpThread['num'];
-        $threadUrl = self::BASE_URL . "/pr/res/{$threadId}.json";
 
-        $responseBody = $this->client->get($threadUrl)->getBody();
+        $responseBody = $this->client->get("https://2ch.hk/pr/res/{$threadId}.json")->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
 
         $postsArray = $responseJson['threads'][0]['posts'] ?? null;
@@ -113,8 +110,8 @@ class DvachApiClient
     private function extractFile(array $fileArray, Post $post): File
     {
         return new File(
-            self::BASE_URL . $fileArray['path'],
-            self::BASE_URL . $fileArray['thumbnail'],
+            'https://2ch.hk' . $fileArray['path'],
+            'https://2ch.hk' . $fileArray['thumbnail'],
             $post,
             $fileArray['height'],
             $fileArray['width'],

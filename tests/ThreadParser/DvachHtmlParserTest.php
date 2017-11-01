@@ -92,6 +92,17 @@ class DvachHtmlParserTest extends TestCase
         ];
     }
 
+    public function testWithThreadsDir()
+    {
+        $threadDir = __DIR__ . '/dvach_fixtures';
+        
+        $thread = $this->threadParser->extractThread(file_get_contents($threadDir . '/80.html'), $threadDir);
+        
+        $file = $thread->getPosts()[0]->getFiles()[0];
+        
+        $this->assertEquals($threadDir . '/' . basename($file->getPath()), $file->getPath());
+    }
+
     /**
      * @dataProvider providePostsWithOpPostTitles
      */
@@ -162,7 +173,6 @@ class DvachHtmlParserTest extends TestCase
         $this->assertGreaterThan(600, $posts->count());
         $this->assertEquals('!xnn2uE3AU.', $posts[0]->getAuthor());
         $this->assertContains('пробелы между строчками и всё заработало', $posts[7]->getText());
-        $this->assertCount(1, $posts[7]->getFiles());
         $this->assertContains('будет идти потоковое видео?', $posts->last()->getText());
     }
 
@@ -211,13 +221,6 @@ class DvachHtmlParserTest extends TestCase
         $this->assertCount(1, $posts[1]->getFiles());
         $this->assertCount(1, $posts[2]->getFiles());
         $this->assertCount(0, $posts[3]->getFiles());
-        
-        $pathToHtml = __DIR__ . '/dvach_fixtures/15.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
-        $posts = $thread->getPosts();
-        $this->assertCount(1, $posts[0]->getFiles());
-        $this->assertCount(1, $posts[1]->getFiles());
-        $this->assertCount(0, $posts[2]->getFiles());
         
         $pathToHtml = __DIR__ . '/dvach_fixtures/77.html';
         $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));

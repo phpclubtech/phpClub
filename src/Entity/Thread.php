@@ -11,10 +11,14 @@ class Thread
     /** @Id @Column(type="integer") **/
     private $id;
     
-    /** @OneToMany(targetEntity="Post", mappedBy="thread", cascade={"all"}) **/
+    /**
+     * @OneToMany(targetEntity="Post", mappedBy="thread", cascade={"all"})
+     **/
     private $posts;
 
-    /** @OneToMany(targetEntity="ArchiveLink", mappedBy="thread") **/
+    /**
+     * @OneToMany(targetEntity="ArchiveLink", mappedBy="thread", cascade={"all"})
+     **/
     private $archiveLinks;
 
     /**

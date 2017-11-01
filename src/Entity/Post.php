@@ -35,12 +35,14 @@ class Post
     /** @Column(type="string") **/
     private $author;
     
-    /** @OneToMany(targetEntity="File", mappedBy="post", cascade={"all"}) **/
+    /**
+     * @OneToMany(targetEntity="File", mappedBy="post", cascade={"all"})
+     **/
     private $files;
 
     /**
      * @ManyToOne(targetEntity="Thread", inversedBy="posts")
-     * @JoinColumn(nullable=false)
+     * @JoinColumn(nullable=false, onDelete="CASCADE")
      **/
     private $thread;
 

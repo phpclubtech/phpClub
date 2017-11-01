@@ -20,10 +20,18 @@ class ThreadHtmlParser
      * @var DateConverter
      */
     private $dateConverter;
+    
+    /**
+     * For this threads files are missed
+     * #345388 - Thread 15 (Google cache)
+     * 
+     * @var array
+     */
+    private $threadsWithMissedFiles = ['345388'];
 
     /**
-     * @param DateConverter $dateConverter
      * @param ThreadInterface $thread
+     * @param DateConverter $dateConverter
      */
     public function __construct(ThreadInterface $thread, DateConverter $dateConverter)
     {
@@ -36,23 +44,26 @@ class ThreadHtmlParser
      * @return Thread[]
      * @throws \Exception
      */
-    public function parseThreadsFromDir(string $threadsDir): array
+    public function parseAllThreads(string $threadsDir): array
     {
-        $threadHtmls = glob($threadsDir . '/*/*.htm*');
+        $threadHtmlPaths = glob($threadsDir . '/*/*.htm*');
 
-        if (!$threadHtmls) {
+        if (!$threadHtmlPaths) {
             throw new \Exception('No threads found in ' . $threadsDir);
         }
-
-        return array_map([$this, 'extractPostsFromThread'], $threadHtmls);
+        
+        return array_map(function ($threadHtmlPath) {
+            return $this->extractThread(file_get_contents($threadHtmlPath), dirname($threadHtmlPath));
+        }, $threadHtmlPaths);
     }
 
     /**
      * @param string $threadHtml
+     * @param string $threadPath
      * @return Thread
      * @throws \Exception
      */
-    public function extractThread(string $threadHtml): Thread
+    public function extractThread(string $threadHtml, string $threadPath = ''): Thread
     {
         $threadCrawler = new Crawler($threadHtml);
 
@@ -67,8 +78,7 @@ class ThreadHtmlParser
             throw new \Exception('Posts not found');
         }
 
-        // We need to use each() because foreach on Crawler will iterate over DomElements
-        $postNodes->each(function (Crawler $postNode) use ($thread) {
+        $extractPost = function (Crawler $postNode) use ($thread, $threadPath) {
             $post = new Post(
                 $this->extractId($postNode),
                 $this->extractTitle($postNode),
@@ -77,9 +87,12 @@ class ThreadHtmlParser
                 $this->extractText($postNode),
                 $thread
             );
-            $post->addFiles($this->extractFiles($postNode, $post));
+            $post->addFiles($this->extractFiles($postNode, $post, $threadPath));
             $thread->addPost($post);
-        });
+        };
+
+        // We need to use each() because foreach on Crawler will iterate over DomElements
+        $postNodes->each($extractPost);
 
         return $thread;
     }
@@ -173,15 +186,31 @@ class ThreadHtmlParser
     /**
      * @param Crawler $postNode
      * @param Post $post
+     * @param string $threadPath
      * @return File[]
      */
-    private function extractFiles(Crawler $postNode, Post $post): array
+    private function extractFiles(Crawler $postNode, Post $post, string $threadPath): array
     {
+        if (in_array($post->getThread()->getId(), $this->threadsWithMissedFiles)) {
+            return [];
+        }
+
         $filesXPath = $this->thread->getFilesXPath();
         $fileNodes = $postNode->filterXPath($filesXPath);
 
-        return $fileNodes->each(function (Crawler $fileNode) use ($post) {
-            return $this->thread->extractFile($fileNode, $post);
-        });
+        $extractFile = function (Crawler $fileNode) use ($post, $threadPath) {
+            $file = $this->thread->extractFile($fileNode, $post);
+
+            if ($threadPath && !filter_var($file->getPath(), FILTER_VALIDATE_URL)) {
+                $file->updatePaths(
+                    $threadPath . '/' . basename($file->getPath()),
+                    $threadPath . '/' . basename($file->getThumbPath())
+                );
+            }
+
+            return $file;
+        };
+
+        return $fileNodes->each($extractFile);
     }
 }

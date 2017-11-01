@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Evenement\EventEmitterTrait;
 use phpClub\Entity\Thread;
-use phpClub\Entity\{Post, File};
-use phpClub\Repository\ThreadRepository;
 use phpClub\ThreadParser\FileStorage\FileStorageInterface;
-use phpClub\ThreadParser\Dto\{Post as PostDto, File as FileDto};
 
 class ThreadImporter
 {
@@ -27,20 +25,13 @@ class ThreadImporter
      * @var EntityManagerInterface
      */
     private $entityManager;
-    
-    /**
-     * @var ThreadRepository
-     */
-    private $threadRepository;
 
     public function __construct(
         FileStorageInterface $fileStorage,
-        EntityManagerInterface $entityManager,
-        ThreadRepository $threadRepository
+        EntityManagerInterface $entityManager
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;
-        $this->threadRepository = $threadRepository;
     }
 
     /**
@@ -50,18 +41,17 @@ class ThreadImporter
     {
         $this->cascadeRemoveThreads($threads);
 
-        $this->entityManager->flush();
-
         foreach ($threads as $thread) {
             $this->saveFilesFromThread($thread);
             $this->entityManager->persist($thread);
             $this->emit(self::EVENT_THREAD_PERSISTED, [$thread]);
+            $this->entityManager->flush();
+            $this->entityManager->clear();
         }
 
         // TODO: recalculate 3 last posts
         // TODO: recalculate chains
 
-        $this->entityManager->flush();
     }
 
     /**
@@ -70,22 +60,29 @@ class ThreadImporter
      */
     private function cascadeRemoveThreads(array $threads): void
     {
-        foreach ($threads as $thread) {
-            $reference = $this->entityManager->getReference(Thread::class, $thread->getId());
-            $this->entityManager->remove($reference);
-        }
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+
+        $threadIds = array_map(function (Thread $thread) {
+            return $thread->getId();
+        }, $threads);
+
+        $connection->executeQuery('DELETE FROM thread WHERE id IN (?)',
+            [$threadIds],
+            [Connection::PARAM_STR_ARRAY]
+        );
     }
 
     private function saveFilesFromThread(Thread $thread): void
     {
         foreach ($thread->getPosts() as $post) {
             foreach ($post->getFiles() as $file) {
-                if ($this->fileStorage->isFileExist($file->getPath(), $thread->getId())) {
+                if ($this->fileStorage->isFileExist($file->getPath(), (string) $thread->getId())) {
                     continue;
                 }
-
+                
                 $file->updatePaths(
-                    $this->fileStorage->put($file->getPath(), $thread->getId()),
+                    $this->fileStorage->put($file->getPath(), (string) $thread->getId()),
                     $this->fileStorage->put($file->getThumbPath(), $thread->getId() . '/thumb')
                 );
             }

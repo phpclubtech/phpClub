@@ -9,7 +9,7 @@ class ArchiveLink
     /** @Id @Column(type="integer") @GeneratedValue **/
     protected $id;
 
-    /** @ManyToOne(targetEntity="Thread", inversedBy="posts") **/
+    /** @ManyToOne(targetEntity="Thread", inversedBy="archiveLinks") **/
     protected $thread;
 
     /** @Column(type="string") **/

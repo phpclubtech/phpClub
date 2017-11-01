@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace phpClub\ThreadParser\Command;
 
 use phpClub\Entity\Thread;
+use phpClub\ThreadParser\Helper\DateConverter;
+use phpClub\ThreadParser\Thread\ArhivachThread;
+use phpClub\ThreadParser\Thread\DvachThread;
 use phpClub\ThreadParser\ThreadImporter;
 use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
 use phpClub\ThreadParser\ThreadProvider\ThreadHtmlParser;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -38,7 +42,10 @@ class ImportThreadsCommand extends Command
         $this
             ->setName('phpClub:import-threads')
             ->setDescription('Imports threads')
-            ->setHelp('This command allows you to create a user...')
+            ->addArgument('source', InputArgument::REQUIRED, 'The source of threads: 2ch-api or path to folder with threads')
+            // TODO: option?
+            ->addArgument('board', InputArgument::OPTIONAL, 'Board (2ch or arhivach)')
+            ->setHelp('Import threads')
         ;
     }
 
@@ -68,10 +75,36 @@ class ImportThreadsCommand extends Command
     /**
      * @param InputInterface $input
      * @return Thread[]
+     * @throws \Exception
      */
     private function getThreads(InputInterface $input): array
     {
-        // TODO: add switch statement based on input
-        return $this->dvachApiClient->getAlivePhpThreads();
+        $source = $input->getArgument('source');
+
+        if ($source === '2ch-api') {
+            return $this->dvachApiClient->getAlivePhpThreads();
+        }
+
+        if ($source === 'arhivach') {
+            $threadIds = $input->getArgument('thread_ids');
+        }
+        
+        if (!is_dir($source)) {
+            throw new \Exception('Source option must be "2ch-api" or absolute path to the folder with threads');
+        }
+
+        $board = $input->getArgument('board');
+
+        if ($board === '2ch') {
+            $board = new DvachThread();
+        } else if ($board === 'arhivach') {
+            $board = new ArhivachThread();
+        } else {
+            throw new \Exception('Board option must be "2ch" or "arhivach"');
+        }
+
+        $threadHtmlParser = new ThreadHtmlParser($board, new DateConverter());
+
+        return $threadHtmlParser->parseAllThreads($source);
     }
 }

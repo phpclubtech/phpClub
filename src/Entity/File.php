@@ -44,7 +44,7 @@ class File
     /**
      * @var Post
      * @ManyToOne(targetEntity="Post", inversedBy="files")
-     * @JoinColumn(nullable=false)
+     * @JoinColumn(nullable=false, onDelete="CASCADE")
      **/
     private $post;
 
@@ -73,7 +73,7 @@ class File
 
     public function getSize(): int
     {
-        return $this->size;
+        return $this->size ?: 0;
     }
 
     public function getHeight(): int
