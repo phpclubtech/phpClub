@@ -8,8 +8,8 @@ require __DIR__ . '/base/boardHeader.phtml';
     <section class="posts">
         <form id="posts-form">
             <div id="thread-<?= $thread->getId() ?>" class="thread">
-                <?php foreach ($thread->getPosts() as $post) :?>
-                    <?= $this->fetch('/post.phtml', ['threads' => $threads, 'post' => $post]) ?>
+                <?php foreach ($thread->getLastPosts() as $post): ?>
+                    <?= $this->fetch('/post.phtml', ['threads' => $threads, 'post' => $post, 'thread' => $thread]) ?>
                 <?php endforeach; ?>
             </div>
             <hr>

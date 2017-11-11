@@ -1,11 +1,11 @@
 <?php
 /** @var \phpClub\Entity\Thread[] $threads */
+/** @var \phpClub\Entity\Thread $thread */
 /** @var \phpClub\Entity\File $file */
 /** @var \phpClub\Entity\Post $post */
 /** @var \phpClub\Service\UrlGenerator $urlGenerator */
 use phpClub\Entity\File;
 use phpClub\Service\Helper;
-
 ?>
 
 <div id="post-<?= $post->getId() ?>" class="<?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
@@ -18,22 +18,24 @@ use phpClub\Service\Helper;
     <span class="ananimas"><?= $post->getAuthor() ?></span>
 
     <span class="posttime-reflink">
-                <span class="posttime"><?= $post->getDate()->format('Y-m-d') ?>&nbsp;</span>
-                <span class="reflink">
+        <span class="posttime"><?= $post->getDate()->format('Y-m-d') ?>&nbsp;</span>
+        <span class="reflink">
 
-                    <a href="/pr/chain/<?= $post->getId() ?>#<?= $post->getId() ?>">№</a><a href="/pr/res/<?= $post->getThread()->getId() ?>.html#<?= $post->getId() ?>" class="postbtn-reply-href" id="<?= $post->getId() ?>"><?= $post->getId() ?></a>
-                </span>
-            </span>
+            <a href="/pr/chain/<?= $post->getId() ?>#<?= $post->getId() ?>">№</a><a
+                href="<?= $urlGenerator->toPostAnchor($post) ?>" class="postbtn-reply-href"
+                id="<?= $post->getId() ?>"><?= $post->getId() ?></a>
+        </span>
+    </span>
 
-    <?php if (isset($threads) and $post->isFirstPost()) : ?>
+    <?php if (isset($threads) and $post->isFirstPost()): ?>
         <span class="desktop">
-                [<a class="orange" href="<?= $urlGenerator->toThread($post->getThread()) ?>.html">Просмотреть</a>]
-                </span>
+            [<a class="orange" href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>]
+        </span>
     <?php endif; ?>
 
     <?php if ($post->isFirstPost()) : ?>
         <span class="archive-links">
-            <?php foreach($post->getThread()->getArchiveLinks() as $archiveLink) :?>
+            <?php foreach($thread->getArchiveLinks() as $archiveLink) :?>
                 <a href="<?= $archiveLink->getLink() ?>"><img src="<?= Helper::getArchiveIconUrl($archiveLink->getLink())?>"></a>
             <?php endforeach; ?>
         </span>
@@ -69,11 +71,10 @@ use phpClub\Service\Helper;
 
 <div id="refmap-<?= $post->getId() ?>" class="ABU-refmap" style="display: none;"><em>Ответы: </em></div>
 
-
 <?php if (isset($threads) and $post->isFirstPost()) : ?>
     <div class="oppost-options-mob mobile">
         <div class="hide-view">
-            <a href="/pr/res/<?= $post->getThread()->getId() ?>.html" class="button-mob">В тред</a>
+            <a href="<?= $urlGenerator->toThread($thread) ?>" class="button-mob">В тред</a>
         </div>
     </div>
 <?php endif; ?>
@@ -81,5 +82,5 @@ use phpClub\Service\Helper;
 </div>
 
 <?php if (isset($threads) and $post->isFirstPost()) : ?>
-    <span class="mess-post desktop">Нажмите <a href="/pr/res/<?= $post->getThread()->getId() ?>.html">Просмотреть</a>, чтобы посмотреть.</span>
+    <span class="mess-post desktop">Нажмите <a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>, чтобы посмотреть.</span>
 <?php endif; ?>

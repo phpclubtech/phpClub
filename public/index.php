@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: main
- * Date: 4/30/2017
- * Time: 1:22 PM
- */
 
-require(__DIR__ . '/../src/Bootstrap.php');
+$di = require_once __DIR__ . '/../src/Bootstrap.php';
 
 use Slim\App;
 

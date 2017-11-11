@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Evenement\EventEmitterTrait;
 use phpClub\Entity\Thread;
+use phpClub\Service\LastPostUpdater;
 use phpClub\ThreadParser\FileStorage\FileStorageInterface;
 
 class ThreadImporter
@@ -26,12 +27,19 @@ class ThreadImporter
      */
     private $entityManager;
 
+    /**
+     * @var LastPostUpdater
+     */
+    private $lastPostUpdater;
+
     public function __construct(
         FileStorageInterface $fileStorage,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        LastPostUpdater $lastPostUpdater
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;
+        $this->lastPostUpdater = $lastPostUpdater;
     }
 
     /**
@@ -49,9 +57,8 @@ class ThreadImporter
             $this->entityManager->clear();
         }
 
-        // TODO: recalculate 3 last posts
+        $this->lastPostUpdater->updateLastPosts($threads);
         // TODO: recalculate chains
-
     }
 
     /**

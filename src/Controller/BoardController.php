@@ -1,63 +1,54 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: main
- * Date: 4/30/2017
- * Time: 2:07 PM
- */
 
 namespace phpClub\Controller;
 
+use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\Threader;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Views\PhpRenderer as View;
-use Symfony\Component\Cache\Simple\AbstractCache;
+use Slim\Views\PhpRenderer;
 
-/**
- * Class MainPageController
- *
- * @package phpClub\Controller
- * @author foobar1643 <foobar76239@gmail.com>
- */
 class BoardController
 {
     /**
-     * @var \Slim\Views\PhpRenderer
+     * @var Authorizer
      */
-    protected $view;
+    private $authorizer;
 
     /**
-     * @var \phpClub\Service\Threader
+     * @var PhpRenderer
      */
-    protected $threader;
+    private $view;
 
     /**
-     * @var \phpClub\Service\Authorizer
+     * @var CacheInterface
      */
-    protected $authorizer;
+    private $cache;
 
-    public function __construct(Authorizer $authorizer, View $view, AbstractCache $cache, ContainerInterface $container)
-    {
+    /**
+     * @var ThreadRepository
+     */
+    private $threadRepository;
+
+    public function __construct(
+        Authorizer $authorizer,
+        PhpRenderer $view,
+        CacheInterface $cache,
+        ThreadRepository $threadRepository
+    ) {
         $this->view = $view;
-
-        //$this->threader = $threader;
-
         $this->authorizer = $authorizer;
-
         $this->cache = $cache;
-
-        $this->threadRepository = $container->get('ThreadRepository');
+        $this->threadRepository = $threadRepository;
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         $template = $this->getOrSetCache('/board.phtml', [
-            'threads' => $this->threader->getThreads(),
+            'threads' => $this->threadRepository->getWithLastPosts(),
             'logged' => $this->authorizer->isLoggedIn()
         ], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 

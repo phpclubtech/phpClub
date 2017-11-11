@@ -24,7 +24,7 @@ class UrlGeneratorTest extends AbstractTestCase
     {
         $router = new Router();
 
-        $router->map(['GET'], '/thread/{id}', null)->setName('thread');
+        $router->map(['GET'], '/thread/{thread}', null)->setName('thread');
         $router->map(['GET'], '/chain/{id}', null)->setName('chain');
         
         return $router;

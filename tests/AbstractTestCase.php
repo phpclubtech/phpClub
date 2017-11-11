@@ -6,15 +6,18 @@ namespace Tests;
 
 use PHPUnit\Framework\TestCase;
 use phpClub\Entity\{File, Post, Thread};
+use Slim\Container;
 
 abstract class AbstractTestCase extends TestCase
 {
+    private $container;
+    
     public function createThread($id): Thread
     {
         return new Thread($id);
     }
 
-    public function createPost($id): Post
+    public function createPost($id, Thread $thread = null): Post
     {
         return new Post(
             $id,
@@ -22,11 +25,11 @@ abstract class AbstractTestCase extends TestCase
             'author ' . $id,
             new \DateTimeImmutable(),
             'text ' . $id,
-            $this->createThread($id)
+            $thread ?: $this->createThread($id)
         );
     }
 
-    public function createFile($id): File
+    public function createFile(int $id): File
     {
         return new File(
             __DIR__ . '/FileStorage/1.png',
@@ -36,5 +39,14 @@ abstract class AbstractTestCase extends TestCase
             200,
             120
         );
+    }
+
+    public function getContainer(): Container
+    {
+        if (!$this->container) {
+            $this->container = require_once __DIR__ . '/../src/Bootstrap.php';
+        }
+        
+        return $this->container;
     }
 }

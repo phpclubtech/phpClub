@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\ORM\EntityManager;
@@ -18,11 +18,11 @@ use phpClub\ThreadParser\Command\ImportThreadsCommand;
 use phpClub\ThreadParser\FileStorage\{DropboxFileStorage, LocalFileStorage};
 use phpClub\ThreadParser\ThreadImporter;
 use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
+use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Slim\Http\{Request, Response};
 use Slim\Views\PhpRenderer as View;
-use Symfony\Component\Cache\Simple\AbstractCache;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Cache\Simple\{ArrayCache, FilesystemCache};
 use Doctrine\Common\Cache\FilesystemCache as DoctrineCache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use GuzzleHttp\{HandlerStack, Client};
@@ -57,12 +57,17 @@ $di['EntityManager'] = function (Container $di): EntityManager {
 };
 
 $di['config'] = function (): array {
-    return parse_ini_file(__DIR__ . '/../config/config.ini');
+    $configName = getenv('ENVIRONMENT') === 'testing' ? 'config.testing.ini' : 'config.ini';
+    return parse_ini_file(__DIR__ . '/../config/' . $configName);
 };
 
 /* Application services section */
 $di['DropboxClient'] = function ($di) {
     return new \Spatie\Dropbox\Client($di['config']['dropbox_token']);
+};
+
+$di['LastPostUpdater'] = function ($di) {
+    return new \phpClub\Service\LastPostUpdater($di['EntityManager']->getConnection());
 };
 
 $di['DropboxFileStorage'] = function ($di) {
@@ -78,8 +83,8 @@ $di['LocalFileStorage'] = function (Container $di) {
 };
 
 $di['ThreadImporter'] = function (Container $di) {
-    // TODO: use file_storage from config
-    return new ThreadImporter($di['LocalFileStorage'], $di['EntityManager'], $di['ThreadRepository']);
+    // TODO: move file_storage to config
+    return new ThreadImporter($di['LocalFileStorage'], $di['EntityManager'], $di['LastPostUpdater']);
 };
 
 $di['ImportThreadsCommand'] = function (Container $di) {
@@ -129,13 +134,20 @@ $di['Linker'] = function (Container $di): Linker {
     );
 };
 
-$di["Cache"] = function (Container $di): AbstractCache {
-    return new FilesystemCache();
+$di["Cache"] = function (Container $di): CacheInterface {
+    return getenv('ENVIRONMENT') === 'production'
+        ? new FilesystemCache()
+        : new ArrayCache();
 };
 
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
-    return new BoardController($di->get('Authorizer'), $di->get('View'), $di->get('Cache'), $di);
+    return new BoardController(
+        $di->get('Authorizer'),
+        $di->get('View'),
+        $di->get('Cache'),
+        $di->get('ThreadRepository')
+    );
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
@@ -170,3 +182,5 @@ $di['notFoundHandler'] = function (Container $di) {
 };
 
 set_error_handler($di->get('PHPErrorHandler'));
+
+return $di;

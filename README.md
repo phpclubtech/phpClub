@@ -10,3 +10,8 @@ Demonstration: http://phpclub.rf.gd/
 4. run migrations `vendor/bin/doctrine-migrations migrations:migrate`
 5. `sudo a2enmod rewrite`, change `AllowOverride` from `None` to `All` in your apache config file
 7. make cron task `*/5 * * * * php your/server/directory/update.php`
+
+## Testing
+1. Create test database, edit config.testing.ini
+2. Run migrations for test database `composer migrate-test`
+3. Run tests using `composer test`

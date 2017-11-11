@@ -40,9 +40,7 @@ class Linker
 
                 if ($thread) {
                     if (!$linkRepository->findOneBy(['link' => $post['archive-link']])) {
-                        $archiveLink = new ArchiveLink();
-                        $archiveLink->setThread($thread);
-                        $archiveLink->setLink($post['archive-link']);
+                        $archiveLink = new ArchiveLink($thread, $post['archive-link']);
 
                         $this->archiveLinkRepository->persist($archiveLink);
                         $this->archiveLinkRepository->flush();
@@ -58,7 +56,7 @@ class Linker
 
     public function removeLink(int $id)
     {
-        $archiveLink = $this->$this->archiveLinkRepository->find($id);
+        $archiveLink = $this->archiveLinkRepository->find($id);
 
         $threadNumber = $archiveLink->getThread()->getNumber();
 

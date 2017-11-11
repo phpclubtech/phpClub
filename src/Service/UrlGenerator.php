@@ -21,12 +21,12 @@ class UrlGenerator
 
     public function toThread(Thread $thread): string
     {
-        return $this->router->pathFor('thread', ['id' => $thread->getId()]);
+        return $this->router->pathFor('thread', ['thread' => $thread->getId()]);
     }
 
     public function toPostAnchor(Post $post): string
     {
-        return $this->router->pathFor('thread', ['id' => $post->getThread()->getId()]) . '.html#' . $post->getId();
+        return $this->router->pathFor('thread', ['thread' => $post->getThread()->getId()]) . '#' . $post->getId();
     }
 
     public function toChain(Post $post): string

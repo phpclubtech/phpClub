@@ -22,6 +22,16 @@ class Thread
     private $archiveLinks;
 
     /**
+     * @var Post[]
+     * @ManyToMany(targetEntity="Post")
+     * @JoinTable(name="last_post",
+     *      joinColumns={@JoinColumn(name="thread_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@JoinColumn(name="post_id", referencedColumnName="id")}
+     * )
+     */
+    private $lastPosts;
+
+    /**
      * @param $id
      * @param Post[] $posts
      * @param ArchiveLink[] $archiveLinks
@@ -31,6 +41,7 @@ class Thread
         $this->id = $id;
         $this->posts = new ArrayCollection($posts);
         $this->archiveLinks = new ArrayCollection($archiveLinks);
+        $this->lastPosts = new ArrayCollection();
     }
 
     public function addPost(Post $post)
@@ -68,5 +79,13 @@ class Thread
     public function getArchiveLinks()
     {
         return $this->archiveLinks;
+    }
+
+    /**
+     * @return Post[]|ArrayCollection
+     */
+    public function getLastPosts()
+    {
+        return $this->lastPosts;
     }
 }
