@@ -20,14 +20,6 @@ class ThreadHtmlParser
      * @var DateConverter
      */
     private $dateConverter;
-    
-    /**
-     * For this threads files are missed
-     * #345388 - Thread 15 (Google cache)
-     * 
-     * @var array
-     */
-    private $threadsWithMissedFiles = ['345388'];
 
     /**
      * @param ThreadInterface $thread
@@ -51,7 +43,7 @@ class ThreadHtmlParser
         if (!$threadHtmlPaths) {
             throw new \Exception('No threads found in ' . $threadsDir);
         }
-        
+
         return array_map(function ($threadHtmlPath) {
             return $this->extractThread(file_get_contents($threadHtmlPath), dirname($threadHtmlPath));
         }, $threadHtmlPaths);
@@ -87,11 +79,14 @@ class ThreadHtmlParser
                 $this->extractText($postNode),
                 $thread
             );
-            $post->addFiles($this->extractFiles($postNode, $post, $threadPath));
+            
+            if (!$this->isThreadWithMissedFiles($thread)) {
+                $post->addFiles($this->extractFiles($postNode, $post, $threadPath));
+            }
+            
             $thread->addPost($post);
         };
 
-        // We need to use each() because foreach on Crawler will iterate over DomElements
         $postNodes->each($extractPost);
 
         return $thread;
@@ -191,10 +186,6 @@ class ThreadHtmlParser
      */
     private function extractFiles(Crawler $postNode, Post $post, string $threadPath): array
     {
-        if (in_array($post->getThread()->getId(), $this->threadsWithMissedFiles)) {
-            return [];
-        }
-
         $filesXPath = $this->thread->getFilesXPath();
         $fileNodes = $postNode->filterXPath($filesXPath);
 
@@ -212,5 +203,13 @@ class ThreadHtmlParser
         };
 
         return $fileNodes->each($extractFile);
+    }
+
+    private function isThreadWithMissedFiles(Thread $thread): bool
+    {
+        // 345388 - Thread #15 (Google cache)
+        $threadsWithMissedFiles = ['345388'];
+        
+        return in_array($thread, $threadsWithMissedFiles);
     }
 }
