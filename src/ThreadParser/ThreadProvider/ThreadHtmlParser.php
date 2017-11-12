@@ -210,6 +210,6 @@ class ThreadHtmlParser
         // 345388 - Thread #15 (Google cache)
         $threadsWithMissedFiles = ['345388'];
         
-        return in_array($thread, $threadsWithMissedFiles);
+        return in_array($thread->getId(), $threadsWithMissedFiles);
     }
 }

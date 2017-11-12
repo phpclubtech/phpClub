@@ -11,6 +11,11 @@ Demonstration: http://phpclub.rf.gd/
 5. `sudo a2enmod rewrite`, change `AllowOverride` from `None` to `All` in your apache config file
 7. make cron task `*/5 * * * * php your/server/directory/update.php`
 
+## Thread import
+- Import alive threads from 2ch.hk API: `php cli/import_threads.php phpClub:import-threads 2ch-api`
+- Import all threads from local folder: `php cli/import_threads.php phpClub:import-threads <path-to-threads> <board>`
+- Import threads from arhivach by thread id (TODO)
+
 ## Testing
 1. Create test database, edit config.testing.ini
 2. Run migrations for test database `composer migrate-test`

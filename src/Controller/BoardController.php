@@ -48,7 +48,7 @@ class BoardController
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         $template = $this->getOrSetCache('/board.phtml', [
-            'threads' => $this->threadRepository->getWithLastPosts(),
+            'threads' => $this->threadRepository->getWithLastPosts($request->getParam('page', 1)),
             'logged' => $this->authorizer->isLoggedIn()
         ], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 

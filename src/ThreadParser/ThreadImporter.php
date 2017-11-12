@@ -84,10 +84,6 @@ class ThreadImporter
     {
         foreach ($thread->getPosts() as $post) {
             foreach ($post->getFiles() as $file) {
-                if ($this->fileStorage->isFileExist($file->getPath(), (string) $thread->getId())) {
-                    continue;
-                }
-                
                 $file->updatePaths(
                     $this->fileStorage->put($file->getPath(), (string) $thread->getId()),
                     $this->fileStorage->put($file->getThumbPath(), $thread->getId() . '/thumb')

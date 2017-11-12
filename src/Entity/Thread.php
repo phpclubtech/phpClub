@@ -25,8 +25,8 @@ class Thread
      * @var Post[]
      * @ManyToMany(targetEntity="Post")
      * @JoinTable(name="last_post",
-     *      joinColumns={@JoinColumn(name="thread_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@JoinColumn(name="post_id", referencedColumnName="id")}
+     *      joinColumns={@JoinColumn(name="thread_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@JoinColumn(name="post_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      */
     private $lastPosts;

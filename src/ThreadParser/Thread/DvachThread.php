@@ -19,7 +19,8 @@ class DvachThread implements ThreadInterface
     {
         return '//span[starts-with(@class,"poster") or @class="ananimas"][normalize-space(string())]
                 | //span[@class="name"]/text()
-                | //div/a[@class="post-email"]/text()';
+                | //div/a[@class="post-email"]/text()
+                | //span[@class="mod"]/text()';
     }
 
     public function getDateXPath(): string
@@ -53,7 +54,7 @@ class DvachThread implements ThreadInterface
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
         
-        return new File($fullName, $thumbName, $post, (int) $height, (int) $width);
+        return new File(ltrim($fullName, "'"), $thumbName, $post, (int) $height, (int) $width);
     }
 
     private function extractOnClickJsArgs(Crawler $fileNode): array

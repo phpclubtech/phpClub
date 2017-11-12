@@ -37,7 +37,9 @@ class LocalFileStorage implements FileStorageInterface
     {
         $relativePath = '/' . $directory . '/' . basename($path);
 
-        $this->filesystem->copy($path, $this->uploadRoot . $relativePath);
+        if (!$this->isFileExist($path, $directory)) {
+            $this->filesystem->copy($path, $this->uploadRoot . $relativePath);
+        }
 
         return $relativePath;
     }

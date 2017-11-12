@@ -51,10 +51,12 @@ class ImportThreadsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $threads = $this->getThreads($input);
-        
         $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
         $output->writeln('Parsing threads...');
+        
+        $threads = $this->getThreads($input);
+
+        $output->writeln('Saving threads...');
         
         $progress = new ProgressBar($output, count($threads));
         $progress->start();
