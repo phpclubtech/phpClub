@@ -8,9 +8,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
+use phpClub\ThreadParser\DvachApiClient;
 use PHPUnit\Framework\TestCase;
-use phpClub\Entity\{Thread, Post, File};
+use phpClub\Entity\{Thread, Post};
 
 class DvachApiClientTest extends TestCase
 {

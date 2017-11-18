@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\ThreadProvider;
+namespace phpClub\ThreadParser;
 
 use phpClub\Entity\{Thread, Post, File};
 use GuzzleHttp\Client;
@@ -18,14 +18,14 @@ class DvachApiClient
     /**
      * @var Client
      */
-    private $client;
+    private $guzzle;
 
     /**
-     * @param Client $client
+     * @param Client $guzzle
      */
-    public function __construct(Client $client)
+    public function __construct(Client $guzzle)
     {
-        $this->client = $client;
+        $this->guzzle = $guzzle;
     }
 
     /**
@@ -33,7 +33,7 @@ class DvachApiClient
      */
     public function getAlivePhpThreads(): array
     {
-        $responseBody = $this->client->get('https://2ch.hk/pr/catalog.json')->getBody();
+        $responseBody = $this->guzzle->get('https://2ch.hk/pr/catalog.json')->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
         $threads = $responseJson['threads'];
 
@@ -61,7 +61,7 @@ class DvachApiClient
     {
         $threadId = $phpThread['num'];
 
-        $responseBody = $this->client->get("https://2ch.hk/pr/res/{$threadId}.json")->getBody();
+        $responseBody = $this->guzzle->get("https://2ch.hk/pr/res/{$threadId}.json")->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
 
         $postsArray = $responseJson['threads'][0]['posts'] ?? null;

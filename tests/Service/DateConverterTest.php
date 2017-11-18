@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\Helper;
+namespace Tests\Service;
 
 use PHPUnit\Framework\TestCase;
-use phpClub\ThreadParser\Helper\DateConverter;
+use phpClub\Service\DateConverter;
 
 class DateConverterTest extends TestCase
 {

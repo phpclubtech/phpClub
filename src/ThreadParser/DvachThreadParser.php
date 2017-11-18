@@ -2,20 +2,19 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\Thread;
+namespace phpClub\ThreadParser;
 
-use phpClub\Entity\File;
-use phpClub\Entity\Post;
+use phpClub\Entity\{File, Post};
 use Symfony\Component\DomCrawler\Crawler;
 
-class DvachThread implements ThreadInterface
+class DvachThreadParser extends AbstractThreadParser
 {
-    public function getPostsXPath(): string
+    protected function getPostsXPath(): string
     {
         return '//td[@class="reply"] | //div[starts-with(@id, "post-body-") or @class="oppost"]';
     }
 
-    public function getAuthorXPath(): string
+    protected function getAuthorXPath(): string
     {
         return '//span[starts-with(@class,"poster") or @class="ananimas"][normalize-space(string())]
                 | //span[@class="name"]/text()
@@ -23,34 +22,34 @@ class DvachThread implements ThreadInterface
                 | //span[@class="mod"]/text()';
     }
 
-    public function getDateXPath(): string
+    protected function getDateXPath(): string
     {
         return '//span[contains(@class,"dateTime") or @class="posttime"]/text()';
     }
 
-    public function getIdXPath(): string
+    protected function getIdXPath(): string
     {
         return '//td/@id | //div/@data-num | //span[@class="reflink"]/a';
     }
 
-    public function getTextXPath(): string
+    protected function getTextXPath(): string
     {
         return '//blockquote/p | //blockquote[not(p)]';
     }
 
-    public function getTitleXPath(): string
+    protected function getTitleXPath(): string
     {
         return '//span[@class="nameBlock"]/span[@class="subject"]
                 | //span[@class="post-title"]';
     }
 
-    public function getFilesXPath(): string
+    protected function getFilesXPath(): string
     {
         return '//div[starts-with(@class, "images")]/figure[starts-with(@class, "image")]
                 | //span[starts-with(@id, "exlink_")]';
     }
 
-    public function extractFile(Crawler $fileNode, Post $post): File
+    protected function extractFile(Crawler $fileNode, Post $post): File
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
         

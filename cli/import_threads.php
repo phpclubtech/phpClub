@@ -3,7 +3,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/Bootstrap.php';
 
-use phpClub\ThreadParser\Command\ImportThreadsCommand;
+use phpClub\Command\ImportThreadsCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application();

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\FileStorage;
 
 use phpClub\Entity\File;
-use phpClub\ThreadParser\FileStorage\DropboxFileStorage;
+use phpClub\FileStorage\DropboxFileStorage;
 use Spatie\Dropbox\Client;
 use GuzzleHttp\Psr7\Response;
 use Spatie\Dropbox\Exceptions\BadRequest;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\Helper;
+namespace phpClub\Service;
 
 class DateConverter
 {

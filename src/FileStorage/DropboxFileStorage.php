@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\FileStorage;
+namespace phpClub\FileStorage;
 
 use Spatie\Dropbox\Client;
 use Spatie\Dropbox\Exceptions\BadRequest;

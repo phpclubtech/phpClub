@@ -1,9 +1,9 @@
 <?php
 namespace phpClub\Entity;
 
-/** 
-* @Entity(repositoryClass="phpClub\Repository\ArchiveLinkRepository") 
-**/
+/**
+ * @Entity(repositoryClass="phpClub\Repository\ArchiveLinkRepository") 
+ */
 class ArchiveLink
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
@@ -31,7 +31,7 @@ class ArchiveLink
         return $this->thread;
     }
 
-    public function getLink()
+    public function getLink(): string 
     {
         return $this->link;
     }

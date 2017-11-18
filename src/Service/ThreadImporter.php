@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\Service;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Evenement\EventEmitterTrait;
 use phpClub\Entity\Thread;
-use phpClub\Service\LastPostUpdater;
-use phpClub\ThreadParser\FileStorage\FileStorageInterface;
+use phpClub\FileStorage\FileStorageInterface;
 
 class ThreadImporter
 {

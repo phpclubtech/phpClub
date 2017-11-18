@@ -2,20 +2,15 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\Command;
+namespace phpClub\Command;
 
 use phpClub\Entity\Thread;
-use phpClub\ThreadParser\Helper\DateConverter;
-use phpClub\ThreadParser\Thread\ArhivachThread;
-use phpClub\ThreadParser\Thread\DvachThread;
-use phpClub\ThreadParser\ThreadImporter;
-use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
-use phpClub\ThreadParser\ThreadProvider\ThreadHtmlParser;
-use Psr\Container\ContainerInterface;
+use phpClub\Service\DateConverter;
+use phpClub\Service\ThreadImporter;
+use phpClub\ThreadParser\{ArhivachThreadParser, DvachApiClient, DvachThreadParser};
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\{InputArgument, InputInterface};
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportThreadsCommand extends Command
@@ -98,14 +93,12 @@ class ImportThreadsCommand extends Command
         $board = $input->getArgument('board');
 
         if ($board === '2ch') {
-            $board = new DvachThread();
+            $threadHtmlParser = new DvachThreadParser(new DateConverter());
         } else if ($board === 'arhivach') {
-            $board = new ArhivachThread();
+            $threadHtmlParser = new ArhivachThreadParser(new DateConverter());
         } else {
             throw new \Exception('Board option must be "2ch" or "arhivach"');
         }
-
-        $threadHtmlParser = new ThreadHtmlParser($board, new DateConverter());
 
         return $threadHtmlParser->parseAllThreads($source);
     }

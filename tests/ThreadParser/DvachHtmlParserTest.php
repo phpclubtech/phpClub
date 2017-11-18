@@ -5,21 +5,20 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use phpClub\Entity\{Post, File};
-use phpClub\ThreadParser\Thread\DvachThread;
-use phpClub\ThreadParser\Helper\DateConverter;
-use phpClub\ThreadParser\ThreadProvider\ThreadHtmlParser;
+use phpClub\Service\DateConverter;
+use phpClub\ThreadParser\DvachThreadParser;
 use PHPUnit\Framework\TestCase;
 
 class DvachHtmlParserTest extends TestCase
 {
     /**
-     * @var ThreadHtmlParser
+     * @var DvachThreadParser
      */
     private $threadParser;
 
     public function setUp()
     {
-        $this->threadParser = new ThreadHtmlParser(new DvachThread(), new DateConverter());
+        $this->threadParser = new DvachThreadParser(new DateConverter());
     }
 
     public function testGetPost()

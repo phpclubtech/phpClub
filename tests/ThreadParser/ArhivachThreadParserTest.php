@@ -5,21 +5,20 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use phpClub\Entity\File;
-use phpClub\ThreadParser\Thread\ArhivachThread;
-use phpClub\ThreadParser\ThreadProvider\ThreadHtmlParser;
-use phpClub\ThreadParser\Helper\DateConverter;
+use phpClub\Service\DateConverter;
+use phpClub\ThreadParser\ArhivachThreadParser;
 use PHPUnit\Framework\TestCase;
 
-class ArhivachHtmlParserTest extends TestCase
+class ArhivachThreadParserTest extends TestCase
 {
     /**
-     * @var ThreadHtmlParser
+     * @var ArhivachThreadParser
      */
     private $threadParser;
 
     public function setUp()
     {
-        $this->threadParser = new ThreadHtmlParser(new ArhivachThread(), new DateConverter());
+        $this->threadParser = new ArhivachThreadParser(new DateConverter());
     }
 
     public function testThread83()

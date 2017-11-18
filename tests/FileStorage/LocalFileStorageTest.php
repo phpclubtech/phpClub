@@ -6,7 +6,7 @@ namespace Tests\FileStorage;
 
 use org\bovigo\vfs\vfsStream;
 use phpClub\Entity\File;
-use phpClub\ThreadParser\FileStorage\LocalFileStorage;
+use phpClub\FileStorage\LocalFileStorage;
 use Symfony\Component\Filesystem\Filesystem;
 use Tests\AbstractTestCase;
 

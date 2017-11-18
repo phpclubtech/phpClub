@@ -2,49 +2,49 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\Thread;
+namespace phpClub\ThreadParser;
 
 use phpClub\Entity\{File, Post};
 use Symfony\Component\DomCrawler\Crawler;
 
-class ArhivachThread implements ThreadInterface
+class ArhivachThreadParser extends AbstractThreadParser
 {
-    public function getPostsXPath(): string
+    protected function getPostsXPath(): string
     {
         return '//div[@class="post"]';
     }
 
-    public function getAuthorXPath(): string
+    protected function getAuthorXPath(): string
     {
         return '//span[@class="poster_name"] | //span[@class="poster_trip"]';
     }
 
-    public function getDateXPath(): string
+    protected function getDateXPath(): string
     {
         return '//span[@class="post_time"]';
     }
 
-    public function getIdXPath(): string
+    protected function getIdXPath(): string
     {
         return '//span[@class="post_id"]';
     }
 
-    public function getTextXPath(): string
+    protected function getTextXPath(): string
     {
         return '//div[@class="post_comment_body"]';
     }
 
-    public function getTitleXPath(): string
+    protected function getTitleXPath(): string
     {
         return '//*[@class="post_subject"]';
     }
 
-    public function getFilesXPath(): string
+    protected function getFilesXPath(): string
     {
         return '//span[@class="post_comment"]/div[@class="post_image_block"]';
     }
 
-    public function extractFile(Crawler $fileNode, Post $post): File
+    protected function extractFile(Crawler $fileNode, Post $post): File
     {
         $fileXPath = '//a[@class="expand_image"]';
         $fileNode = $fileNode->filterXPath($fileXPath);

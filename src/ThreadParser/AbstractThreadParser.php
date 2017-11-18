@@ -2,32 +2,24 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser\ThreadProvider;
+namespace phpClub\ThreadParser;
 
-use phpClub\ThreadParser\Helper\DateConverter;
+use phpClub\Service\DateConverter;
 use phpClub\Entity\{File, Post, Thread};
-use phpClub\ThreadParser\Thread\ThreadInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ThreadHtmlParser
+abstract class AbstractThreadParser
 {
-    /**
-     * @var ThreadInterface
-     */
-    private $thread;
-
     /**
      * @var DateConverter
      */
     private $dateConverter;
 
     /**
-     * @param ThreadInterface $thread
      * @param DateConverter $dateConverter
      */
-    public function __construct(ThreadInterface $thread, DateConverter $dateConverter)
+    public function __construct(DateConverter $dateConverter)
     {
-        $this->thread        = $thread;
         $this->dateConverter = $dateConverter;
     }
 
@@ -59,7 +51,7 @@ class ThreadHtmlParser
     {
         $threadCrawler = new Crawler($threadHtml);
 
-        $postsXPath = $this->thread->getPostsXPath();
+        $postsXPath = $this->getPostsXPath();
 
         $firstPostXPath = $threadCrawler->filterXPath($postsXPath . '[1]');
         $thread = new Thread($this->extractId($firstPostXPath));
@@ -97,9 +89,9 @@ class ThreadHtmlParser
      * @return int
      * @throws \Exception
      */
-    private function extractId(Crawler $postNode): int
+    protected function extractId(Crawler $postNode): int
     {
-        $idXPath = $this->thread->getIdXPath();
+        $idXPath = $this->getIdXPath();
         $idNode  = $postNode->filterXPath($idXPath);
 
         if (!count($idNode)) {
@@ -115,9 +107,9 @@ class ThreadHtmlParser
      * @param Crawler $postNode
      * @return string
      */
-    private function extractTitle(Crawler $postNode): string
+    protected function extractTitle(Crawler $postNode): string
     {
-        $titleXPath = $this->thread->getTitleXPath();
+        $titleXPath = $this->getTitleXPath();
         $titleNode  = $postNode->filterXPath($titleXPath);
 
         if (!count($titleNode)) {
@@ -132,9 +124,9 @@ class ThreadHtmlParser
      * @return string
      * @throws \Exception
      */
-    private function extractAuthor(Crawler $postNode): string
+    protected function extractAuthor(Crawler $postNode): string
     {
-        $authorXPath = $this->thread->getAuthorXPath();
+        $authorXPath = $this->getAuthorXPath();
         $authorNode  = $postNode->filterXPath($authorXPath);
 
         if (!count($authorNode)) {
@@ -149,9 +141,9 @@ class ThreadHtmlParser
      * @return \DateTimeImmutable
      * @throws \Exception
      */
-    private function extractDate(Crawler $postNode): \DateTimeImmutable
+    protected function extractDate(Crawler $postNode): \DateTimeImmutable
     {
-        $dateXPath = $this->thread->getDateXPath();
+        $dateXPath = $this->getDateXPath();
         $dateNode  = $postNode->filterXPath($dateXPath);
 
         if (!count($dateNode)) {
@@ -166,9 +158,9 @@ class ThreadHtmlParser
      * @return string
      * @throws \Exception
      */
-    private function extractText(Crawler $postNode): string
+    protected function extractText(Crawler $postNode): string
     {
-        $textXPath = $this->thread->getTextXPath();
+        $textXPath = $this->getTextXPath();
         $textNode  = $postNode->filterXPath($textXPath);
 
         if (!count($textNode)) {
@@ -184,13 +176,13 @@ class ThreadHtmlParser
      * @param string $threadPath
      * @return File[]
      */
-    private function extractFiles(Crawler $postNode, Post $post, string $threadPath): array
+    protected function extractFiles(Crawler $postNode, Post $post, string $threadPath): array
     {
-        $filesXPath = $this->thread->getFilesXPath();
+        $filesXPath = $this->getFilesXPath();
         $fileNodes = $postNode->filterXPath($filesXPath);
 
         $extractFile = function (Crawler $fileNode) use ($post, $threadPath) {
-            $file = $this->thread->extractFile($fileNode, $post);
+            $file = $this->extractFile($fileNode, $post);
 
             if ($threadPath && !filter_var($file->getPath(), FILTER_VALIDATE_URL)) {
                 $file->updatePaths(
@@ -205,11 +197,27 @@ class ThreadHtmlParser
         return $fileNodes->each($extractFile);
     }
 
-    private function isThreadWithMissedFiles(Thread $thread): bool
+    protected function isThreadWithMissedFiles(Thread $thread): bool
     {
         // 345388 - Thread #15 (Google cache)
         $threadsWithMissedFiles = ['345388'];
         
-        return in_array($thread->getId(), $threadsWithMissedFiles);
+        return in_array($thread->getId(), $threadsWithMissedFiles, $strict = true);
     }
+    
+    abstract protected function getPostsXPath(): string;
+
+    abstract protected function getIdXPath(): string;
+
+    abstract protected function getTitleXPath(): string;
+
+    abstract protected function getAuthorXPath(): string;
+
+    abstract protected function getDateXPath(): string;
+
+    abstract protected function getTextXPath(): string;
+
+    abstract protected function getFilesXPath(): string;
+
+    abstract protected function extractFile(Crawler $fileNode, Post $post): File;
 }
