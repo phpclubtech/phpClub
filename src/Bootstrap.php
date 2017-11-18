@@ -14,20 +14,20 @@ use phpClub\Entity\ArchiveLink;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Linker;
 use phpClub\Service\Searcher;
-use phpClub\ThreadParser\Command\ImportThreadsCommand;
-use phpClub\ThreadParser\FileStorage\{DropboxFileStorage, LocalFileStorage};
-use phpClub\ThreadParser\ThreadImporter;
-use phpClub\ThreadParser\ThreadProvider\DvachApiClient;
+use phpClub\Command\ImportThreadsCommand;
+use phpClub\FileStorage\{DropboxFileStorage, LocalFileStorage};
+use phpClub\Service\ThreadImporter;
+use phpClub\ThreadParser\DvachApiClient;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Slim\Http\{Request, Response};
-use Slim\Views\PhpRenderer as View;
 use Symfony\Component\Cache\Simple\{ArrayCache, FilesystemCache};
 use Doctrine\Common\Cache\FilesystemCache as DoctrineCache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use GuzzleHttp\{HandlerStack, Client};
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use Slim\Views\PhpRenderer;
 
 $slimConfig = [
     'settings' => [
@@ -112,11 +112,16 @@ $di['UrlGenerator'] = function (Container $di) {
     return new \phpClub\Service\UrlGenerator($di->get('router'));
 };
 
-$di['View'] = function (Container $di): View {
-    return new View(__DIR__ . '/../templates', [
+$di['View'] = function (Container $di): PhpRenderer {
+    return new PhpRenderer(__DIR__ . '/../templates', [
         // Shared variables
         'urlGenerator' => $di['UrlGenerator'],
+        'paginator' => $di['Paginator']
     ]);
+};
+
+$di['Paginator'] = function (): \phpClub\Service\Paginator {
+    return new \phpClub\Service\Paginator();
 };
 
 $di['Authorizer'] = function (Container $di): Authorizer {

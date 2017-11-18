@@ -1,0 +1,9 @@
+.pagerfanta {
+    display: block;
+    text-align: center;
+    padding: 10px;
+}
+
+.pagerfanta a, span.current {
+    padding: 10px;
+}

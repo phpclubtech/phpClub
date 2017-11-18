@@ -1,5 +1,7 @@
 <?php
-/** @var \phpClub\Entity\Thread[] $threads */
+/** @var \phpClub\Entity\Thread[]|\Pagerfanta\Pagerfanta $threads */
+/** @var \phpClub\Service\Paginator $paginator */
+
 require __DIR__ . '/base/header.phtml';
 require __DIR__ . '/base/boardHeader.phtml';
 ?>
@@ -16,5 +18,7 @@ require __DIR__ . '/base/boardHeader.phtml';
         </form>
     </section>
 <?php endforeach ?>
+
+<?= $paginator->paginate($threads) ?>
 
 <?php require __DIR__ . '/base/footer.phtml' ?>
