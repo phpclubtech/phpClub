@@ -6,7 +6,7 @@
         }
     },
     "require": {
-        "doctrine/orm": "*",
+        "doctrine/orm": "@dev",
         "doctrine/migrations": "^1.5",
         "slim/slim": "^3.8",
         "slim/php-view": "^2.2",
