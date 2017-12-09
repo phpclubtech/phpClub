@@ -6,13 +6,20 @@ Demonstration: http://phpclub.rf.gd/
 2. `composer install`
 3. config db connection in `src/config.ini`  
 4. run migrations `vendor/bin/doctrine-migrations migrations:migrate`
-5. `sudo a2enmod rewrite`, change `AllowOverride` from `None` to `All` in your apache config file
-7. make cron task `*/5 * * * * php your/server/directory/update.php`
 
 ## Thread import
-- Import alive threads from 2ch.hk API: `php cli/import_threads.php phpClub:import-threads 2ch-api`
-- Import all threads from local folder: `php cli/import_threads.php phpClub:import-threads <path-to-threads> <board>`
-- Import threads from arhivach by thread id (TODO)
+Run `./bin/console phpClub:import-threads` with following arguments. Examples:
+
+- Import alive threads from 2ch.hk API:
+`--source=2ch-api`
+- Import all archived PHP threads from arhivach.org:
+`--source=arhivach`
+- Import 2ch.hk threads from local folder:
+`--dir=/var/www/threads/ --board=2ch`
+- Import 2ch.hk threads saved in arhivach from local folder:
+`--dir=/var/www/threads/ --board=arhivach`
+- Import specific threads from arhivach.org:
+`--source=arhivach --urls http://arhivach.org/thread/254710/,http://arhivach.org/thread/261841/`
 
 ## Testing
 1. Create test database, edit config.testing.ini
