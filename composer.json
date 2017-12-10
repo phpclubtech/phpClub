@@ -17,7 +17,8 @@
         "guzzlehttp/guzzle": "^6.3",
         "spatie/dropbox-api": "^1.6",
         "evenement/evenement": "^3.0",
-        "pagerfanta/pagerfanta": "^1.0"
+        "pagerfanta/pagerfanta": "^1.0",
+        "vlucas/phpdotenv": "^2.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2",
@@ -29,6 +30,6 @@
         "test": "vendor/bin/phpunit",
         "diff": "vendor/bin/doctrine-migrations migrations:diff",
         "migrate": "vendor/bin/doctrine-migrations migrations:migrate",
-        "migrate-test": "ENVIRONMENT=testing vendor/bin/doctrine-migrations migrations:migrate"
+        "migrate-test": "APP_ENV=test vendor/bin/doctrine-migrations migrations:migrate"
     }
 }

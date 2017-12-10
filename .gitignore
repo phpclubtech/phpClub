@@ -11,3 +11,4 @@
 /public/*
 !/public/index.php
 !/public/media
+.env

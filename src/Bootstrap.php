@@ -5,19 +5,22 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
-use phpClub\Controller\ArchiveLinkController;
-use phpClub\Controller\BoardController;
-use phpClub\Controller\SearchController;
-use phpClub\Controller\UsersController;
+use phpClub\Controller\{BoardController, SearchController, UsersController};
 use phpClub\Entity\{Post, Thread, User};
-use phpClub\Entity\ArchiveLink;
+use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\Linker;
+use phpClub\Service\DateConverter;
+use phpClub\Service\LastPostUpdater;
+use phpClub\Service\Paginator;
 use phpClub\Service\Searcher;
 use phpClub\Command\ImportThreadsCommand;
-use phpClub\FileStorage\{DropboxFileStorage, LocalFileStorage};
+use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Service\ThreadImporter;
+use phpClub\Service\UrlGenerator;
+use phpClub\ThreadParser\ArhivachClient;
+use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachApiClient;
+use phpClub\ThreadParser\DvachThreadParser;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Slim\Http\{Request, Response};
@@ -29,20 +32,40 @@ use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Slim\Views\PhpRenderer;
 
+(new Dotenv\Dotenv(__DIR__ . '/../'))->load();
+
 $slimConfig = [
     'settings' => [
-        'displayErrorDetails' => ini_get("display_errors"),
+        'displayErrorDetails' => getenv('APP_ENV') !== 'prod',
+        'fileStorage' => LocalFileStorage::class,
+    ],
+    'connections' => [
+        'mysql' => [
+            'driver' => 'pdo_mysql',
+            'charset' => 'utf8',
+            'host' => getenv('DB_HOST'),
+            'user' => getenv('DB_USER'),
+            'password' => getenv('DB_PASSWORD'),
+            'dbname' => getenv('DB_NAME'),
+        ],
+        'mysql_test' => [
+            'driver' => 'pdo_mysql',
+            'charset' => 'utf8',
+            'host' => getenv('DB_HOST'),
+            'user' => getenv('DB_USER'),
+            'password' => getenv('DB_PASSWORD'),
+            'dbname' => getenv('TEST_DB_NAME'),
+        ]
     ],
 ];
 
 $di = new Container($slimConfig);
 
-/* General services section */
-$di['EntityManager'] = function (Container $di): EntityManager {
+$di[EntityManager::class] = function (Container $di): EntityManager {
     $paths     = array(__DIR__ . "/Entity/");
     $isDevMode = false;
 
-    $config = $di->get('config');
+    $config = getenv('APP_ENV') === 'test' ? $di['connections']['mysql_test'] : $di['connections']['mysql'];
 
     $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
 
@@ -56,39 +79,58 @@ $di['EntityManager'] = function (Container $di): EntityManager {
     return $entityManager;
 };
 
-$di['config'] = function (): array {
-    $configName = getenv('ENVIRONMENT') === 'testing' ? 'config.testing.ini' : 'config.ini';
-    return parse_ini_file(__DIR__ . '/../config/' . $configName);
+$di[\Doctrine\ORM\EntityManagerInterface::class] = function (Container $di) {
+    return $di[EntityManager::class];
 };
 
-/* Application services section */
-$di['DropboxClient'] = function ($di) {
-    return new \Spatie\Dropbox\Client($di['config']['dropbox_token']);
+$di[\phpClub\Service\RefLinkManager::class] = function (Container $di) {
+    return new \phpClub\Service\RefLinkManager($di[EntityManager::class]);
 };
 
-$di['LastPostUpdater'] = function ($di) {
-    return new \phpClub\Service\LastPostUpdater($di['EntityManager']->getConnection());
+$di[LastPostUpdater::class] = function (Container $di) {
+    return new LastPostUpdater($di[EntityManager::class]->getConnection());
 };
 
-$di['DropboxFileStorage'] = function ($di) {
-    return new DropboxFileStorage($di['DropboxClient']);
+$di[ArhivachClient::class] = function (Container $di) {
+    return new ArhivachClient(
+        $di['Guzzle'],
+        $di[ArhivachThreadParser::class],
+        getenv('ARHIVACH_EMAIL'),
+        getenv('ARHIVACH_PASSWORD')
+    );
 };
 
-$di['ThreadRepository'] = function (Container $di) {
-    return $di->get('EntityManager')->getRepository(Thread::class);
+$di[ArhivachThreadParser::class] = function ($di) {
+    return new ArhivachThreadParser($di[DateConverter::class]);
 };
 
-$di['LocalFileStorage'] = function (Container $di) {
+$di[DvachThreadParser::class] = function ($di) {
+    return new DvachThreadParser($di[DateConverter::class]);
+};
+
+$di[DateConverter::class] = function () {
+    return new DateConverter();
+};
+
+$di[ThreadRepository::class] = function (Container $di) {
+    return $di->get(EntityManager::class)->getRepository(Thread::class);
+};
+
+$di[LocalFileStorage::class] = function () {
     return new LocalFileStorage(new Symfony\Component\Filesystem\Filesystem(), __DIR__ . '/../public');
 };
 
-$di['ThreadImporter'] = function (Container $di) {
-    // TODO: move file_storage to config
-    return new ThreadImporter($di['LocalFileStorage'], $di['EntityManager'], $di['LastPostUpdater']);
+$di[ThreadImporter::class] = function (Container $di) {
+    return new ThreadImporter(
+        $di[$di['settings']['fileStorage']],
+        $di[EntityManager::class],
+        $di[LastPostUpdater::class],
+        $di[\phpClub\Service\RefLinkManager::class]
+    );
 };
 
-$di['ImportThreadsCommand'] = function (Container $di) {
-    return new ImportThreadsCommand($di['ThreadImporter'], $di['DvachApiClient']);
+$di[ImportThreadsCommand::class] = function (Container $di) {
+    return new ImportThreadsCommand($di);
 };
 
 $di['Guzzle'] = function () {
@@ -104,67 +146,55 @@ $di['Guzzle.cacheable'] = function () {
     return new Client(['handler' => $stack]);
 };
 
-$di['DvachApiClient'] = function ($di) {
+$di[DvachApiClient::class] = function ($di) {
     return new DvachApiClient($di['Guzzle.cacheable']);
 };
 
-$di['UrlGenerator'] = function (Container $di) {
-    return new \phpClub\Service\UrlGenerator($di->get('router'));
+$di[UrlGenerator::class] = function (Container $di) {
+    return new UrlGenerator($di->get('router'), $di[ArhivachClient::class]);
 };
 
-$di['View'] = function (Container $di): PhpRenderer {
+$di[PhpRenderer::class] = function (Container $di): PhpRenderer {
     return new PhpRenderer(__DIR__ . '/../templates', [
         // Shared variables
-        'urlGenerator' => $di['UrlGenerator'],
-        'paginator' => $di['Paginator']
+        'urlGenerator' => $di->get(UrlGenerator::class),
+        'paginator' => $di->get(Paginator::class),
     ]);
 };
 
-$di['Paginator'] = function (): \phpClub\Service\Paginator {
-    return new \phpClub\Service\Paginator();
+$di[Paginator::class] = function (): Paginator {
+    return new Paginator();
 };
 
-$di['Authorizer'] = function (Container $di): Authorizer {
-    return new Authorizer($di->get('EntityManager')->getRepository(User::class));
+$di[Authorizer::class] = function (Container $di): Authorizer {
+    return new Authorizer($di->get(EntityManager::class)->getRepository(User::class));
 };
 
-$di['Searcher'] = function (Container $di): Searcher {
-    return new Searcher($di->get('EntityManager')->getRepository(Post::class));
+$di[Searcher::class] = function (Container $di): Searcher {
+    return new Searcher($di->get(EntityManager::class)->getRepository(Post::class));
 };
 
-$di['Linker'] = function (Container $di): Linker {
-    return new Linker(
-        $di->get('EntityManager')->getRepository(ArchiveLink::class),
-        $di->get('EntityManager')->getRepository(Thread::class)
-    );
-};
-
-$di["Cache"] = function (Container $di): CacheInterface {
-    return getenv('ENVIRONMENT') === 'production'
-        ? new FilesystemCache()
-        : new ArrayCache();
+$di[CacheInterface::class] = function (): CacheInterface {
+    return getenv('APP_ENV') === 'prod' ? new FilesystemCache() : new ArrayCache();
 };
 
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
     return new BoardController(
-        $di->get('Authorizer'),
-        $di->get('View'),
-        $di->get('Cache'),
-        $di->get('ThreadRepository')
+        $di->get(Authorizer::class),
+        $di->get(PhpRenderer::class),
+        $di->get(CacheInterface::class),
+        $di->get(ThreadRepository::class),
+        $di->get(\phpClub\Service\RefLinkManager::class)
     );
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
-    return new SearchController($di->get('Searcher'), $di->get('Authorizer'), $di->get('View'));
+    return new SearchController($di->get(Searcher::class), $di->get(Authorizer::class), $di->get(PhpRenderer::class));
 };
 
 $di['UsersController'] = function (Container $di): UsersController {
-    return new UsersController($di->get('Authorizer'), $di->get('View'));
-};
-
-$di['ArchiveLinkController'] = function (Container $di): ArchiveLinkController {
-    return new ArchiveLinkController($di->get('Authorizer'), $di->get('Linker'));
+    return new UsersController($di->get(Authorizer::class), $di->get(PhpRenderer::class));
 };
 
 /* Error handler for altering PHP errors output */
@@ -180,7 +210,7 @@ $di['PHPErrorHandler'] = function () {
 
 $di['notFoundHandler'] = function (Container $di) {
     return function (Request $request, Response $response) use ($di) {
-        return $di->get('View')
+        return $di->get(PhpRenderer::class)
             ->render($response, '/notFound.phtml', [])
             ->withStatus(404);
     };

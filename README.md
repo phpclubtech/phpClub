@@ -1,11 +1,11 @@
 # phpClub [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/someApprentice_phpClub/Lobby)
-Demonstration: http://phpclub.rf.gd/
+Demonstration: http://phpclub.tech/
 
 ## Installation
 1. `git clone https://github.com/someApprentice/phpClub.git`
 2. `composer install`
-3. config db connection in `src/config.ini`  
-4. run migrations `vendor/bin/doctrine-migrations migrations:migrate`
+3. `cp .env.example to .env`, config db connection
+4. Run migrations `composer migrate`
 
 ## Thread import
 Run `./bin/console phpClub:import-threads` with following arguments. Examples:
@@ -21,7 +21,12 @@ Run `./bin/console phpClub:import-threads` with following arguments. Examples:
 - Import specific threads from arhivach.org:
 `--source=arhivach --urls http://arhivach.org/thread/254710/,http://arhivach.org/thread/261841/`
 
+## Example
+1. Import threads 1-78: `./bin/console phpClub:import-threads --dir=/var/www/dvach-threads --board=2ch`
+2. Import threads 25, ?: `./bin/console phpClub:import-threads --dir=/var/www/arhivach-threads --board=arhivach`
+3. Import threads 79-95 `./bin/console phpClub:import-threads --source=arhivach`
+
 ## Testing
-1. Create test database, edit config.testing.ini
+1. Create test database, edit TEST_DB_NAME variable in `.env` file
 2. Run migrations for test database `composer migrate-test`
 3. Run tests using `composer test`
