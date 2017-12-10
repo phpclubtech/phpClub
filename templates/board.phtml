@@ -19,6 +19,6 @@ require __DIR__ . '/base/boardHeader.phtml';
     </section>
 <?php endforeach ?>
 
-<?= $paginator->paginate($threads) ?>
+<?= $paginator->render($threads) ?>
 
 <?php require __DIR__ . '/base/footer.phtml' ?>

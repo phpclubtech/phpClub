@@ -7,8 +7,12 @@ use Pagerfanta\View\DefaultView;
 
 class Paginator
 {
-    public function paginate(Pagerfanta $pagerfanta): string
+    public function render(Pagerfanta $pagerfanta): string
     {
+        if ($pagerfanta->count() < $pagerfanta->getMaxPerPage()) {
+            return '';
+        }
+
         $view = new DefaultView();
         
         return $view->render($pagerfanta, [$this, 'generateRoute'], [
