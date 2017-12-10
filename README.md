@@ -12,7 +12,7 @@ Run `./bin/console phpClub:import-threads` with following arguments. Examples:
 
 - Import alive threads from 2ch.hk API:
 `--source=2ch-api`
-- Import all archived PHP threads from arhivach.org:
+- (TODO) Import all archived PHP threads from arhivach.org:
 `--source=arhivach`
 - Import 2ch.hk threads from local folder:
 `--dir=/var/www/threads/ --board=2ch`
@@ -20,11 +20,6 @@ Run `./bin/console phpClub:import-threads` with following arguments. Examples:
 `--dir=/var/www/threads/ --board=arhivach`
 - Import specific threads from arhivach.org:
 `--source=arhivach --urls http://arhivach.org/thread/254710/,http://arhivach.org/thread/261841/`
-
-## Example
-1. Import threads 1-78: `./bin/console phpClub:import-threads --dir=/var/www/dvach-threads --board=2ch`
-2. Import threads 25, ?: `./bin/console phpClub:import-threads --dir=/var/www/arhivach-threads --board=arhivach`
-3. Import threads 79-95 `./bin/console phpClub:import-threads --source=arhivach`
 
 ## Testing
 1. Create test database, edit TEST_DB_NAME variable in `.env` file
