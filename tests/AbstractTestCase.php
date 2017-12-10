@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use phpClub\FileStorage\FileStorageInterface;
+use Doctrine\ORM\EntityManager;
+use phpClub\Service\RefLinkManager;
+use phpClub\Service\ThreadImporter;
+use phpClub\Service\LastPostUpdater;
+use phpClub\ThreadParser\DvachThreadParser;
 use PHPUnit\Framework\TestCase;
 use phpClub\Entity\{File, Post, Thread};
 use Slim\Container;
 
 abstract class AbstractTestCase extends TestCase
 {
-    private $container;
+    private static $container;
     
     public function createThread($id): Thread
     {
@@ -43,10 +49,26 @@ abstract class AbstractTestCase extends TestCase
 
     public function getContainer(): Container
     {
-        if (!$this->container) {
-            $this->container = require_once __DIR__ . '/../src/Bootstrap.php';
+        if (!self::$container) {
+            self::$container = require_once __DIR__ . '/../src/Bootstrap.php';
         }
         
-        return $this->container;
+        return self::$container;
+    }
+
+    public function importThreadToDb(string $pathToHtml)
+    {
+        /** @var DvachThreadParser $parser */
+        $parser = $this->getContainer()->get(DvachThreadParser::class);
+        $thread = $parser->extractThread(file_get_contents($pathToHtml));
+
+        $importer = new ThreadImporter(
+            $this->createMock(FileStorageInterface::class),
+            $this->getContainer()->get(EntityManager::class),
+            $this->createMock(LastPostUpdater::class),
+            $this->createMock(RefLinkManager::class)
+        );
+
+        $importer->import([$thread]);
     }
 }
