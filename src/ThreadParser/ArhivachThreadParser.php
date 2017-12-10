@@ -44,6 +44,12 @@ class ArhivachThreadParser extends AbstractThreadParser
         return '//span[@class="post_comment"]/div[@class="post_image_block"]';
     }
 
+    /**
+     * @param Crawler $fileNode
+     * @param Post $post
+     * @return File
+     * @throws \Exception
+     */
     protected function extractFile(Crawler $fileNode, Post $post): File
     {
         $fileXPath = '//a[@class="expand_image"]';
@@ -69,7 +75,11 @@ class ArhivachThreadParser extends AbstractThreadParser
 
         return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width);
     }
-    
+
+    /**
+     * @param string $fileName
+     * @return bool
+     */
     private function isOldArhivachThread(string $fileName): bool 
     {
         return strpos($fileName, 'abload.de') !== false;

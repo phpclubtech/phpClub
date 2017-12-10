@@ -17,11 +17,6 @@ class Thread
     private $posts;
 
     /**
-     * @OneToMany(targetEntity="ArchiveLink", mappedBy="thread", cascade={"all"})
-     **/
-    private $archiveLinks;
-
-    /**
      * @var Post[]
      * @ManyToMany(targetEntity="Post")
      * @JoinTable(name="last_post",
@@ -34,13 +29,11 @@ class Thread
     /**
      * @param $id
      * @param Post[] $posts
-     * @param ArchiveLink[] $archiveLinks
      */
-    public function __construct($id, array $posts = [], array $archiveLinks = [])
+    public function __construct($id, array $posts = [])
     {
         $this->id = $id;
         $this->posts = new ArrayCollection($posts);
-        $this->archiveLinks = new ArrayCollection($archiveLinks);
         $this->lastPosts = new ArrayCollection();
     }
 
@@ -60,25 +53,6 @@ class Thread
     public function getPosts()
     {
         return $this->posts;
-    }
-
-    public function addArchiveLink(ArchiveLink $archiveLink)
-    {
-        $this->archiveLinks[] = $archiveLink;
-
-        return $this;
-    }
-
-    public function removeArchiveLink(ArchiveLink $archiveLink)
-    {
-        $this->archiveLinks->removeElement($archiveLink);
-        
-        return $this;
-    }
-
-    public function getArchiveLinks()
-    {
-        return $this->archiveLinks;
     }
 
     /**

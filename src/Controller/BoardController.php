@@ -4,6 +4,7 @@ namespace phpClub\Controller;
 
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
+use phpClub\Service\RefLinkManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
@@ -33,22 +34,29 @@ class BoardController
      */
     private $threadRepository;
 
+    /**
+     * @var RefLinkManager
+     */
+    private $refLinkManager;
+
     public function __construct(
         Authorizer $authorizer,
         PhpRenderer $view,
         CacheInterface $cache,
-        ThreadRepository $threadRepository
+        ThreadRepository $threadRepository,
+        RefLinkManager $refLinkManager
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
         $this->cache = $cache;
         $this->threadRepository = $threadRepository;
+        $this->refLinkManager = $refLinkManager;
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         $template = $this->getOrSetCache('/board.phtml', [
-            'threads' => $this->threadRepository->getWithLastPosts($request->getParam('page', 1)),
+            'threads' => $this->threadRepository->getThreadsWithLastPosts($request->getParam('page', 1)),
             'logged' => $this->authorizer->isLoggedIn()
         ], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
 
@@ -74,42 +82,52 @@ class BoardController
 
     public function chainAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        try {
-            $chain = $this->threader->getChain((int) $args['post']);
-        } catch (\InvalidArgumentException $e) {
+        $chain = $this->refLinkManager->getChain((int) $args['post']);
+
+        if ($chain->isEmpty()) {
             throw new NotFoundException($request, $response);
         }
 
-        $template = $this->getOrSetCache('/chain.phtml', ['posts' => $chain, 'logged' => $this->authorizer->isLoggedIn()], 'chain' . (int) $args['post'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
+        $template = $this->getOrSetCache('/chain.phtml', [
+            'posts' => $chain,
+            'logged' => $this->authorizer->isLoggedIn()],
+            'chain' . (int) $args['post'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false)
+        );
 
         return $this->renderHtml($response, $template);
     }
+
     /**
-     * [getOrSetCache get html template cache by key or set html cache to cache by key]
-     * @param  [string] $template   [path to timplate]
-     * @param  [array] $data       [array of attr inside template]
-     * @param  [stirng] $name_cache [name key cache]
-     * @return [string]             [string of html template with set attr]
+     * Get html template cache by key or set html cache to cache by key
+     * 
+     * @param  string $template   path to template
+     * @param  array $data        array of attr inside template
+     * @param  string $nameCache  name key cache
+     * @return mixed              string of html template with set attr
+     * @throws \Exception
+     * @throws \Throwable
      */
-    public function getOrSetCache($template, $data, $name_cache)
+    public function getOrSetCache($template, array $data, string $nameCache)
     {
-        $cache = $this->cache->get($name_cache);
+        $cache = $this->cache->get($nameCache);
         if (!$cache) {
             $cache = $this->view->fetch(
                 $template,
                 $data
             );
-            $this->cache->set($name_cache, $cache);
+            $this->cache->set($nameCache, $cache);
         }
         return $cache;
     }
+
     /**
-     * [renderHtml Render template by html string]
-     * @param  [Response] $response [action response varible]
-     * @param  [string] $html     [html string]
-     * @return [Response]           [render templatate]
+     * Render template by html string
+     *
+     * @param Response $response
+     * @param string $html
+     * @return Response
      */
-    public function renderHtml($response, $html)
+    public function renderHtml(Response $response, string $html): Response
     {
         $response->getBody()->write($html);
 

@@ -12,7 +12,7 @@ use phpClub\Service\Helper;
     <div class="post <?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getId() ?>"" data-num="<?= $post->getId() ?>"">
 
     <div class="post-details" id="post-details-<?= $post->getId() ?>"">
-    <input name="delete" class="turnmeoff" value="<?= $post->getId() ?>"" type="checkbox">
+    <input name="delete" class="turnmeoff" value="<?= $post->getId() ?>" type="checkbox">
 
     <span class="post-title"><?= $post->getTitle() ?></span>
     <span class="ananimas"><?= $post->getAuthor() ?></span>
@@ -21,9 +21,9 @@ use phpClub\Service\Helper;
         <span class="posttime"><?= $post->getDate()->format('Y-m-d') ?>&nbsp;</span>
         <span class="reflink">
 
-            <a href="/pr/chain/<?= $post->getId() ?>#<?= $post->getId() ?>">№</a><a
-                href="<?= $urlGenerator->toPostAnchor($post) ?>" class="postbtn-reply-href"
-                id="<?= $post->getId() ?>"><?= $post->getId() ?></a>
+            <a href="<?= $urlGenerator->toPostAnchor($post) ?>"
+               class="postbtn-reply-href"
+               id="<?= $post->getId() ?>">№<?= $post->getId()?></a>
         </span>
     </span>
 
@@ -33,13 +33,20 @@ use phpClub\Service\Helper;
         </span>
     <?php endif; ?>
 
-    <?php if ($post->isFirstPost()) : ?>
+    <?php if ($post->isFirstPost() && isset($thread)) : ?>
         <span class="archive-links">
-            <?php foreach($thread->getArchiveLinks() as $archiveLink) :?>
-                <a href="<?= $archiveLink->getLink() ?>"><img src="<?= Helper::getArchiveIconUrl($archiveLink->getLink())?>"></a>
-            <?php endforeach; ?>
+            <a href="<?= $urlGenerator->toDvachArchiveThread($thread) ?>">
+                <img src="<?= $urlGenerator->toDvachIcon() ?>" title="Искать в архиве 2ch.hk">
+            </a>
+            
+            <a href="<?= $urlGenerator->toArhivachThread($thread) ?>">
+                <img src="<?= $urlGenerator->toArhivachIcon() ?>" title="Искать в архиваче">
+            </a>
+            <i class="fa fa-chain"></i>
         </span>
     <?php endif; ?>
+
+    | <a href="<?= $urlGenerator->toChain($post) ?>">Chain</a>
 
     <br class="turnmeoff">
 </div>

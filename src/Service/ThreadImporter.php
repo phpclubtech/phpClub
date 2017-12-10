@@ -14,7 +14,7 @@ class ThreadImporter
 {
     use EventEmitterTrait;
 
-    const EVENT_THREAD_PERSISTED = 'event.thread.persisted';
+    const EVENT_THREAD_SAVED = 'event.thread.saved';
 
     /**
      * @var FileStorageInterface
@@ -31,14 +31,21 @@ class ThreadImporter
      */
     private $lastPostUpdater;
 
+    /**
+     * @var RefLinkManager
+     */
+    private $refLinkManager;
+
     public function __construct(
         FileStorageInterface $fileStorage,
         EntityManagerInterface $entityManager,
-        LastPostUpdater $lastPostUpdater
+        LastPostUpdater $lastPostUpdater,
+        RefLinkManager $refLinkManager
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;
         $this->lastPostUpdater = $lastPostUpdater;
+        $this->refLinkManager = $refLinkManager;
     }
 
     /**
@@ -51,13 +58,13 @@ class ThreadImporter
         foreach ($threads as $thread) {
             $this->saveFilesFromThread($thread);
             $this->entityManager->persist($thread);
-            $this->emit(self::EVENT_THREAD_PERSISTED, [$thread]);
+            $this->refLinkManager->insertChain($thread);
+            $this->emit(self::EVENT_THREAD_SAVED, [$thread]);
             $this->entityManager->flush();
             $this->entityManager->clear();
         }
 
         $this->lastPostUpdater->updateLastPosts($threads);
-        // TODO: recalculate chains
     }
 
     /**

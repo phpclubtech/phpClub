@@ -49,6 +49,12 @@ class DvachThreadParser extends AbstractThreadParser
                 | //span[starts-with(@id, "exlink_")]';
     }
 
+    /**
+     * @param Crawler $fileNode
+     * @param Post $post
+     * @return File
+     * @throws \Exception
+     */
     protected function extractFile(Crawler $fileNode, Post $post): File
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
@@ -56,6 +62,11 @@ class DvachThreadParser extends AbstractThreadParser
         return new File(ltrim($fullName, "'"), $thumbName, $post, (int) $height, (int) $width);
     }
 
+    /**
+     * @param Crawler $fileNode
+     * @return array
+     * @throws \Exception
+     */
     private function extractOnClickJsArgs(Crawler $fileNode): array
     {
         $argsXPath = '//div[@class="image-link"]/a/@onclick | //a[@name="expandfunc"]/@onclick';

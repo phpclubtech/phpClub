@@ -4,7 +4,7 @@ Demonstration: http://phpclub.tech/
 ## Installation
 1. `git clone https://github.com/someApprentice/phpClub.git`
 2. `composer install`
-3. `cp .env.example to .env`, config db connection
+3. `cp .env.example .env`, config db connection
 4. Run migrations `composer migrate`
 
 ## Thread import

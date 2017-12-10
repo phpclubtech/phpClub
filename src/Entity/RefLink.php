@@ -18,6 +18,13 @@ class RefLink
     /** @Column(type="integer") **/
     private $depth;
 
+    public function __construct(Post $post, Post $reference, int $depth)
+    {
+        $this->post = $post;
+        $this->reference = $reference;
+        $this->depth = $depth;
+    }
+
     public function getId()
     {
         return $this->id;
@@ -28,30 +35,9 @@ class RefLink
         return $this->post;
     }
 
-    public function setPost($post)
-    {
-        $this->post = $post;
-
-        return $this;
-    }
-
     public function getReference()
     {
         return $this->reference;
-    }
-
-    public function setReference($reference)
-    {
-        $this->reference = $reference;
-
-        return $this;
-    }
-
-    public function setDepth($depth)
-    {
-        $this->depth = $depth;
-
-        return $this;
     }
 
     public function getDepth()

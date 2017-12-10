@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: main
- * Date: 4/30/2017
- * Time: 7:40 PM
- */
 
 namespace phpClub\Service;
 
 class Validator
 {
     const PHPREGEXP = "/^(Клуб)[\s\w\W]*(PHP)[\s\w\W]*$/ui";
-    const ARCHIVESREGEXP = "!^https?:\/\/((2ch\.hk\/pr\/arch\/\d{4}-\d{2}-\d{2}\/res\/\d+\.html)|(arhivach\.org\/thread\/\d+\/?))$!";
 
     const EMAIL_ERROR = "Некорректный адрес";
     const NAME_ERROR = "Имя должно быть короче 20 русских или английских символов";
@@ -29,11 +22,6 @@ class Validator
     public static function validateThreadLink($path)
     {
         return (boolval((preg_match('!\/pr\/res\/(\d+)\.html(#\d+)?!', $path, $matches)))) ? $matches[1] : false;
-    }
-
-    public static function validateChainLink($path)
-    {
-        return (boolval(preg_match('!\/pr\/chain\/(\d+)(#\d+)?!', $path, $matches))) ? $matches[1] : false;
     }
 
     public static function validateRegistrationLink($path)
@@ -71,16 +59,6 @@ class Validator
         return (boolval(preg_match('!\/search\/(.+[^/])\/?!ui', $path, $matches))) ? $matches[1] : false;
     }
 
-    public static function validateRefLinks($comment)
-    {
-        $regexp = '/<a href="[\S]+" class="post-reply-link" data-thread="(\d+)" data-num="(\d+)">/';
-        $matches = array();
-
-        preg_match_all($regexp, $comment, $matches);
-
-        return $matches[2];
-    }
-
     public static function validateEmail($email): bool
     {
         return boolval(preg_match('/[^ ]+@[^ ]+\.[^ ]+/i', $email));
@@ -99,11 +77,6 @@ class Validator
     public static function isPasswordsEquals($password, $retryPassword): bool
     {
         return ($password === $retryPassword);
-    }
-
-    public static function validateArchiveLink($link): bool
-    {
-        return boolval((preg_match(self::ARCHIVESREGEXP, $link)));
     }
 
     public static function validateRegistrationPost($post)

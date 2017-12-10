@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace phpClub\Service;
 
 use phpClub\Entity\{Thread, Post, File};
+use phpClub\ThreadParser\ArhivachClient;
 use Slim\Interfaces\RouterInterface;
 
 class UrlGenerator
@@ -13,10 +14,16 @@ class UrlGenerator
      * @var RouterInterface
      */
     private $router;
+    
+    /**
+     * @var ArhivachClient
+     */
+    private $arhivachClient;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, ArhivachClient $arhivachClient)
     {
         $this->router = $router;
+        $this->arhivachClient = $arhivachClient;
     }
 
     public function toThread(Thread $thread): string
@@ -31,6 +38,27 @@ class UrlGenerator
 
     public function toChain(Post $post): string
     {
-        return $this->router->pathFor('chain', ['id' => $post->getId()]);
+        return $this->router->pathFor('chain', ['post' => $post->getId()]);
+    }
+
+    public function toArhivachThread(Thread $thread): string
+    {
+        return $this->arhivachClient->generateArchiveLink($thread);
+    }
+
+    public function toDvachArchiveThread(Thread $thread): string
+    {
+        // TODO: implement
+        return '';
+    }
+    
+    public function toDvachIcon()
+    {
+        return '/media/images/2ch.ico';
+    }
+
+    public function toArhivachIcon()
+    {
+        return '/media/images/arhivach.ico';
     }
 }

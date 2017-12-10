@@ -17,10 +17,10 @@ class DvachApiClientTest extends TestCase
     public function testThreadsFound()
     {
         $dvachApiClient = $this->createDvachApiClient(
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/dvach_api_fixtures/catalog.json')),
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/dvach_api_fixtures/93a.json')),
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/dvach_api_fixtures/93b.json')),
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/dvach_api_fixtures/92.json'))
+            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog.json')),
+            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/93a.json')),
+            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/93b.json')),
+            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/92.json'))
         );
 
         $phpThreads = $dvachApiClient->getAlivePhpThreads();
@@ -51,7 +51,7 @@ class DvachApiClientTest extends TestCase
     public function testThreadsNotFound()
     {
         $dvachApiClient = $this->createDvachApiClient(
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/dvach_api_fixtures/catalog_without_php_threads.json'))
+            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog_without_php_threads.json'))
         );
         $this->assertEmpty($dvachApiClient->getAlivePhpThreads());
     }

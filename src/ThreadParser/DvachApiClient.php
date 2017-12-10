@@ -49,7 +49,7 @@ class DvachApiClient
      */
     private function looksLikePhpThread(array $threadArray): bool
     {
-        return !!preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
+        return !! preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
     }
 
     /**
@@ -118,5 +118,16 @@ class DvachApiClient
             $fileArray['size'],
             $fileArray['fullname'] ?? $fileArray['name']
         );
+    }
+
+    /**
+     * @param Thread $thread
+     * @return string
+     */
+    public function searchInArchive(Thread $thread): string
+    {
+        $archiveBaseUrl = 'https://2ch.hk/pr/arch/0.html';
+
+        // TODO: implement search
     }
 }

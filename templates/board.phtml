@@ -6,19 +6,27 @@ require __DIR__ . '/base/header.phtml';
 require __DIR__ . '/base/boardHeader.phtml';
 ?>
 
-<?php foreach ($threads as $thread) : ?>
-    <section class="posts">
-        <form id="posts-form">
-            <div id="thread-<?= $thread->getId() ?>" class="thread">
-                <?php foreach ($thread->getLastPosts() as $post): ?>
-                    <?= $this->fetch('/post.phtml', ['threads' => $threads, 'post' => $post, 'thread' => $thread]) ?>
-                <?php endforeach; ?>
-            </div>
-            <hr>
-        </form>
-    </section>
-<?php endforeach ?>
+<?php if (count($threads)): ?>
 
-<?= $paginator->render($threads) ?>
+    <?php foreach ($threads as $thread) : ?>
+        <section class="posts">
+            <form id="posts-form">
+                <div id="thread-<?= $thread->getId() ?>" class="thread">
+                    <?php foreach ($thread->getLastPosts() as $post): ?>
+                        <?= $this->fetch('/post.phtml', ['threads' => $threads, 'post' => $post, 'thread' => $thread]) ?>
+                    <?php endforeach; ?>
+                </div>
+                <hr>
+            </form>
+        </section>
+    <?php endforeach ?>
+
+    <?= $paginator->render($threads) ?>
+
+<?php else: ?>
+    
+    <h2>В приложении отсутствуют треды.</h2>
+    
+<?php endif ?>
 
 <?php require __DIR__ . '/base/footer.phtml' ?>

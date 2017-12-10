@@ -23,23 +23,21 @@ abstract class AbstractThreadParser
         $this->dateConverter = $dateConverter;
     }
 
-    /**
-     * @param string $threadsDir
-     * @return Thread[]
-     * @throws \Exception
-     */
-    public function parseAllThreads(string $threadsDir): array
-    {
-        $threadHtmlPaths = glob($threadsDir . '/*/*.htm*');
+    abstract protected function getPostsXPath(): string;
 
-        if (!$threadHtmlPaths) {
-            throw new \Exception('No threads found in ' . $threadsDir);
-        }
+    abstract protected function getIdXPath(): string;
 
-        return array_map(function ($threadHtmlPath) {
-            return $this->extractThread(file_get_contents($threadHtmlPath), dirname($threadHtmlPath));
-        }, $threadHtmlPaths);
-    }
+    abstract protected function getTitleXPath(): string;
+
+    abstract protected function getAuthorXPath(): string;
+
+    abstract protected function getDateXPath(): string;
+
+    abstract protected function getTextXPath(): string;
+
+    abstract protected function getFilesXPath(): string;
+
+    abstract protected function extractFile(Crawler $fileNode, Post $post): File;
 
     /**
      * @param string $threadHtml
@@ -204,20 +202,4 @@ abstract class AbstractThreadParser
         
         return in_array($thread->getId(), $threadsWithMissedFiles, $strict = true);
     }
-    
-    abstract protected function getPostsXPath(): string;
-
-    abstract protected function getIdXPath(): string;
-
-    abstract protected function getTitleXPath(): string;
-
-    abstract protected function getAuthorXPath(): string;
-
-    abstract protected function getDateXPath(): string;
-
-    abstract protected function getTextXPath(): string;
-
-    abstract protected function getFilesXPath(): string;
-
-    abstract protected function extractFile(Crawler $fileNode, Post $post): File;
 }

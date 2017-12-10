@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Service;
 
 use Doctrine\ORM\EntityManager;
+use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\Repository\ThreadRepository;
 use Tests\AbstractTestCase;
@@ -29,11 +30,10 @@ class LastPostUpdaterTest extends AbstractTestCase
 
     public function setUp()
     {
-        $this->entityManager = $this->getContainer()->get('EntityManager');
-        $this->threadRepository = $this->getContainer()->get('ThreadRepository');
-        $this->lastPostUpdater = $this->getContainer()->get('LastPostUpdater');
+        $this->entityManager = $this->getContainer()->get(EntityManager::class);
+        $this->threadRepository = $this->getContainer()->get(ThreadRepository::class);
+        $this->lastPostUpdater = $this->getContainer()->get(LastPostUpdater::class);
         $this->entityManager->getConnection()->beginTransaction();
-        parent::setUp();
     }
 
     public function testLastPosts()
@@ -41,21 +41,23 @@ class LastPostUpdaterTest extends AbstractTestCase
         $threads = $this->prepareThreads();
 
         $this->lastPostUpdater->updateLastPosts($threads);
-
-        $threadsWithLastPosts = $this->threadRepository->getWithLastPosts();
-
-        list($thread4, $thread3, $thread2, $thread1) = $threadsWithLastPosts;
         
-        $this->assertHasLastPosts($thread4, [15, 16]);
-        $this->assertHasLastPosts($thread3, [11, 12, 13, 14]);
-        $this->assertHasLastPosts($thread2, [6, 8, 9, 10]);
-        $this->assertHasLastPosts($thread1, [1, 3, 4, 5]);
-    }
+        $expectedLastPosts = [
+            [15, 16],
+            [11, 12, 13, 14],
+            [6, 8, 9, 10],
+            [1, 3, 4, 5],
+        ];
 
-    private function assertHasLastPosts(Thread $thread, array $expectedLastPosts): void
-    {
-        foreach ($thread->getLastPosts() as $lastPost) {
-            $this->assertEquals(current($expectedLastPosts), $lastPost->getId());
+        /** @var Thread[] $threadsWithLastPosts */
+        $threadsWithLastPosts = $this->threadRepository->getThreadsWithLastPosts();
+        
+        foreach ($threadsWithLastPosts as $thread) {
+            $postIds = $thread->getLastPosts()
+                ->map(function (Post $post) { return $post->getId(); })
+                ->toArray();
+            
+            $this->assertEquals($postIds, current($expectedLastPosts));
             next($expectedLastPosts);
         }
     }

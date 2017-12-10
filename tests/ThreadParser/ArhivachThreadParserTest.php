@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use phpClub\Entity\File;
-use phpClub\Service\DateConverter;
 use phpClub\ThreadParser\ArhivachThreadParser;
-use PHPUnit\Framework\TestCase;
+use Tests\AbstractTestCase;
 
-class ArhivachThreadParserTest extends TestCase
+class ArhivachThreadParserTest extends AbstractTestCase
 {
     /**
      * @var ArhivachThreadParser
@@ -18,25 +17,25 @@ class ArhivachThreadParserTest extends TestCase
 
     public function setUp()
     {
-        $this->threadParser = new ArhivachThreadParser(new DateConverter());
+        $this->threadParser = $this->getContainer()->get(ArhivachThreadParser::class);
     }
 
     public function testThread83()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/arhivach_fixtures/83.html'));
+        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/arhivach/83.html'));
         $posts = $thread->getPosts();
         $post = $posts[16];
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('24/11/16 23:34:24', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('881710', $post->getId());
         $this->assertContains('Помогите с циклами, ребята.', $post->getText());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertTrue($post->getFiles()->isEmpty());
 
         $post = $posts[452];
         $this->assertContains('Лучше всего почитать у Фаулера', $post->getText());
         $this->assertEquals('Аноним', $post->getAuthor());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertTrue($post->getFiles()->isEmpty());
 
         $post = $posts->last();
@@ -51,14 +50,14 @@ class ArhivachThreadParserTest extends TestCase
 
     public function testThread90()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/arhivach_fixtures/90.html'));
+        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/arhivach/90.html'));
         $posts = $thread->getPosts();
         $post = $posts[27];
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('04/06/17 04:56:50', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('1000752', $post->getId());
         $this->assertContains('rand() использует линейный ГПСЧ, который абсолютно предсказуем и имеет относительно небольшой период', $post->getText());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
 
         $post = $posts[15];
@@ -66,7 +65,7 @@ class ArhivachThreadParserTest extends TestCase
         $this->assertEquals('03/06/17 20:05:31', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('1000566', $post->getId());
         $this->assertContains('sudo searchd --config sphinx.conf', $post->getText());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
 
         $post = $posts[306];
@@ -74,7 +73,7 @@ class ArhivachThreadParserTest extends TestCase
         $this->assertEquals('14/06/17 09:46:46', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('1005616', $post->getId());
         $this->assertContains('Для передачи параметров есть следующие способы:', $post->getText());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertCount(4, $post->getFiles());
 
         $post = $posts[860];
@@ -85,7 +84,7 @@ class ArhivachThreadParserTest extends TestCase
 
     public function testThread25()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/arhivach_fixtures/25.html'));
+        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/arhivach/25.html'));
         $posts = $thread->getPosts();
 
         $post = $posts[8];
@@ -93,7 +92,7 @@ class ArhivachThreadParserTest extends TestCase
         $this->assertEquals('09/06/14 14:49:35', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('360403', $post->getId());
         $this->assertContains('http://brainstorage.me/jobs?q=haskell', $post->getText());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertCount(1, $post->getFiles());
         $this->assertNotEmpty($post->getFiles()->first()->getPath());
         $this->assertNotEmpty($post->getFiles()->first()->getThumbPath());
@@ -103,7 +102,7 @@ class ArhivachThreadParserTest extends TestCase
         $this->assertEquals('10/06/14 16:44:24', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('360614', $post->getId());
         $this->assertContains('Аноны, помогите!', $post->getText());
-        $this->assertEquals('', $post->getTitle());
+        $this->assertEmpty($post->getTitle());
         $this->assertCount(1, $post->getFiles());
         $this->assertNotEmpty($post->getFiles()->first()->getPath());
         $this->assertNotEmpty($post->getFiles()->first()->getThumbPath());
@@ -126,15 +125,15 @@ class ArhivachThreadParserTest extends TestCase
     public function provideThreadsHtml()
     {
         return [
-            [__DIR__ . '/arhivach_fixtures/25.html'],
-            [__DIR__ . '/arhivach_fixtures/83.html'],
-            [__DIR__ . '/arhivach_fixtures/90.html'],
+            [__DIR__ . '/../Fixtures/arhivach/25.html'],
+            [__DIR__ . '/../Fixtures/arhivach/83.html'],
+            [__DIR__ . '/../Fixtures/arhivach/90.html'],
         ];
     }
 
     public function testFiles()
     {
-        $pathToHtml  = __DIR__ . '/arhivach_fixtures/83.html';
+        $pathToHtml  = __DIR__ . '/../Fixtures/arhivach/83.html';
         $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
         $posts = $thread->getPosts();
         /** @var File[] $files */
