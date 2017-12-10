@@ -7,19 +7,19 @@ Demonstration: http://phpclub.tech/
 3. `cp .env.example .env`, config db connection
 4. Run migrations `composer migrate`
 
-## Thread import
-Run `./bin/console phpClub:import-threads` with following arguments. Examples:
+## Thread import syntax
+Run `./bin/console phpClub:import-threads` with following arguments:
 
-- Import alive threads from 2ch.hk API:
-`--source=2ch-api`
-- (TODO) Import all archived PHP threads from arhivach.org:
-`--source=arhivach`
-- Import 2ch.hk threads from local folder:
-`--dir=/var/www/threads/ --board=2ch`
-- Import 2ch.hk threads saved in arhivach from local folder:
-`--dir=/var/www/threads/ --board=arhivach`
-- Import specific threads from arhivach.org:
-`--source=arhivach --urls http://arhivach.org/thread/254710/,http://arhivach.org/thread/261841/`
+- `--source=2ch-api` - Import alive threads from 2ch.hk API:
+- `--source=arhivach` - Import [list of threads](https://github.com/someApprentice/phpClub/blob/experimental/src/Command/ImportThreadsCommand.php#L134) from arhivach.org:
+- `--dir=/var/www/threads/` - Import 2ch.hk threads from local folder:
+
+## Full import example
+1) Import threads 1-24, 26-78 from local folder (currently without threads 15-21):
+- `./bin/console phpClub:import-threads --dir=/absolute/path/to/2ch/threads`
+
+2) Import threads 25, 79-95 from arhivach:
+- `./bin/console phpClub:import-threads --source=arhivach`
 
 ## Testing
 1. Create test database, edit TEST_DB_NAME variable in `.env` file

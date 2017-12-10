@@ -45,6 +45,23 @@ class ArhivachThreadParser extends AbstractThreadParser
     }
 
     /**
+     * @param Crawler $postNode
+     * @return string
+     * @throws \Exception
+     */
+    protected function extractAuthor(Crawler $postNode): string
+    {
+        $authorXPath = $this->getAuthorXPath();
+        $authorNode  = $postNode->filterXPath($authorXPath);
+
+        if (!count($authorNode)) {
+            return '';
+        }
+
+        return $authorNode->text();
+    }
+
+    /**
      * @param Crawler $fileNode
      * @param Post $post
      * @return File
