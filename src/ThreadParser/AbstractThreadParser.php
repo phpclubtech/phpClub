@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use phpClub\Service\DateConverter;
 use phpClub\Entity\{File, Post, Thread};
 use Symfony\Component\DomCrawler\Crawler;
 

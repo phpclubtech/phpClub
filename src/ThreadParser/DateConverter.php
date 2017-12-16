@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\Service;
+namespace phpClub\ThreadParser;
 
 class DateConverter
 {
@@ -54,4 +54,3 @@ class DateConverter
         return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths));
     }
 }
-

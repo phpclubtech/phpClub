@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\BoardClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use phpClub\Entity\ArchiveLink;
+use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\Entity\Thread;
-use phpClub\Repository\ArchiveLinkRepository;
 
 class ArhivachClient
 {

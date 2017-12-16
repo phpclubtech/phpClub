@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace phpClub\Command;
 
 use phpClub\Entity\Thread;
-use phpClub\Service\ThreadImporter;
-use phpClub\ThreadParser\{ArhivachClient, ArhivachThreadParser, DvachApiClient, DvachThreadParser};
-use Psr\Container\ContainerInterface;
+use phpClub\ThreadImport\ThreadImporter;
+use phpClub\ThreadParser\DvachThreadParser;
+use phpClub\BoardClient\DvachClient;
+use phpClub\BoardClient\ArhivachClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\{InputArgument, InputInterface};
@@ -21,7 +22,7 @@ class ImportThreadsCommand extends Command
     private $threadImporter;
 
     /**
-     * @var DvachApiClient
+     * @var DvachClient
      */
     private $dvachApiClient;
 
@@ -35,26 +36,24 @@ class ImportThreadsCommand extends Command
      */
     private $dvachThreadParser;
 
-    /**
-     * @var ArhivachThreadParser
-     */
-    private $arhivachThreadParser;
-
-    public function __construct(ContainerInterface $di) 
-    {
+    public function __construct(
+        ThreadImporter $threadImporter,
+        DvachClient $dvachApiClient,
+        ArhivachClient $arhivachClient,
+        DvachThreadParser $dvachThreadParser
+    ) {
+        $this->threadImporter = $threadImporter;
+        $this->dvachApiClient = $dvachApiClient;
+        $this->arhivachClient = $arhivachClient;
+        $this->dvachThreadParser = $dvachThreadParser;
+        
         parent::__construct();
-        // TODO: get rid of this after migrate to PHP-DI
-        $this->threadImporter = $di->get(ThreadImporter::class);
-        $this->dvachApiClient = $di->get(DvachApiClient::class);
-        $this->arhivachClient = $di->get(ArhivachClient::class);
-        $this->dvachThreadParser = $di->get(DvachThreadParser::class);
-        $this->arhivachThreadParser = $di->get(ArhivachThreadParser::class);
     }
 
     protected function configure()
     {
         $this
-            ->setName('phpClub:import-threads')
+            ->setName('import-threads')
             ->setDescription('Imports threads')
             ->addOption(
                 'source',

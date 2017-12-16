@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\Service;
+namespace Tests\ThreadImport;
 
 use Doctrine\ORM\EntityManager;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\Repository\ThreadRepository;
 use Tests\AbstractTestCase;
-use phpClub\Service\LastPostUpdater;
+use phpClub\ThreadImport\LastPostUpdater;
 
 class LastPostUpdaterTest extends AbstractTestCase
 {

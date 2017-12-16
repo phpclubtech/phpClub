@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\Service;
+namespace phpClub\ThreadImport;
 
 use Doctrine\DBAL\Connection;
 use phpClub\Entity\Thread;

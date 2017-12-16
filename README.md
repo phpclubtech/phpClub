@@ -8,7 +8,7 @@ Demonstration: http://phpclub.tech/
 4. Run migrations `composer migrate`
 
 ## Thread import syntax
-Run `./bin/console phpClub:import-threads` with following arguments:
+Run `./bin/console import-threads` with following arguments:
 
 - `--source=2ch-api` - Import alive threads from 2ch.hk API:
 - `--source=arhivach` - Import [list of threads](https://github.com/someApprentice/phpClub/blob/experimental/src/Command/ImportThreadsCommand.php#L134) from arhivach.org:
@@ -16,10 +16,10 @@ Run `./bin/console phpClub:import-threads` with following arguments:
 
 ## Full import example
 1) Import threads 1-24, 26-78 from local folder (currently without threads 15-21):
-- `./bin/console phpClub:import-threads --dir=/absolute/path/to/2ch/threads`
+- `./bin/console import-threads --dir=/absolute/path/to/2ch/threads`
 
 2) Import threads 25, 79-95 from arhivach:
-- `./bin/console phpClub:import-threads --source=arhivach`
+- `./bin/console import-threads --source=arhivach`
 
 ## Testing
 1. Create test database, edit TEST_DB_NAME variable in `.env` file

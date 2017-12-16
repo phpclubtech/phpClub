@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\Service;
+namespace phpClub\ThreadImport;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -32,7 +32,7 @@ class ThreadImporter
     private $lastPostUpdater;
 
     /**
-     * @var RefLinkManager
+     * @var RefLinkGenerator
      */
     private $refLinkManager;
 
@@ -40,7 +40,7 @@ class ThreadImporter
         FileStorageInterface $fileStorage,
         EntityManagerInterface $entityManager,
         LastPostUpdater $lastPostUpdater,
-        RefLinkManager $refLinkManager
+        RefLinkGenerator $refLinkManager
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;

@@ -6,9 +6,7 @@ namespace Tests;
 
 use phpClub\FileStorage\FileStorageInterface;
 use Doctrine\ORM\EntityManager;
-use phpClub\Service\RefLinkManager;
-use phpClub\Service\ThreadImporter;
-use phpClub\Service\LastPostUpdater;
+use phpClub\ThreadImport\{RefLinkGenerator, ThreadImporter, LastPostUpdater};
 use phpClub\ThreadParser\DvachThreadParser;
 use PHPUnit\Framework\TestCase;
 use phpClub\Entity\{File, Post, Thread};
@@ -66,7 +64,7 @@ abstract class AbstractTestCase extends TestCase
             $this->createMock(FileStorageInterface::class),
             $this->getContainer()->get(EntityManager::class),
             $this->createMock(LastPostUpdater::class),
-            $this->createMock(RefLinkManager::class)
+            $this->createMock(RefLinkGenerator::class)
         );
 
         $importer->import([$thread]);

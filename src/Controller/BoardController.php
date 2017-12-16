@@ -2,9 +2,10 @@
 
 namespace phpClub\Controller;
 
+use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\RefLinkManager;
+use phpClub\ThreadImport\RefLinkGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
@@ -35,22 +36,29 @@ class BoardController
     private $threadRepository;
 
     /**
-     * @var RefLinkManager
+     * @var RefLinkGenerator
      */
     private $refLinkManager;
+    
+    /**
+     * @var RefLinkRepository
+     */
+    private $refLinkRepository;
 
     public function __construct(
         Authorizer $authorizer,
         PhpRenderer $view,
         CacheInterface $cache,
         ThreadRepository $threadRepository,
-        RefLinkManager $refLinkManager
+        RefLinkGenerator $refLinkManager,
+        RefLinkRepository $refLinkRepository
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
         $this->cache = $cache;
         $this->threadRepository = $threadRepository;
         $this->refLinkManager = $refLinkManager;
+        $this->refLinkRepository = $refLinkRepository;
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
@@ -82,7 +90,7 @@ class BoardController
 
     public function chainAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        $chain = $this->refLinkManager->getChain((int) $args['post']);
+        $chain = $this->refLinkRepository->getChain((int) $args['post']);
 
         if ($chain->isEmpty()) {
             throw new NotFoundException($request, $response);

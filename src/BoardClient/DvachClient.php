@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\BoardClient;
 
 use phpClub\Entity\{Thread, Post, File};
 use GuzzleHttp\Client;
 
-class DvachApiClient
+class DvachClient
 {
     // Fixes 2ch.hk API poor naming
     const POST_AUTHOR = 'name';

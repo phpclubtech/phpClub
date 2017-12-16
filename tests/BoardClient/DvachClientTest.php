@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Tests\ThreadParser;
+namespace Tests\BoardClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use phpClub\ThreadParser\DvachApiClient;
+use phpClub\BoardClient\DvachClient;
 use PHPUnit\Framework\TestCase;
 use phpClub\Entity\{Thread, Post};
 
-class DvachApiClientTest extends TestCase
+class DvachClientTest extends TestCase
 {
-    public function testThreadsFound()
+    public function testThreads92and93()
     {
-        $dvachApiClient = $this->createDvachApiClient(
+        $dvachClient = $this->createDvachApiClient(
             new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog.json')),
             new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/93a.json')),
             new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/93b.json')),
             new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/92.json'))
         );
 
-        $phpThreads = $dvachApiClient->getAlivePhpThreads();
+        $phpThreads = $dvachClient->getAlivePhpThreads();
 
         $this->assertCount(3, $phpThreads);
 
@@ -48,6 +48,7 @@ class DvachApiClientTest extends TestCase
 
         // TODO: add more tests
     }
+
     public function testThreadsNotFound()
     {
         $dvachApiClient = $this->createDvachApiClient(
@@ -55,11 +56,12 @@ class DvachApiClientTest extends TestCase
         );
         $this->assertEmpty($dvachApiClient->getAlivePhpThreads());
     }
-    private function createDvachApiClient(Response ...$responses): DvachApiClient
+
+    private function createDvachApiClient(Response ...$responses): DvachClient
     {
         $mockHandler = new MockHandler($responses);
         $stack = HandlerStack::create($mockHandler);
         $client = new Client(['handler' => $stack]);
-        return new DvachApiClient($client);
+        return new DvachClient($client);
     }
 }

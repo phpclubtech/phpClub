@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\Service;
 
-use phpClub\Entity\{Thread, Post, File};
-use phpClub\ThreadParser\ArhivachClient;
+use phpClub\Entity\{Thread, Post};
+use phpClub\BoardClient\ArhivachClient;
 use Slim\Interfaces\RouterInterface;
 
 class UrlGenerator

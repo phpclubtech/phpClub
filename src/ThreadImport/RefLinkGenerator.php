@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-namespace phpClub\Service;
+namespace phpClub\ThreadImport;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use phpClub\Entity\Post;
-use phpClub\Entity\RefLink;
-use phpClub\Entity\Thread;
+use phpClub\Entity\{Post, RefLink, Thread};
 
-class RefLinkManager
+class RefLinkGenerator
 {
     /**
      * @var EntityManagerInterface
@@ -47,7 +44,9 @@ class RefLinkManager
             $reflink = new Reflink($forPost, $forPost, $depth);
             $this->em->persist($reflink);
         }
+        
         $references = $this->parseReferences($reference);
+
         foreach ($references as $r) {
             /** @var Post $r */
             $r = $this->em->getRepository(Post::class)->find($r);
@@ -71,25 +70,5 @@ class RefLinkManager
         preg_match_all($regexp, $post->getText(), $matches);
 
         return $matches[2];
-    }
-
-    /**
-     * @param int $postId
-     * @return ArrayCollection
-     */
-    public function getChain(int $postId): ArrayCollection
-    {
-        /** @var RefLink[] $chain */
-        $chain = $this->em->getRepository(RefLink::class)->findBy(['post' => $postId], ['reference' => 'ASC']);
-
-        $posts = new ArrayCollection();
-
-        foreach ($chain as $reflink) {
-            if (!$posts->contains($reflink->getReference())) {
-                $posts->add($reflink->getReference());
-            }
-        }
-
-        return $posts;
     }
 }

@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace Tests\ThreadImport;
 
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
+use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use Doctrine\ORM\EntityManager;
-use phpClub\Service\RefLinkManager;
+use phpClub\ThreadImport\RefLinkGenerator;
 use Tests\AbstractTestCase;
 
-class RefLinkManagerTest extends AbstractTestCase
+class RefLinkGeneratorTest extends AbstractTestCase
 {
     /**
-     * @var RefLinkManager
+     * @var RefLinkGenerator
      */
     private $refLinkManager;
 
@@ -27,11 +28,17 @@ class RefLinkManagerTest extends AbstractTestCase
      * @var ThreadRepository
      */
     private $threadRepository;
+    
+    /**
+     * @var RefLinkRepository
+     */
+    private $refLinkRepository;
 
     public function setUp()
     {
         $this->entityManager = $this->getContainer()->get(EntityManager::class);
-        $this->refLinkManager = $this->getContainer()->get(RefLinkManager::class);
+        $this->refLinkManager = $this->getContainer()->get(RefLinkGenerator::class);
+        $this->refLinkRepository = $this->getContainer()->get(RefLinkRepository::class);
         $this->threadRepository = $this->getContainer()->get(ThreadRepository::class);
         $this->entityManager->getConnection()->beginTransaction();
     }
@@ -48,7 +55,7 @@ class RefLinkManagerTest extends AbstractTestCase
         $this->refLinkManager->insertChain($thread);
 
         foreach ($chains as $postId => $expectedChain) {
-            $givenChain = $this->refLinkManager->getChain($postId)
+            $givenChain = $this->refLinkRepository->getChain($postId)
                 ->map(function (Post $post) { return $post->getId(); })
                 ->toArray();
             

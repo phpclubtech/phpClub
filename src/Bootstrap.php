@@ -7,19 +7,21 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use phpClub\Controller\{BoardController, SearchController, UsersController};
 use phpClub\Entity\{Post, Thread, User};
+use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\DateConverter;
-use phpClub\Service\LastPostUpdater;
+use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadParser\DateConverter;
+use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\Service\Paginator;
 use phpClub\Service\Searcher;
 use phpClub\Command\ImportThreadsCommand;
 use phpClub\FileStorage\LocalFileStorage;
-use phpClub\Service\ThreadImporter;
+use phpClub\ThreadImport\ThreadImporter;
 use phpClub\Service\UrlGenerator;
-use phpClub\ThreadParser\ArhivachClient;
+use phpClub\BoardClient\ArhivachClient;
+use phpClub\BoardClient\DvachClient;
 use phpClub\ThreadParser\ArhivachThreadParser;
-use phpClub\ThreadParser\DvachApiClient;
 use phpClub\ThreadParser\DvachThreadParser;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
@@ -83,8 +85,8 @@ $di[\Doctrine\ORM\EntityManagerInterface::class] = function (Container $di) {
     return $di[EntityManager::class];
 };
 
-$di[\phpClub\Service\RefLinkManager::class] = function (Container $di) {
-    return new \phpClub\Service\RefLinkManager($di[EntityManager::class]);
+$di[RefLinkGenerator::class] = function (Container $di) {
+    return new RefLinkGenerator($di[EntityManager::class]);
 };
 
 $di[LastPostUpdater::class] = function (Container $di) {
@@ -93,7 +95,7 @@ $di[LastPostUpdater::class] = function (Container $di) {
 
 $di[ArhivachClient::class] = function (Container $di) {
     return new ArhivachClient(
-        $di['Guzzle'],
+        $di[Client::class],
         $di[ArhivachThreadParser::class],
         getenv('ARHIVACH_EMAIL'),
         getenv('ARHIVACH_PASSWORD')
@@ -116,6 +118,10 @@ $di[ThreadRepository::class] = function (Container $di) {
     return $di->get(EntityManager::class)->getRepository(Thread::class);
 };
 
+$di[RefLinkRepository::class] = function (Container $di) {
+    return $di->get(EntityManager::class)->getRepository(\phpClub\Entity\RefLink::class);
+};
+
 $di[LocalFileStorage::class] = function () {
     return new LocalFileStorage(new Symfony\Component\Filesystem\Filesystem(), __DIR__ . '/../public');
 };
@@ -125,15 +131,20 @@ $di[ThreadImporter::class] = function (Container $di) {
         $di[$di['settings']['fileStorage']],
         $di[EntityManager::class],
         $di[LastPostUpdater::class],
-        $di[\phpClub\Service\RefLinkManager::class]
+        $di[RefLinkGenerator::class]
     );
 };
 
 $di[ImportThreadsCommand::class] = function (Container $di) {
-    return new ImportThreadsCommand($di);
+    return new ImportThreadsCommand(
+        $di[ThreadImporter::class],
+        $di[DvachClient::class],
+        $di[ArhivachClient::class],
+        $di[DvachThreadParser::class]
+    );
 };
 
-$di['Guzzle'] = function () {
+$di[Client::class] = function () {
     return new Client();
 };
 
@@ -146,8 +157,8 @@ $di['Guzzle.cacheable'] = function () {
     return new Client(['handler' => $stack]);
 };
 
-$di[DvachApiClient::class] = function ($di) {
-    return new DvachApiClient($di['Guzzle.cacheable']);
+$di[DvachClient::class] = function ($di) {
+    return new DvachClient($di[Client::class]);
 };
 
 $di[UrlGenerator::class] = function (Container $di) {
@@ -185,7 +196,8 @@ $di['BoardController'] = function (Container $di): BoardController {
         $di->get(PhpRenderer::class),
         $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
-        $di->get(\phpClub\Service\RefLinkManager::class)
+        $di->get(RefLinkGenerator::class),
+        $di->get(RefLinkRepository::class)
     );
 };
 
