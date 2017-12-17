@@ -3,68 +3,63 @@ namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-/**
-* @Entity @Table(name="threads")
+/** 
+* @Entity(repositoryClass="phpClub\Repository\ThreadRepository")
 **/
 class Thread
 {
-
     /** @Id @Column(type="integer") **/
-    protected $number;
+    private $id;
     
-    /** @OneToMany(targetEntity="phpClub\Entity\Post", mappedBy="thread") **/
-    public $posts;
+    /**
+     * @OneToMany(targetEntity="Post", mappedBy="thread", cascade={"all"})
+     **/
+    private $posts;
 
-    /** @OneToMany(targetEntity="phpClub\Entity\ArchiveLink", mappedBy="thread") **/
-    public $archiveLinks;
+    /**
+     * @var Post[]
+     * @ManyToMany(targetEntity="Post")
+     * @JoinTable(name="last_post",
+     *      joinColumns={@JoinColumn(name="thread_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@JoinColumn(name="post_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     */
+    private $lastPosts;
 
-    public function __construct()
+    /**
+     * @param $id
+     * @param Post[] $posts
+     */
+    public function __construct($id, array $posts = [])
     {
-        $this->posts = new ArrayCollection();
-        $this->archiveLinks = new ArrayCollection();
-    }
-
-    public function getNumber()
-    {
-        return $this->number;
-    }
-
-    public function setNumber($number)
-    {
-        $this->number = $number;
+        $this->id = $id;
+        $this->posts = new ArrayCollection($posts);
+        $this->lastPosts = new ArrayCollection();
     }
 
     public function addPost(Post $post)
     {
-        $this->posts[] = $post;
-
-        return $this;
+        $this->posts->add($post);
     }
 
-    public function removePost(Post $post)
+    public function getId()
     {
-        $this->posts->removeElement($post);
+        return $this->id;
     }
 
+    /**
+     * @return Post[]|ArrayCollection
+     */
     public function getPosts()
     {
         return $this->posts;
     }
 
-    public function addArchiveLink(ArchiveLink $archiveLink)
+    /**
+     * @return Post[]|ArrayCollection
+     */
+    public function getLastPosts()
     {
-        $this->archiveLinks[] = $archiveLink;
-
-        return $this;
-    }
-
-    public function removeArchiveLink(ArchiveLink $archiveLink)
-    {
-        $this->archiveLinks->removeElement($archiveLink);
-    }
-
-    public function getArchiveLinks()
-    {
-        return $this->archiveLinks;
+        return $this->lastPosts;
     }
 }

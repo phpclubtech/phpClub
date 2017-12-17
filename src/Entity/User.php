@@ -2,7 +2,7 @@
 namespace phpClub\Entity;
 
 /**
-* @Entity @Table(name="users")
+* @Entity(repositoryClass="phpClub\Repository\UserRepository")
 **/
 class User
 {
@@ -20,7 +20,6 @@ class User
 
     /** @Column(type="string") **/
     protected $salt;
-
 
     public function getId()
     {

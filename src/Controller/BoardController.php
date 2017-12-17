@@ -1,96 +1,144 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: main
- * Date: 4/30/2017
- * Time: 2:07 PM
- */
 
 namespace phpClub\Controller;
 
-use Slim\Exception\NotFoundException;
-use Slim\Http\Response;
-use Slim\Http\Request;
-use Psr\Http\Message\ResponseInterface;
-use Slim\Views\PhpRenderer as View;
-use phpClub\Service\Threader;
+use phpClub\Repository\RefLinkRepository;
+use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
+use phpClub\ThreadImport\RefLinkGenerator;
+use Psr\Http\Message\ResponseInterface;
+use Psr\SimpleCache\CacheInterface;
+use Slim\Exception\NotFoundException;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Views\PhpRenderer;
 
-/**
- * Class MainPageController
- *
- * @package phpClub\Controller
- * @author foobar1643 <foobar76239@gmail.com>
- */
 class BoardController
 {
     /**
-     * @var \Slim\Views\PhpRenderer
+     * @var Authorizer
      */
-    protected $view;
+    private $authorizer;
 
     /**
-     * @var \phpClub\Service\Threader
+     * @var PhpRenderer
      */
-    protected $threader;
+    private $view;
 
     /**
-     * @var \phpClub\Service\Authorizer
+     * @var CacheInterface
      */
-    protected $authorizer;
+    private $cache;
 
-    public function __construct(Threader $threader, Authorizer $authorizer, View $view)
-    {
+    /**
+     * @var ThreadRepository
+     */
+    private $threadRepository;
+
+    /**
+     * @var RefLinkGenerator
+     */
+    private $refLinkManager;
+    
+    /**
+     * @var RefLinkRepository
+     */
+    private $refLinkRepository;
+
+    public function __construct(
+        Authorizer $authorizer,
+        PhpRenderer $view,
+        CacheInterface $cache,
+        ThreadRepository $threadRepository,
+        RefLinkGenerator $refLinkManager,
+        RefLinkRepository $refLinkRepository
+    ) {
         $this->view = $view;
-
-        $this->threader = $threader;
-
         $this->authorizer = $authorizer;
+        $this->cache = $cache;
+        $this->threadRepository = $threadRepository;
+        $this->refLinkManager = $refLinkManager;
+        $this->refLinkRepository = $refLinkRepository;
     }
 
     public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        return $this->view->render(
-            $response,
-            '/board.phtml',
-            [
-                'threads' => $this->threader->getThreads(),
-                'logged' => $this->authorizer->isLoggedIn()
-            ]
-        );
+        $template = $this->getOrSetCache('/board.phtml', [
+            'threads' => $this->threadRepository->getThreadsWithLastPosts($request->getParam('page', 1)),
+            'logged' => $this->authorizer->isLoggedIn()
+        ], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
+
+        return $this->renderHtml($response, $template);
     }
 
     public function threadAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        try {
-            $thread = $this->threader->getThread((int)$args['thread']);
-        } catch (\InvalidArgumentException $e) {
+        $thread = $this->threadRepository->find($args['thread']);
+
+        if (!$thread) {
             throw new NotFoundException($request, $response);
         }
 
-        return $this->view->render(
-            $response,
-            '/thread.phtml',
-            [
-                'thread' => $thread, 'logged' => $this->authorizer->isLoggedIn()
-            ]
+        $template = $this->getOrSetCache('/thread.phtml', [
+            'thread' => $thread,
+            'logged' => $this->authorizer->isLoggedIn()],
+            'thread_' . (int) $args['thread'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false)
         );
+
+        return $this->renderHtml($response, $template);
     }
 
     public function chainAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-        try {
-            $chain = $this->threader->getChain((int)$args['post']);
-        } catch (\InvalidArgumentException $e) {
+        $chain = $this->refLinkRepository->getChain((int) $args['post']);
+
+        if ($chain->isEmpty()) {
             throw new NotFoundException($request, $response);
         }
 
-        return $this->view->render(
-            $response,
-            '/chain.phtml',
-            [
-                'posts' => $chain, 'logged' => $this->authorizer->isLoggedIn()
-            ]
+        $template = $this->getOrSetCache('/chain.phtml', [
+            'posts' => $chain,
+            'logged' => $this->authorizer->isLoggedIn()],
+            'chain' . (int) $args['post'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false)
         );
+
+        return $this->renderHtml($response, $template);
+    }
+
+    /**
+     * Get html template cache by key or set html cache to cache by key
+     * 
+     * @param  string $template   path to template
+     * @param  array $data        array of attr inside template
+     * @param  string $nameCache  name key cache
+     * @return mixed              string of html template with set attr
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function getOrSetCache($template, array $data, string $nameCache)
+    {
+        $cache = $this->cache->get($nameCache);
+        if (!$cache) {
+            $cache = $this->view->fetch(
+                $template,
+                $data
+            );
+            $this->cache->set($nameCache, $cache);
+        }
+        return $cache;
+    }
+
+    /**
+     * Render template by html string
+     *
+     * @param Response $response
+     * @param string $html
+     * @return Response
+     */
+    public function renderHtml(Response $response, string $html): Response
+    {
+        $response->getBody()->write($html);
+
+        return $response;
     }
 }

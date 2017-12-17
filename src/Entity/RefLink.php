@@ -2,27 +2,28 @@
 namespace phpClub\Entity;
 
 /**
-* @Entity @Table(name="refmap")
+* @Entity(repositoryClass="phpClub\Repository\RefLinkRepository")
 **/
 class RefLink
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
-    protected $id;
+    private $id;
 
-    /**
-    * @ManyToOne(targetEntity="phpClub\Entity\Post")
-    * @JoinColumn(name="post", referencedColumnName="post")
-    */
-    protected $post;
+    /** @ManyToOne(targetEntity="Post") */
+    private $post;
 
-    /**
-    * @ManyToOne(targetEntity="phpClub\Entity\Post")
-    * @JoinColumn(name="reference", referencedColumnName="post")
-    */
-    protected $reference;
+    /** @ManyToOne(targetEntity="Post") */
+    private $reference;
 
     /** @Column(type="integer") **/
-    protected $depth;
+    private $depth;
+
+    public function __construct(Post $post, Post $reference, int $depth)
+    {
+        $this->post = $post;
+        $this->reference = $reference;
+        $this->depth = $depth;
+    }
 
     public function getId()
     {
@@ -34,30 +35,9 @@ class RefLink
         return $this->post;
     }
 
-    public function setPost($post)
-    {
-        $this->post = $post;
-
-        return $this;
-    }
-
     public function getReference()
     {
         return $this->reference;
-    }
-
-    public function setReference($reference)
-    {
-        $this->reference = $reference;
-
-        return $this;
-    }
-
-    public function setDepth($depth)
-    {
-        $this->depth = $depth;
-
-        return $this;
     }
 
     public function getDepth()

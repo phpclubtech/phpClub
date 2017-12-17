@@ -10,6 +10,8 @@ namespace phpClub\Service;
 
 use Doctrine\ORM\EntityManager;
 use phpClub\Entity\User;
+use phpClub\Repository\UserRepository;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 
 class Authorizer
 {
@@ -18,15 +20,15 @@ class Authorizer
      */
     protected $em;
 
-    public function __construct(EntityManager $em)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->em = $em;
+        $this->userRepository = $userRepository;
     }
 
     public function isLoggedIn()
     {
         if (isset($_COOKIE['id'])) {
-            $student = $this->em->getRepository('phpClub\Entity\User')->find($_COOKIE['id']);
+            $student = $this->userRepository->find($_COOKIE['id']);
 
             if (isset($_COOKIE['token'])) {
                 if ($student->getHash() == $_COOKIE['hash']) {
@@ -57,7 +59,7 @@ class Authorizer
 
             $errors = Validator::validateRegistrationPost($post);
 
-            if ($this->em->getRepository('phpClub\Entity\User')->findOneBy(['email' => $post['email']])) {
+            if ($this->userRepository->findOneBy(['email' => $post['email']])) {
                 $errors['email'] = "Почта уже занята";
             }
 
@@ -71,8 +73,8 @@ class Authorizer
                 $user->setHash($hash);
                 $user->setSalt($salt);
 
-                $this->em->persist($user);
-                $this->em->flush();
+                $this->userRepository->persist($user);
+                $this->userRepository->flush();
 
                 $this->login();
             }
@@ -95,7 +97,7 @@ class Authorizer
             $errors = Validator::validateLoginPost($post);
 
             if (empty($errors)) {
-                $user = $this->em->getRepository('phpClub\Entity\User')->findOneBy(['email' => $post['email']]);
+                $user = $this->userRepository->findOneBy(['email' => $post['email']]);
 
                 if ($user) {
                     if ($user->getHash() == Helper::generateHash($post['password'], $user->getSalt())) {
@@ -127,7 +129,7 @@ class Authorizer
                 if (Validator::validateName($post['name'])) {
                     $user->setName($post['name']);
 
-                    $this->em->flush();
+                    $this->userRepository->flush();
                 } else {
                     $errors['name'] = Validator::NAME_ERROR;
                 }
@@ -139,7 +141,7 @@ class Authorizer
                 if (Validator::validateEmail($post['email'])) {
                     $user->setEmail($post['email']);
 
-                    $this->em->flush();
+                    $this->userRepository->flush();
                 } else {
                     $errors['email'] = Validator::EMAIL_ERROR;
                 }
@@ -162,7 +164,7 @@ class Authorizer
                             $expires = 60 * 60 * 24 * 30 * 12 * 3;
                             setcookie('hash', $user->getHash(), time() + $expires, '/', null, null, true);
 
-                            $this->em->flush();
+                            $this->userRepository->flush();
                         } else {
                             $errors['retryPassword'] = Validator::RETRY_PASSWORD_ERROR;
                         }
@@ -179,7 +181,7 @@ class Authorizer
     }
 
     public function logout()
-    {
+    {        
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (Validator::validateToken($_POST['token']) and $this->isLoggedIn()) {
                 setcookie('id', null, time()-1, '/');

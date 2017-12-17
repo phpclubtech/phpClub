@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+set_time_limit(0);
+
+use phpClub\Command\ImportThreadsCommand;
+use Symfony\Component\Console\Application;
+
+require __DIR__ . '/../vendor/autoload.php';
+$di = require __DIR__ . '/../src/Bootstrap.php';
+
+$application = new Application();
+$application->add($di->get(ImportThreadsCommand::class));
+$application->run();

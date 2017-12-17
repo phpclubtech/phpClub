@@ -4,114 +4,128 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
-use PHPUnit\Framework\TestCase;
-use phpClub\ThreadParser\DTO\Post;
-use phpClub\ThreadParser\Thread\DvachThread;
-use phpClub\ThreadParser\{ThreadHtmlParser, DateConverter};
+use phpClub\Entity\{Post, File};
+use phpClub\ThreadParser\DvachThreadParser;
+use Tests\AbstractTestCase;
 
-class DvachHtmlParserTest extends TestCase
+class DvachHtmlParserTest extends AbstractTestCase
 {
     /**
-     * @var ThreadHtmlParser
+     * @var DvachThreadParser
      */
     private $threadParser;
 
     public function setUp()
     {
-        $this->threadParser = new ThreadHtmlParser(new DateConverter(), new DvachThread());
+        $this->threadParser = $this->getContainer()->get(DvachThreadParser::class);
     }
-    
+
     public function testGetPost()
     {
-        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/dvach_fixtures/posts/post-thread-17.html'));
-        $post = $posts[0];
-        $this->assertEquals('Аноним', $post->author);
-        $this->assertEquals('20/01/14 17:23:22', $post->date->format('d/m/y H:i:s'));
-        $this->assertEquals('319724', $post->id);
-        $this->assertContains('делать, если расширение', $post->text);
-        $this->assertEquals('', $post->title);
-        $this->assertCount(0, $post->files);
-
-        $posts = $this->threadParser->getPosts(file_get_contents(__DIR__ . '/dvach_fixtures/posts/post-thread-71.html'));
-        $post = $posts[0];
-        $this->assertEquals('пхп', $post->author);
-        $this->assertEquals('24/02/16 17:11:57', $post->date->format('d/m/y H:i:s'));
-        $this->assertEquals('665216', $post->id);
-        $this->assertContains('что в пхп ини то же самое</span><br>А ты тот файл который нужно редактируешь? Настройки', $post->text);
-        $this->assertEquals('', $post->title);
-        $this->assertCount(0, $post->files);
+        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/dvach/posts/post-thread-17.html'));
+        $post = $thread->getPosts()[0];
+        $this->assertEquals('Аноним', $post->getAuthor());
+        $this->assertEquals('20/01/14 17:23:22', $post->getDate()->format('d/m/y H:i:s'));
+        $this->assertEquals('319724', $post->getId());
+        $this->assertContains('делать, если расширение', $post->getText());
+        $this->assertEmpty($post->getTitle());
+        $this->assertCount(0, $post->getFiles());
+        
+        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/dvach/posts/post-thread-71.html'));
+        $post = $thread->getPosts()[0];
+        $this->assertEquals('пхп', $post->getAuthor());
+        $this->assertEquals('24/02/16 17:11:57', $post->getDate()->format('d/m/y H:i:s'));
+        $this->assertEquals('665216', $post->getId());
+        $this->assertContains('что в пхп ини то же самое</span><br>А ты тот файл который нужно редактируешь? Настройки', $post->getText());
+        $this->assertEmpty($post->getTitle());
+        $this->assertCount(0, $post->getFiles());
     }
 
     /**
      * @dataProvider provideThreadsHtml
      */
-    public function testGetPosts($pathToThreadHtml)
+    public function testExtractThread(string $pathToThreadHtml)
     {
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToThreadHtml));
-        $this->assertGreaterThan(500, count($threadArray));
-        $this->assertNotEmpty($threadArray[0]->author);
-        $this->assertNotEmpty($threadArray[0]->id);
-        $this->assertNotEmpty($threadArray[0]->text);
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
+        $posts = $thread->getPosts();
+        
+        // It is enough to check only posts count, because $threadParser throws an exception when parsing fails
+        $this->assertGreaterThan(490, $posts->count());
+        $this->assertNotEmpty($posts->first()->getAuthor());
+        $this->assertNotEmpty($posts->first()->getId());
+        $this->assertNotEmpty($posts->first()->getText());
     }
 
     public function provideThreadsHtml()
     {
         return [
-            [__DIR__ . '/dvach_fixtures/1.html'],
-            [__DIR__ . '/dvach_fixtures/2.html'],
-            [__DIR__ . '/dvach_fixtures/3.html'],
-            [__DIR__ . '/dvach_fixtures/6.html'],
-            [__DIR__ . '/dvach_fixtures/10.html'],
-            [__DIR__ . '/dvach_fixtures/15.html'],
-            [__DIR__ . '/dvach_fixtures/17.html'],
-            [__DIR__ . '/dvach_fixtures/18.html'],
-            [__DIR__ . '/dvach_fixtures/19.html'],
-            [__DIR__ . '/dvach_fixtures/20.html'],
-            [__DIR__ . '/dvach_fixtures/21.html'],
-            [__DIR__ . '/dvach_fixtures/22.html'],
-            [__DIR__ . '/dvach_fixtures/23.html'],
-            [__DIR__ . '/dvach_fixtures/24.html'],
-            [__DIR__ . '/dvach_fixtures/26.html'],
-            [__DIR__ . '/dvach_fixtures/27.html'],
-            [__DIR__ . '/dvach_fixtures/28.html'],
-            [__DIR__ . '/dvach_fixtures/29.html'],
-            [__DIR__ . '/dvach_fixtures/30.html'],
-            [__DIR__ . '/dvach_fixtures/31.html'],
-            [__DIR__ . '/dvach_fixtures/40.html'],
-            [__DIR__ . '/dvach_fixtures/32.html'],
-            [__DIR__ . '/dvach_fixtures/50.html'],
-            [__DIR__ . '/dvach_fixtures/60.html'],
-            [__DIR__ . '/dvach_fixtures/77.html'],
-            [__DIR__ . '/dvach_fixtures/80.html'],
+            [__DIR__ . '/../Fixtures/dvach/1.html'],
+            [__DIR__ . '/../Fixtures/dvach/2.html'],
+            [__DIR__ . '/../Fixtures/dvach/3.html'],
+            [__DIR__ . '/../Fixtures/dvach/4b.html'],
+            [__DIR__ . '/../Fixtures/dvach/6.html'],
+            [__DIR__ . '/../Fixtures/dvach/10.html'],
+            [__DIR__ . '/../Fixtures/dvach/15.html'],
+            [__DIR__ . '/../Fixtures/dvach/17.html'],
+            [__DIR__ . '/../Fixtures/dvach/18.html'],
+            [__DIR__ . '/../Fixtures/dvach/19.html'],
+            [__DIR__ . '/../Fixtures/dvach/20.html'],
+            [__DIR__ . '/../Fixtures/dvach/21.html'],
+            [__DIR__ . '/../Fixtures/dvach/22.html'],
+            [__DIR__ . '/../Fixtures/dvach/23.html'],
+            [__DIR__ . '/../Fixtures/dvach/24.html'],
+            [__DIR__ . '/../Fixtures/dvach/26.html'],
+            [__DIR__ . '/../Fixtures/dvach/27.html'],
+            [__DIR__ . '/../Fixtures/dvach/28.html'],
+            [__DIR__ . '/../Fixtures/dvach/29.html'],
+            [__DIR__ . '/../Fixtures/dvach/30.html'],
+            [__DIR__ . '/../Fixtures/dvach/31.html'],
+            [__DIR__ . '/../Fixtures/dvach/40.html'],
+            [__DIR__ . '/../Fixtures/dvach/32.html'],
+            [__DIR__ . '/../Fixtures/dvach/50.html'],
+            [__DIR__ . '/../Fixtures/dvach/60.html'],
+            [__DIR__ . '/../Fixtures/dvach/77.html'],
+            [__DIR__ . '/../Fixtures/dvach/80.html'],
         ];
+    }
+
+    public function testWithThreadsDir()
+    {
+        $threadDir = __DIR__ . '/../Fixtures/dvach';
+        
+        $thread = $this->threadParser->extractThread(file_get_contents($threadDir . '/80.html'), $threadDir);
+        
+        $file = $thread->getPosts()[0]->getFiles()[0];
+        
+        $this->assertContains($threadDir, $file->getPath());
     }
 
     /**
      * @dataProvider providePostsWithOpPostTitles
      */
-    public function testOpPostTitleIsCorrect($pathToThreadHtml, $opPostTitle)
+    public function testOpPostTitleIsCorrect(string $pathToThreadHtml, string $opPostTitle)
     {
-        $postsArray = $this->threadParser->getPosts(file_get_contents($pathToThreadHtml));
-        $this->assertEquals($opPostTitle, $postsArray[0]->title);
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
+        $this->assertEquals($opPostTitle, $thread->getPosts()->first()->getTitle());
     }
 
     public function providePostsWithOpPostTitles()
     {
         return [
             [
-                __DIR__ . '/dvach_fixtures/80.html',
+                __DIR__ . '/../Fixtures/dvach/80.html',
                 'Клуб изучающих PHP 80: Последний летний.'
             ],
             [
-                __DIR__ . '/dvach_fixtures/6.html',
+                __DIR__ . '/../Fixtures/dvach/6.html',
                 'Клуб PHP для начинающих (6)'
             ],
             [
-                __DIR__ . '/dvach_fixtures/2.html',
+                __DIR__ . '/../Fixtures/dvach/2.html',
                 ''
             ],
             [
-                __DIR__ . '/dvach_fixtures/31.html',
+                __DIR__ . '/../Fixtures/dvach/31.html',
                 'Клуб изучения PHP 31',
             ]
         ];
@@ -119,138 +133,143 @@ class DvachHtmlParserTest extends TestCase
 
     public function testFilesThread80()
     {
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/80.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $files       = $threadArray[0]->files;
-
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/80.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        
+        /** @var File[] $files */
+        $files = $posts->first()->getFiles();
         $this->assertCount(4, $files);
-
+        
         // Image 1
-        $this->assertEquals('14719368905530.png', $files[0]->fullName);
-        $this->assertEquals(500, $files[0]->height);
-        $this->assertEquals(500, $files[0]->width);
-        $this->assertEquals('14719368905530s.jpg', $files[0]->thumbName);
-
+        $this->assertEquals('14719368905530.png', $files[0]->getPath());
+        $this->assertEquals(500, $files[0]->getHeight());
+        $this->assertEquals(500, $files[0]->getWidth());
+        $this->assertEquals('14719368905530s.jpg', $files[0]->getThumbPath());
+        
         // Image 2
-        $this->assertEquals('14719368905541.jpg', $files[1]->fullName);
-        $this->assertEquals(166, $files[1]->height);
-        $this->assertEquals(250, $files[1]->width);
-        $this->assertEquals('14719368905541s.jpg', $files[1]->thumbName);
-
+        $this->assertEquals('14719368905541.jpg', $files[1]->getPath());
+        $this->assertEquals(166, $files[1]->getHeight());
+        $this->assertEquals(250, $files[1]->getWidth());
+        $this->assertEquals('14719368905541s.jpg', $files[1]->getThumbPath());
+        
         // Image 3
-        $this->assertEquals('14719368905542.jpg', $files[2]->fullName);
-        $this->assertEquals(250, $files[2]->height);
-        $this->assertEquals(175, $files[2]->width);
-        $this->assertEquals('14719368905542s.jpg', $files[2]->thumbName);
-
-        $this->assertCount(2, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-    }
-
-    public function testFilesCount()
-    {
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/1.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(0, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-        $this->assertCount(1, $threadArray[3]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/3.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/6.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(1, $threadArray[1]->files);
-        $this->assertCount(0, end($threadArray)->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/10.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(1, $threadArray[1]->files);
-        $this->assertCount(1, $threadArray[2]->files);
-        $this->assertCount(0, $threadArray[3]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/15.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(1, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/77.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(4, $threadArray[0]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/60.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(4, $threadArray[0]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/50.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(4, $threadArray[0]->files);
-        $this->assertCount(3, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/40.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(4, $threadArray[0]->files);
-        $this->assertCount(2, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/32.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(3, $threadArray[0]->files);
-        $this->assertCount(3, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/29.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(1, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/27.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(1, $threadArray[1]->files);
-        $this->assertCount(0, $threadArray[2]->files);
-        $this->assertCount(1, $threadArray[3]->files);
-
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/20.html';
-        $threadArray = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertCount(1, $threadArray[0]->files);
-        $this->assertCount(1, $threadArray[1]->files);
-        $this->assertCount(1, $threadArray[2]->files);
-        $this->assertCount(0, $threadArray[3]->files);
+        $this->assertEquals('14719368905542.jpg', $files[2]->getPath());
+        $this->assertEquals(250, $files[2]->getHeight());
+        $this->assertEquals(175, $files[2]->getWidth());
+        $this->assertEquals('14719368905542s.jpg', $files[2]->getThumbPath());
+        $this->assertCount(2, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
     }
 
     public function testThreadFromGoogleCache()
     {
-        $pathToHtml  = __DIR__ . '/dvach_fixtures/15.html';
-        $posts = $this->threadParser->getPosts(file_get_contents($pathToHtml));
-        $this->assertGreaterThan(600, count($posts));
-
-        $this->assertEquals('!xnn2uE3AU.', $posts[0]->author);
-
-        $this->assertContains('пробелы между строчками и всё заработало', $posts[7]->text);
-        $this->assertCount(1, $posts[7]->files);
-
-        $this->assertContains('будет идти потоковое видео?', end($posts)->text);
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/15.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertGreaterThan(600, $posts->count());
+        $this->assertEquals('!xnn2uE3AU.', $posts[0]->getAuthor());
+        $this->assertContains('пробелы между строчками и всё заработало', $posts[7]->getText());
+        $this->assertContains('будет идти потоковое видео?', $posts->last()->getText());
     }
 
     public function testWebmParsing()
     {
-        $pathToHtml = __DIR__ . '/dvach_fixtures/66.html';
-        $posts = $this->threadParser->getPosts(file_get_contents($pathToHtml));
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/66.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        
+        $postWithWebm = $thread->getPosts()
+            ->filter(function (Post $post) { return $post->getId() === 610463; })
+            ->first();
+        
+        $this->assertContains('.webm', $postWithWebm->getFiles()->first()->getPath());
+        $this->assertNotEmpty($postWithWebm->getFiles()->first()->getThumbPath());
+    }
 
-        $postWithWebm = current(array_filter($posts, function (Post $post) {
-            return $post->id == 610463;
-        }));
-
-        $this->assertContains('.webm', $postWithWebm->files[0]->fullName);
-        $this->assertNotEmpty($postWithWebm->files[0]->thumbName);
+    public function testFilesCount()
+    {
+        // All this checks are required!
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/1.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(0, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        $this->assertCount(1, $posts[3]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/3.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/6.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(1, $posts[1]->getFiles());
+        $this->assertCount(0, $posts->last()->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/10.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(1, $posts[1]->getFiles());
+        $this->assertCount(1, $posts[2]->getFiles());
+        $this->assertCount(0, $posts[3]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/77.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(4, $posts[0]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/60.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(4, $posts[0]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/50.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(4, $posts[0]->getFiles());
+        $this->assertCount(3, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/40.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(4, $posts[0]->getFiles());
+        $this->assertCount(2, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/32.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(3, $posts[0]->getFiles());
+        $this->assertCount(3, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/29.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(1, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/27.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(1, $posts[1]->getFiles());
+        $this->assertCount(0, $posts[2]->getFiles());
+        $this->assertCount(1, $posts[3]->getFiles());
+        
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/20.html';
+        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $posts = $thread->getPosts();
+        $this->assertCount(1, $posts[0]->getFiles());
+        $this->assertCount(1, $posts[1]->getFiles());
+        $this->assertCount(1, $posts[2]->getFiles());
+        $this->assertCount(0, $posts[3]->getFiles());
     }
 }

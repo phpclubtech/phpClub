@@ -6,11 +6,16 @@ namespace phpClub\ThreadParser;
 
 class DateConverter
 {
+    /**
+     * @param string $date
+     * @return \DateTimeImmutable
+     * @throws \Exception
+     */
     public function toDateTime(string $date): \DateTimeImmutable
     {
         $normalized = $this->normalizeDate($date);
 
-        $dateTime = \DateTimeImmutable::createFromFormat(' d M Y H:i:s', $normalized);
+        $dateTime = \DateTimeImmutable::createFromFormat('d M Y H:i:s', $normalized);
         if ($dateTime !== false) {
             return $dateTime;
         }
@@ -23,6 +28,10 @@ class DateConverter
         throw new \Exception("Unable to parse date: {$date}");
     }
 
+    /**
+     * @param string $date
+     * @return string
+     */
     private function normalizeDate(string $date): string
     {
         $rusToEng = [
@@ -41,8 +50,7 @@ class DateConverter
         ];
 
         $withEngMonths = strtr($date, $rusToEng);
-
+        
         return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths));
     }
 }
-
