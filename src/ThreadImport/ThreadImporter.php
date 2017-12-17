@@ -90,10 +90,14 @@ class ThreadImporter
     {
         foreach ($thread->getPosts() as $post) {
             foreach ($post->getFiles() as $file) {
-                $file->updatePaths(
-                    $this->fileStorage->put($file->getPath(), (string) $thread->getId()),
-                    $this->fileStorage->put($file->getThumbPath(), $thread->getId() . '/thumb')
-                );
+                try {
+                    $file->updatePaths(
+                        $this->fileStorage->put($file->getPath(), (string) $thread->getId()),
+                        $this->fileStorage->put($file->getThumbPath(), $thread->getId() . '/thumb')
+                    );
+                } catch (Symfony\Component\Filesystem\Exception\IOException $e) {
+                    // Unable to download, skip
+                }
             }
         }
     }

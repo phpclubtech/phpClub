@@ -133,4 +133,10 @@ class Post
     {
         return $this->isFirstPost;
     }
+
+    public function isOld(): bool
+    {
+        // Chains supported only for threads 80+
+        return $this->id < 825576;
+    }
 }

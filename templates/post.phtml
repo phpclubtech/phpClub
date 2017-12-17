@@ -46,7 +46,9 @@ use phpClub\Service\Helper;
         </span>
     <?php endif; ?>
 
-    | <a href="<?= $urlGenerator->toChain($post) ?>">Chain</a>
+    <?php if (!$post->isOld()): ?>
+        | <a href="<?= $urlGenerator->toChain($post) ?>">Chain</a>
+    <?php endif ?>
 
     <br class="turnmeoff">
 </div>

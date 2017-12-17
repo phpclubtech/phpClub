@@ -24,6 +24,10 @@ class RefLinkGenerator
      */
     public function insertChain(Thread $thread): void
     {
+        if ($thread->getPosts()->first()->isOld()) {
+            return;
+        }
+
         foreach ($thread->getPosts() as $post) {
             $this->recursiveInsertChain($post);
         }
