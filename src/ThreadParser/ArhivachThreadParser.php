@@ -70,13 +70,13 @@ class ArhivachThreadParser extends AbstractThreadParser
     protected function extractFile(Crawler $fileNode, Post $post): File
     {
         $fileXPath = '//a[@class="expand_image"]';
-        $fileNode = $fileNode->filterXPath($fileXPath);
+        $imgNode = $fileNode->filterXPath($fileXPath);
 
-        if (!count($fileNode)) {
-            throw new \Exception("Unable to parse file, HTML: {$fileNode->html()}");
+        if (!count($imgNode)) {
+            throw new \Exception("Unable to parse file, HTML: {$imgNode->html()}");
         }
 
-        list(, $filePath, $width, $height) = preg_split("/','|',|,|\)/", $fileNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
+        list(, $filePath, $width, $height) = preg_split("/','|',|,|\)/", $imgNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
 
         if ($this->isOldArhivachThread($filePath)) {
             // Hack for old arhivach threads
@@ -84,13 +84,16 @@ class ArhivachThreadParser extends AbstractThreadParser
         }
 
         $thumbXPath = '//div[@class="post_image"]/img';
-        $thumbNode = $fileNode->filterXPath($thumbXPath);
+        $thumbNode = $imgNode->filterXPath($thumbXPath);
 
         if (!count($thumbNode)) {
             throw new \Exception("Unable to parse thumb, HTML: {$thumbNode->html()}");
         }
 
-        return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width);
+        $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');
+        $clientName = count($clientNameNode) ? $clientNameNode->text() : null;
+        
+        return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width, 0, $clientName);
     }
 
     /**

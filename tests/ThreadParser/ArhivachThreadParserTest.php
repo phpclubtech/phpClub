@@ -68,18 +68,26 @@ class ArhivachThreadParserTest extends AbstractTestCase
         $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
 
-        $post = $posts[306];
-        $this->assertEquals('Аноним', $post->getAuthor());
+        $post = $posts[303];
         $this->assertEquals('14/06/17 09:46:46', $post->getDate()->format('d/m/y H:i:s'));
+        $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('1005616', $post->getId());
         $this->assertContains('Для передачи параметров есть следующие способы:', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(4, $post->getFiles());
 
-        $post = $posts[860];
+        $post = $posts[856];
         $webm = $post->getFiles()->first();
         $this->assertContains('.webm', $webm->getPath());
         $this->assertNotEmpty($webm->getThumbPath());
+
+        $givenFileNames = $posts[0]->getFiles()->map(function (File $file) {
+            return $file->getName();
+        })->toArray();
+        
+        $expectedFileNames = ['php-noob-1.png', 'cat-cafe-osaka.jpg', 'l0-sensei.jpg', 'just-google-it.jpg'];
+        
+        $this->assertEquals($expectedFileNames, $givenFileNames);
     }
 
     public function testThread25()

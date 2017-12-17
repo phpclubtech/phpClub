@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Evenement\EventEmitterTrait;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 class ThreadImporter
 {
@@ -95,7 +96,7 @@ class ThreadImporter
                         $this->fileStorage->put($file->getPath(), (string) $thread->getId()),
                         $this->fileStorage->put($file->getThumbPath(), $thread->getId() . '/thumb')
                     );
-                } catch (Symfony\Component\Filesystem\Exception\IOException $e) {
+                } catch (IOException $e) {
                     // Unable to download, skip
                 }
             }
