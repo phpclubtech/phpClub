@@ -17,7 +17,7 @@ class Post
     /** @Column(type="text") **/
     private $text;
 
-    /** @Column(type="date") **/
+    /** @Column(type="datetime_immutable") **/
     private $date;
 
     /** @Column(type="string", nullable=true) **/

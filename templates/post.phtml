@@ -18,7 +18,7 @@ use phpClub\Service\Helper;
     <span class="ananimas"><?= $post->getAuthor() ?></span>
 
     <span class="posttime-reflink">
-        <span class="posttime"><?= $post->getDate()->format('Y-m-d') ?>&nbsp;</span>
+        <span class="posttime"><?= $post->getDate()->format('Y/m/d H:i:s') ?>&nbsp;</span>
         <span class="reflink">
 
             <a href="<?= $urlGenerator->toPostAnchor($post) ?>"
