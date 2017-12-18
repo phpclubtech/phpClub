@@ -37,7 +37,7 @@ class Searcher
             $ids[]=$result['id'];
         }
 
-        $posts = $this->postRepository->findBy(["post"=>$ids]);
+        $posts = $this->postRepository->findBy(["id"=>$ids]);
 
         return $posts;
     }
