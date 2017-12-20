@@ -29,8 +29,6 @@ class Version20171111191253 extends AbstractMigration
         $this->addSql('ALTER TABLE last_post ADD CONSTRAINT FK_CCA1A8D14B89032C FOREIGN KEY (post_id) REFERENCES post (id)');
         $this->addSql('ALTER TABLE archive_link ADD CONSTRAINT FK_6894F6AE2904019 FOREIGN KEY (thread_id) REFERENCES thread (id)');
         $this->addSql('ALTER TABLE post ADD CONSTRAINT FK_5A8A6C8DE2904019 FOREIGN KEY (thread_id) REFERENCES thread (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8764B89032C FOREIGN KEY (post_id) REFERENCES post (id)');
-        $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8761645DEA9 FOREIGN KEY (reference_id) REFERENCES post (id)');
         $this->addSql('ALTER TABLE file ADD CONSTRAINT FK_8C9F36104B89032C FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE');
     }
 
@@ -46,8 +44,6 @@ class Version20171111191253 extends AbstractMigration
         $this->addSql('ALTER TABLE archive_link DROP FOREIGN KEY FK_6894F6AE2904019');
         $this->addSql('ALTER TABLE post DROP FOREIGN KEY FK_5A8A6C8DE2904019');
         $this->addSql('ALTER TABLE last_post DROP FOREIGN KEY FK_CCA1A8D14B89032C');
-        $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8764B89032C');
-        $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8761645DEA9');
         $this->addSql('ALTER TABLE file DROP FOREIGN KEY FK_8C9F36104B89032C');
         $this->addSql('DROP TABLE thread');
         $this->addSql('DROP TABLE last_post');

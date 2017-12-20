@@ -16,8 +16,6 @@ class Version20171218202046 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE post CHANGE date date DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8761645DEK9');
-        $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8764B89032D');
         $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8764B89032C FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8761645DEA9 FOREIGN KEY (reference_id) REFERENCES post (id) ON DELETE CASCADE');
     }
@@ -30,7 +28,5 @@ class Version20171218202046 extends AbstractMigration
         $this->addSql('ALTER TABLE post CHANGE date date DATE NOT NULL');
         $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8764B89032C');
         $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8761645DEA9');
-        $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8761645DEK9 FOREIGN KEY (reference_id) REFERENCES post (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8764B89032D FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE');
     }
 }
