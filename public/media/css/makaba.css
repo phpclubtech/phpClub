@@ -73,17 +73,17 @@ a[href*="youtube.com"] {
 .closed-thread {text-align:center;}
 .closed-board, .archive-thread {text-align:center; color: red;}
 .nav-arrows {
-	position: fixed;
-	right: 10px;
-	width: 54px;
-	height: 54px;
-	display: none;
-	cursor: pointer;
-	z-index: 999;
+    position: fixed;
+    right: 10px;
+    width: 54px;
+    height: 54px;
+    display: none;
+    cursor: pointer;
+    z-index: 999;
 }
-.up-nav-arrow {	top: 40px; background: url(/makaba/templates/img/arrows_up.png) 5px 5px no-repeat;}
+.up-nav-arrow { top: 40px; background: url(/media/images/arrows_up.png) 5px 5px no-repeat;}
 .up-nav-arrow:hover {background-position: -54px 5px;}
-.down-nav-arrow {bottom: 20px;background: url(/makaba/templates/img/arrows_down.png) -54px 5px no-repeat;}
+.down-nav-arrow {bottom: 20px;background: url(/media/images/arrows_down.png) -54px 5px no-repeat;}
 .down-nav-arrow:hover {background-position: 5px 5px;}
 
 span.mod{color:#2266AA;}

@@ -4533,7 +4533,8 @@ Stage('renderStore',                            'renderstore',  Stage.DOMREADY, 
 });
 Stage('Кнопки перемотки страницы',              'scrollbtns',   Stage.DOMREADY,     function(){
     if(!window.thread.board) return; //не запускаем на главной
-    if(!Store.get('other.scroll_btns',false)) return;
+
+    //if(!Store.get('other.scroll_btns',false)) return;
 
     var border = 300;
     var $up_bnt = $('#up-nav-arrow');
