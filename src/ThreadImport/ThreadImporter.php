@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Evenement\EventEmitterTrait;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 class ThreadImporter
@@ -36,17 +37,24 @@ class ThreadImporter
      * @var RefLinkGenerator
      */
     private $refLinkManager;
+    
+    /**
+     * @var CacheInterface
+     */
+    private $cache;
 
     public function __construct(
         FileStorageInterface $fileStorage,
         EntityManagerInterface $entityManager,
         LastPostUpdater $lastPostUpdater,
-        RefLinkGenerator $refLinkManager
+        RefLinkGenerator $refLinkManager,
+        CacheInterface $cache
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;
         $this->lastPostUpdater = $lastPostUpdater;
         $this->refLinkManager = $refLinkManager;
+        $this->cache = $cache;
     }
 
     /**
@@ -66,6 +74,7 @@ class ThreadImporter
         }
 
         $this->lastPostUpdater->updateLastPosts($threads);
+        $this->cache->clear();
     }
 
     /**
