@@ -59,7 +59,7 @@ class DvachThreadParser extends AbstractThreadParser
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
         
-        return new File(ltrim($fullName, "'"), $thumbName, $post, (int) $height, (int) $width);
+        return new File(ltrim($fullName, "'"), $thumbName, $post, (int)$height, (int)$width);
     }
 
     /**

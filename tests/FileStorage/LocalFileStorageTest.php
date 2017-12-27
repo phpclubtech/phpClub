@@ -40,7 +40,7 @@ class LocalFileStorageTest extends AbstractTestCase
      */
     public function testThrowsOnInvalidFilePath()
     {
-        $file = new File('not-exists', 'not-exists', $this->createPost(1), 100, 100, 100);
+        $file = new File('not-exists', 'not-exists', $this->createPost(1), 100, 100);
         
         $this->fileStorage->put($file->getPath(), '92');
     }

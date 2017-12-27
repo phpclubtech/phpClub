@@ -115,7 +115,6 @@ class DvachClient
             $post,
             $fileArray['height'],
             $fileArray['width'],
-            $fileArray['size'],
             $fileArray['fullname'] ?? $fileArray['name']
         );
     }

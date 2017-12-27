@@ -7,6 +7,7 @@ namespace phpClub\ThreadImport;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Evenement\EventEmitterTrait;
+use phpClub\Entity\File;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -105,10 +106,19 @@ class ThreadImporter
                         $this->fileStorage->put($file->getPath(), (string) $thread->getId()),
                         $this->fileStorage->put($file->getThumbPath(), $thread->getId() . '/thumb')
                     );
+                    $this->updateFileSize($file);
                 } catch (IOException $e) {
                     // Unable to download, skip
                 }
             }
+        }
+    }
+
+    private function updateFileSize(File $file): void
+    {
+        if (!$file->hasSize()) {
+            // TODO: use FileStorageInterface::getResource() 
+            $file->setSize((int) (filesize(__DIR__ . '/../../public/' . $file->getPath()) / 1024));
         }
     }
 }
