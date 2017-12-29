@@ -105,118 +105,58 @@ window.Store = {
         },
 
         //скачать пост с сервера и вызвать коллбек (вызывает скачивание всего треда с отслеживанием очереди)
-        download: function(callback) {
-            var post = posts[this.num];
-            //console.log('PostQuery download()' + this.num);
-            //console.log('PostQuery download()' + post);
-            //console.log('PostQuery download()' + JSON.stringify(posts));
-            var thread = posts[post.thread];
-            var from = thread.preloaded ? thread.preloaded+1 : post.thread;
-            var that = this;
-            if(!thread.hasOwnProperty('downloadCallbacks')) {
-                thread.downloadCallbacks = [];
-                if(callback) thread.downloadCallbacks.push(callback);
-            }else{
-                if(callback) thread.downloadCallbacks.push(callback);
-                return this;
-            }
-
-            var process_callbacks = function(param) {
-                var callbacks = thread.downloadCallbacks;
-
-                setTimeout(function(){ //чтоб чужие ошибки не сломали нам delete
-                    for(var i=0;i<callbacks.length;i++) callbacks[i](param);
-                }, 1);
-
-                delete thread.downloadCallbacks;
-            };
-
-            this._fetchPosts(from, function(res) {
-                if(res.hasOwnProperty('error')) return process_callbacks(res);
-                if(res.length) return process_callbacks({updated:0, list:[], deleted: res.deleted, data:[], favorites:res.favorites});
-
-                var postsCB = [];
-                var tmpost = Post(1);
-
-                $.each( res.data, function( key, val ) {
-                    tmpost.num = val.num;
-                    tmpost.setThread(post.thread).setJSON(val); //пусть будет, нам не жалко
-
-                    if(!thread.preloaded || val.num > thread.preloaded) thread.preloaded = parseInt(val.num);
-                    postsCB.push(val.num);
-                });
-
-                //читай комментарий к _findRemovedPosts()
-                //проверяем нашли ли мы все посты, о которых знали
-                that._findRemovedPosts();
-
-                process_callbacks({updated:res.data.length, list:postsCB, deleted: res.deleted, data:res.data, favorites:res.favorites});
-            });
-
-            return this;
-        },
-
-        //скачивание треда с сервера и записывание всего в память
-        _fetchPosts: function(param, callback) { //очень кривокод
-            var board;
-            var thread;
-            var from_post;
-
-            if(typeof(param) == 'object') {
-                from_post = param.from_post;
-                thread = param.thread;
-                board = param.board;
-            }else{
-                var post = posts[this.num];
-                from_post = param;
-                thread = post.thread;
-                board = window.thread.board;
-            }
+        download: function(tNum, pNum, callback) {
+            var board = window.thread.board;
 
             var onsuccess = function( data ) {
-                if(data.hasOwnProperty('Error')) return callback({error:'server', errorText:'API ' + data.Error + '(' + data.Code + ')', errorCode:data.Code});
-                var posts = [];
-                try {
-                    var parsed = JSON.parse(data);
-                    var all_posts = parsed['threads'][0]['posts'];
-                    if(window.updateLikes) window.updateLikes(all_posts);
+                var parse = $.parseHTML(data);
 
-                    //записываем текущие посты из памяти
-                    var known_posts = [];
-                    //если его нет в памяти, то игнорируем иначе сломаем избранное
-                    if(Post(thread).exists()) {
-                        known_posts = Post(thread).threadPosts().filter(function(post_id){
-                            return !Post(post_id).isNotFound();
-                        });
-                    }
+                var thread_el = $(parse).find('.thread');
+                var thread_num = thread_el.attr('id').substr(7);
 
-                    for(var i=0;i<all_posts.length;i++) {
-                        var post = all_posts[i];
-                        if(post.num >= from_post) posts.push(post);
-                        
-                        //удаляем посты из копии памяти, которые пришли с сервера
-                        //если что-то осталось, значит на сервере его уже нет, значит его удалили
-                        var all_posts_pos = known_posts.indexOf(post.num);           
-                        if(all_posts_pos > -1) known_posts.splice(all_posts_pos, 1);
-                    }
+                thread_el.find('.post').each(function(){
+                    var post_el = $(this);
 
-                    //удаляем посты, которые были в памяти, но в новом JSON их уже нет
-                    for(i=0;i<known_posts.length;i++) {
-                        Post(known_posts[i])._notFound();
-                    }
-                }catch(e){
-                    return callback({error:'server', errorText: 'Ошибка парсинга ответа сервера', errorCode: -1});
+                    post_el.find('.post-reply-link').each(function(){
+                        var reply_to = $(this).data('num');
+                        var reply_num = $(post_el).data('num');
+
+                        var $refmap = $(thread_el).find('#refmap-' + reply_to);
+
+                        var link = '<a ' +
+                        'class="post-reply-link" ' +
+                        'data-num="' + reply_num + '" ' +
+                        'data-thread="' + $(this).data('thread') + '" ' +
+                        'href="/' + window.thread.board + '/res/' + thread_num + '.html#' + reply_num + '">' +
+                        '&gt;&gt;' + reply_num +
+                        '</a> ';
+
+                        $refmap.css('display','block');
+                        $refmap.append(link);
+                    });
+                });
+
+
+                var post_el = $(parse).find('#post-' + pNum);
+
+                if ($(post_el).attr('class') == 'oppost-wrapper') {
+                    post_el = $(post_el).find('.post');
+                } else {
+                    post_el = $(post_el).find('.reply');
                 }
-                callback({data:posts, favorites: all_posts[0]['favorites'], deleted: known_posts});
+
+                var html = $(post_el).html();
+
+                callback(html);
             };
             var onerror = function(jqXHR, textStatus) {
-                if(jqXHR.status == 404) return callback({error:'server', errorText: 'Тред не найден', errorCode: -404});
-                if(jqXHR.status == 0) return callback({error:'server', errorText: 'Браузер отменил запрос (' + textStatus + ')', errorCode: 0});
+                if(jqXHR.status == 404) return callback('Тред не найден');
+                if(jqXHR.status == 0) return callback('Браузер отменил запрос (' + textStatus + ')');
                 callback({error:'http', errorText:textStatus, errorCode: jqXHR.status});
             };
 
             //$.ajax( '/makaba/mobile.fcgi?task=get_thread&board=' + board + '&thread=' + thread + '&num=' + from_post, {
-            $.ajax( '/' + board + '/res/' + thread + '.json', {
+            $.ajax( '/' + board + '/res/' + tNum + '.html', {
                 dataType: 'html',
                 timeout: window.config.updatePostsTimeout,
                 success: onsuccess,
@@ -270,6 +210,8 @@ window.Store = {
                 tmp.num = num;
                 tmp.setThread(thread_num).addReply(that.num);
             });
+
+            //el.find('a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]').each(...);
         },
 
         //записать в память ответ из текущего поста в какой-то
@@ -559,11 +501,12 @@ Stage('Превью постов',                          'postpreview',  Stag
 
 
         var post = Post(pNum);
+
         if(!post.exists() || post.isGhost()) {
-            post.download(function(res){
-                if(res.errorText) return funcPostPreview('Ошибка: ' + res.errorText);
-                funcPostPreview(post.previewHTML());
-                if(!post.isRendered()) Media.processLinks($('#m' + pNum + ' a'));
+            post.download(tNum, pNum, function(html){
+                //if(res.errorText) return funcPostPreview('Ошибка: ' + res.errorText);
+                funcPostPreview(html);
+                //if(!post.isRendered()) Media.processLinks($('#m' + pNum + ' a'));
             });
         }else{
             funcPostPreview(post.previewHTML());
@@ -571,14 +514,15 @@ Stage('Превью постов',                          'postpreview',  Stag
         $del($id(pView.id)); //удаляет старый бокс поста
         dForm.appendChild(pView);
 
-        if(!post.isRendered()) {
-            Media.processLinks($('#m' + pNum + ' a')); 
-        }else{
-            //todo костыль. Надо что-то с этим делать.
-            var $preview_box = $('#preview-' + pNum);
-            $preview_box.find('.media-expand-button').remove();
-            //Media.processLinks($preview_box.find('a')); 
-        }
+        //cut
+        // if(!post.isRendered()) {
+        //     Media.processLinks($('#m' + pNum + ' a')); 
+        // }else{
+        //     //todo костыль. Надо что-то с этим делать.
+        //     var $preview_box = $('#preview-' + pNum);
+        //     $preview_box.find('.media-expand-button').remove();
+        //     //Media.processLinks($preview_box.find('a')); 
+        // }
     };
 
     var timers = {};
@@ -608,7 +552,7 @@ Stage('Превью постов',                          'postpreview',  Stag
         return;
     }*/
     
-    $('#posts-form').on('mouseover', '.post-reply-link', function(e){
+    $('.posts').on('mouseover', '.post-reply-link', function(e){
         var $el = $(this);
         var num = $el.data('num');
         var thread = $el.data('thread');
