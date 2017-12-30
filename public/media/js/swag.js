@@ -139,15 +139,19 @@ window.Store = {
 
                 var post_el = $(parse).find('#post-' + pNum);
 
-                if ($(post_el).attr('class') == 'oppost-wrapper') {
-                    post_el = $(post_el).find('.post');
+                if (post_el.length) {
+                    if ($(post_el).attr('class') == 'oppost-wrapper') {
+                        post_el = $(post_el).find('.post');
+                    } else {
+                        post_el = $(post_el).find('.reply');
+                    }
+
+                    var html = $(post_el).html();
+
+                    callback(html);
                 } else {
-                    post_el = $(post_el).find('.reply');
+                    callback('Невозможно определить id стороннего треда');
                 }
-
-                var html = $(post_el).html();
-
-                callback(html);
             };
             var onerror = function(jqXHR, textStatus) {
                 if(jqXHR.status == 404) return callback('Тред не найден');
@@ -211,7 +215,14 @@ window.Store = {
                 tmp.setThread(thread_num).addReply(that.num);
             });
 
-            //el.find('a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]').each(...);
+            el.find('a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]').each(function(){
+                var this_el = $(this);
+                var thread_num = $(this_el).closest('.thread').attr('id').substr(7);
+                var num = $(this_el).html().substr(8);
+                that.addReplyTo(num);
+                tmp.num = num;
+                tmp.setThread(thread_num).addReply(that.num);
+            });
         },
 
         //записать в память ответ из текущего поста в какой-то
@@ -574,6 +585,34 @@ Stage('Превью постов',                          'postpreview',  Stag
             delPostPreview(e);
         })
         .on('click', '.post-reply-link', function(){
+            var $el = $(this);
+            var num = $el.data('num');
+            Post(num).highlight();
+        });
+
+
+    $('.posts').on('mouseover', 'a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]', function(e){
+        var $el = $(this);
+        var num = $el.html().substr(8);
+        var thread = $el.closest('.thread').attr('id').substr(7);
+
+        if(timer_ms) {
+            timers[num] = setTimeout(function(){
+                clearTimer(num);
+                showPostPreview(e, num, thread);
+            }, timer_ms);
+        }else{
+            showPostPreview(e, num, thread);
+        }
+    })
+        .on('mouseout', 'a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]', function(e){
+            var $el = $(this);
+            var num = $el.data('num');
+            clearTimer(num);
+
+            delPostPreview(e);
+        })
+        .on('click', 'a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]', function(){
             var $el = $(this);
             var num = $el.data('num');
             Post(num).highlight();
