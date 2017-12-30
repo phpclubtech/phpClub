@@ -74,6 +74,11 @@ window.Store = {
 
         isThread: function() {
             var post = posts[this.num];
+
+            console.log("this.num: " + this.num);
+            console.log("post.thread: " + post.thread);
+            console.log(post);
+
             return this.num == post.thread;
         },
 
@@ -88,12 +93,16 @@ window.Store = {
             var html;
 
             if(post.rendered) {
+                console.log('rendered');
                 if(this.isThread()){
+                    console.log('thread');
                     html = $('#post-' + num).find('.post').html();
                 }else{
+                    console.log('post');
                     html = $('#post-' + num).find('.reply').html();
                 }
             }else if(post.ajax) {
+                console.log('ajax');
                 html = generatePostBody(post.ajax); //нет времени делать лучше
             }else if(post.notfound){
                 html = 'Пост не найден'; //todo underfined в 3 жквери
@@ -217,8 +226,16 @@ window.Store = {
 
             el.find('a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]').each(function(){
                 var this_el = $(this);
-                var thread_num = $(this_el).closest('.thread').attr('id').substr(7);
+                var thread_num;
                 var num = $(this_el).html().substr(8);
+                var isOpPost = $('#thread-' + num);
+
+                if (isOpPost.length) {
+                    thread_num = num;
+                } else {
+                    thread_num = $el.closest('.thread').attr('id').substr(7);
+                }
+
                 that.addReplyTo(num);
                 tmp.num = num;
                 tmp.setThread(thread_num).addReply(that.num);
@@ -594,7 +611,14 @@ Stage('Превью постов',                          'postpreview',  Stag
     $('.posts').on('mouseover', 'a[onmouseover="showPostPreview(event)"][onmouseout="delPostPreview(event)"]', function(e){
         var $el = $(this);
         var num = $el.html().substr(8);
-        var thread = $el.closest('.thread').attr('id').substr(7);
+        var thread;
+        var isOpPost = $('#thread-' + num);
+
+        if (isOpPost.length) {
+            thread = num;
+        } else {
+            thread = $el.closest('.thread').attr('id').substr(7);
+        }
 
         if(timer_ms) {
             timers[num] = setTimeout(function(){

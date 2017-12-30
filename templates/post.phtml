@@ -9,9 +9,9 @@ use phpClub\Service\Helper;
 ?>
 
 <div id="post-<?= $post->getId() ?>" class="<?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
-    <div class="post <?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getId() ?>"" data-num="<?= $post->getId() ?>"">
+    <div class="post <?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getId() ?>" data-num="<?= $post->getId() ?>">
 
-    <div class="post-details" id="post-details-<?= $post->getId() ?>"">
+    <div class="post-details" id="post-details-<?= $post->getId() ?>">
     <input name="delete" class="turnmeoff" value="<?= $post->getId() ?>" type="checkbox">
 
     <span class="post-title"><?= $post->getTitle() ?></span>
