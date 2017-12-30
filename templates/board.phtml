@@ -8,6 +8,10 @@ require __DIR__ . '/base/boardHeader.phtml';
 
 <?php if (count($threads)): ?>
 
+    <?= $paginator->render($threads) ?>
+
+    <hr>
+
     <?php foreach ($threads as $thread) : ?>
         <section class="posts">
             <form id="posts-form">

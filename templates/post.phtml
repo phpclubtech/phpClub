@@ -35,13 +35,9 @@ use phpClub\Service\Helper;
 
     <?php if ($post->isFirstPost() && isset($thread)) : ?>
         <span class="archive-links">
-            <a href="<?= $urlGenerator->toDvachArchiveThread($thread) ?>">
-                <img src="<?= $urlGenerator->toDvachIcon() ?>" title="Искать в архиве 2ch.hk">
-            </a>
+            <a href="<?= $urlGenerator->toDvachArchiveThread($thread) ?>"><img src="<?= $urlGenerator->toDvachIcon() ?>" title="Искать в архиве 2ch.hk"></a>
             
-            <a href="<?= $urlGenerator->toArhivachThread($thread) ?>">
-                <img src="<?= $urlGenerator->toArhivachIcon() ?>" title="Искать в архиваче">
-            </a>
+            <a href="<?= $urlGenerator->toArhivachThread($thread) ?>"><img src="<?= $urlGenerator->toArhivachIcon() ?>" title="Искать в архиваче"></a>
             <i class="fa fa-chain"></i>
         </span>
     <?php endif; ?>

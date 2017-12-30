@@ -540,7 +540,6 @@ header {
 .post .webm-file {	border: 1px dashed #818181;}
 .post .close-webm {padding-left: 3px;}
 .post .post-message {overflow: auto;}
-.post.reply .post-message {  max-height: 600px;}
 
 .browser-ff .reply.withimg.expanded-media {min-width: 65em;} 
 
