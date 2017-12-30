@@ -80,7 +80,9 @@ class ArhivachThreadParser extends AbstractThreadParser
 
         if ($this->isOldArhivachThread($filePath)) {
             // Hack for old arhivach threads
-            return new File($filePath, str_replace('/img/', '/thumb/', $filePath), $post, 0, 0);
+            list($width, $height) = getimagesize($filePath);
+            
+            return new File($filePath, str_replace('/img/', '/thumb/', $filePath), $post, $height, $width);
         }
 
         $thumbXPath = '//div[@class="post_image"]/img';
@@ -93,7 +95,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');
         $clientName = count($clientNameNode) ? $clientNameNode->text() : null;
         
-        return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width, 0, $clientName);
+        return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width, $clientName);
     }
 
     /**

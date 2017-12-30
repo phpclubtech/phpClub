@@ -54,7 +54,6 @@ class File
         Post $post,
         int $height,
         int $width,
-        int $size = null,
         string $clientName = null
     ) {
         $this->path = $path;
@@ -62,7 +61,6 @@ class File
         $this->post = $post;
         $this->height = $height;
         $this->width = $width;
-        $this->size = $size;
         $this->clientName = $clientName;
     }
 
@@ -71,9 +69,19 @@ class File
         return $this->post;
     }
 
+    public function hasSize(): bool 
+    {
+        return !! $this->size;
+    }
+
     public function getSize(): int
     {
-        return $this->size ?: 0;
+        return $this->size;
+    }
+
+    public function setSize(int $size): void
+    {
+        $this->size = $size;
     }
 
     public function getHeight(): int

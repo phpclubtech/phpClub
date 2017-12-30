@@ -61,17 +61,25 @@ class BoardController
         $this->refLinkRepository = $refLinkRepository;
     }
 
-    public function indexAction(Request $request, Response $response, array $args = []): ResponseInterface
+    public function indexAction(Request $request, Response $response): ResponseInterface
     {
-        $template = $this->getOrSetCache('/board.phtml', [
-            'threads' => $this->threadRepository->getThreadsWithLastPosts($request->getParam('page', 1)),
-            'logged' => $this->authorizer->isLoggedIn()
-        ], 'bord_index' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false));
+        $page = $request->getParam('page', 1);
+
+        $viewArgs = [
+            'threads' => $this->threadRepository->getThreadsWithLastPosts($page),
+            'logged' => $this->authorizer->isLoggedIn(),
+        ];
+
+        if ($this->authorizer->isLoggedIn()) {
+            return $this->view->render($response, '/board.html', $viewArgs);
+        }
+
+        $template = $this->getOrSetCache('/board.phtml', $viewArgs, 'board_index' .  $page);
 
         return $this->renderHtml($response, $template);
     }
 
-    public function threadAction(Request $request, Response $response, array $args = []): ResponseInterface
+    public function threadAction(Request $request, Response $response, array $args): ResponseInterface
     {
         $thread = $this->threadRepository->find($args['thread']);
 
@@ -79,16 +87,21 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        $template = $this->getOrSetCache('/thread.phtml', [
+        $viewArgs = [
             'thread' => $thread,
-            'logged' => $this->authorizer->isLoggedIn()],
-            'thread_' . (int) $args['thread'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false)
-        );
+            'logged' => $this->authorizer->isLoggedIn(),
+        ];
+
+        if ($this->authorizer->isLoggedIn()) {
+            return $this->view->render($response, '/thread.html', $viewArgs);
+        }
+
+        $template = $this->getOrSetCache('/thread.phtml', $viewArgs, 'thread_' . $args['thread']);
 
         return $this->renderHtml($response, $template);
     }
 
-    public function chainAction(Request $request, Response $response, array $args = []): ResponseInterface
+    public function chainAction(Request $request, Response $response, array $args): ResponseInterface
     {
         $chain = $this->refLinkRepository->getChain((int) $args['post']);
 
@@ -96,13 +109,10 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        $template = $this->getOrSetCache('/chain.phtml', [
+        return $this->view->render($response, '/chain.phtml', [
             'posts' => $chain,
-            'logged' => $this->authorizer->isLoggedIn()],
-            'chain' . (int) $args['post'] .'_' . ($this->authorizer->isLoggedIn() ? $_COOKIE['token'] : false)
-        );
-
-        return $this->renderHtml($response, $template);
+            'logged' => $this->authorizer->isLoggedIn(),
+        ]);
     }
 
     /**
@@ -118,13 +128,12 @@ class BoardController
     public function getOrSetCache($template, array $data, string $nameCache)
     {
         $cache = $this->cache->get($nameCache);
+
         if (!$cache) {
-            $cache = $this->view->fetch(
-                $template,
-                $data
-            );
+            $cache = $this->view->fetch($template, $data);
             $this->cache->set($nameCache, $cache);
         }
+
         return $cache;
     }
 

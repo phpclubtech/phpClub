@@ -131,7 +131,8 @@ $di[ThreadImporter::class] = function (Container $di) {
         $di[$di['settings']['fileStorage']],
         $di[EntityManager::class],
         $di[LastPostUpdater::class],
-        $di[RefLinkGenerator::class]
+        $di[RefLinkGenerator::class],
+        $di[CacheInterface::class]
     );
 };
 
