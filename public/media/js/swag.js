@@ -225,7 +225,7 @@ window.Store = {
                 if (isOpPost.length) {
                     thread_num = num;
                 } else {
-                    thread_num = $el.closest('.thread').attr('id').substr(7);
+                    thread_num = this_el.closest('.thread').attr('id').substr(7);
                 }
 
                 that.addReplyTo(num);

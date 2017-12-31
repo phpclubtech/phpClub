@@ -19,19 +19,17 @@ use phpClub\Service\Helper;
 
     <span class="posttime-reflink">
         <span class="posttime"><?= $post->getDate()->format('Y/m/d H:i:s') ?>&nbsp;</span>
-        <span class="reflink">
 
+        <span class="reflink">
             <a href="<?= $urlGenerator->toPostAnchor($post) ?>"
                class="postbtn-reply-href"
                id="<?= $post->getId() ?>">№<?= $post->getId()?></a>
         </span>
     </span>
 
-    <?php if (isset($threads) and $post->isFirstPost()): ?>
-        <span class="desktop">
-            [<a class="orange" href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>]
-        </span>
-    <?php endif; ?>
+    <?php if (!$post->isOld()): ?>
+        <a href="<?= $urlGenerator->toChain($post) ?>"><i class="fa fa-link" aria-hidden="true"></i></a>
+    <?php endif ?>
 
     <?php if ($post->isFirstPost() && isset($thread)) : ?>
         <span class="archive-links">
@@ -42,9 +40,11 @@ use phpClub\Service\Helper;
         </span>
     <?php endif; ?>
 
-    <?php if (!$post->isOld()): ?>
-        | <a href="<?= $urlGenerator->toChain($post) ?>">Chain</a>
-    <?php endif ?>
+    <?php if (isset($threads) and $post->isFirstPost()): ?>
+        <span class="desktop">
+            [<a class="orange" href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>]
+        </span>
+    <?php endif; ?>
 
     <br class="turnmeoff">
 </div>
@@ -87,5 +87,5 @@ use phpClub\Service\Helper;
 </div>
 
 <?php if (isset($threads) and $post->isFirstPost()) : ?>
-    <span class="mess-post desktop">Нажмите <a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>, чтобы посмотреть.</span>
+    <span class="mess-post desktop">Нажмите <a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>, чтобы открыть.</span>
 <?php endif; ?>
