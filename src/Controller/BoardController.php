@@ -39,7 +39,7 @@ class BoardController
      * @var RefLinkGenerator
      */
     private $refLinkManager;
-    
+
     /**
      * @var RefLinkRepository
      */
@@ -67,14 +67,14 @@ class BoardController
 
         $viewArgs = [
             'threads' => $this->threadRepository->getThreadsWithLastPosts($page),
-            'logged' => $this->authorizer->isLoggedIn(),
+            'logged'  => $this->authorizer->isLoggedIn(),
         ];
 
         if ($this->authorizer->isLoggedIn()) {
             return $this->view->render($response, '/board.html', $viewArgs);
         }
 
-        $template = $this->getOrSetCache('/board.phtml', $viewArgs, 'board_index' .  $page);
+        $template = $this->getOrSetCache('/board.phtml', $viewArgs, 'board_index' . $page);
 
         return $this->renderHtml($response, $template);
     }
@@ -110,20 +110,22 @@ class BoardController
         }
 
         return $this->view->render($response, '/chain.phtml', [
-            'posts' => $chain,
+            'posts'  => $chain,
             'logged' => $this->authorizer->isLoggedIn(),
         ]);
     }
 
     /**
-     * Get html template cache by key or set html cache to cache by key
-     * 
-     * @param  string $template   path to template
-     * @param  array $data        array of attr inside template
-     * @param  string $nameCache  name key cache
-     * @return mixed              string of html template with set attr
+     * Get html template cache by key or set html cache to cache by key.
+     *
+     * @param string $template  path to template
+     * @param array  $data      array of attr inside template
+     * @param string $nameCache name key cache
+     *
      * @throws \Exception
      * @throws \Throwable
+     *
+     * @return mixed string of html template with set attr
      */
     public function getOrSetCache($template, array $data, string $nameCache)
     {
@@ -138,10 +140,11 @@ class BoardController
     }
 
     /**
-     * Render template by html string
+     * Render template by html string.
      *
      * @param Response $response
-     * @param string $html
+     * @param string   $html
+     *
      * @return Response
      */
     public function renderHtml(Response $response, string $html): Response

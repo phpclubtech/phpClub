@@ -1,9 +1,6 @@
 <?php
-namespace phpClub\Service;
 
-use phpClub\Entity\RefLink;
-use phpClub\Repository\PostRepository;
-use phpClub\Repository\RefLinkRepository;
+namespace phpClub\Service;
 
 class Helper
 {

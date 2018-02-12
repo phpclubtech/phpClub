@@ -22,7 +22,7 @@ class BaseEntityRepository extends EntityRepository
 
     public function remove($entity)
     {
-    	$this->getEntityManager()->remove($entity);
+        $this->getEntityManager()->remove($entity);
     }
 
     public function paginate($queryOrQueryBuilder, int $page, int $perPage): Pagerfanta

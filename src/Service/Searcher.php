@@ -3,12 +3,11 @@
  * Created by PhpStorm.
  * User: main
  * Date: 4/30/2017
- * Time: 8:57 PM
+ * Time: 8:57 PM.
  */
 
 namespace phpClub\Service;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use phpClub\Repository\PostRepository;
 
@@ -25,19 +24,19 @@ class Searcher
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         $posts = new ArrayCollection();
-        $ids = array();
+        $ids = [];
 
-        $query = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT 1000");
+        $query = $pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT 1000');
         $query->bindValue(':search', $searchQuery);
         $query->execute();
 
         $results = $query->fetchAll();
 
         foreach ($results as $result) {
-            $ids[]=$result['id'];
+            $ids[] = $result['id'];
         }
 
-        $posts = $this->postRepository->findBy(["id"=>$ids]);
+        $posts = $this->postRepository->findBy(['id'=>$ids]);
 
         return $posts;
     }

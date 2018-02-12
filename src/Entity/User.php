@@ -1,9 +1,10 @@
 <?php
+
 namespace phpClub\Entity;
 
 /**
-* @Entity(repositoryClass="phpClub\Repository\UserRepository")
-**/
+ * @Entity(repositoryClass="phpClub\Repository\UserRepository")
+ **/
 class User
 {
     /** @Id @Column(type="integer") @GeneratedValue **/

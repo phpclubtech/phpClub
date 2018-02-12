@@ -8,8 +8,8 @@ use Doctrine\ORM\EntityManager;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\Repository\ThreadRepository;
-use Tests\AbstractTestCase;
 use phpClub\ThreadImport\LastPostUpdater;
+use Tests\AbstractTestCase;
 
 class LastPostUpdaterTest extends AbstractTestCase
 {
@@ -41,7 +41,7 @@ class LastPostUpdaterTest extends AbstractTestCase
         $threads = $this->prepareThreads();
 
         $this->lastPostUpdater->updateLastPosts($threads);
-        
+
         $expectedLastPosts = [
             [15, 16],
             [11, 12, 13, 14],
@@ -51,12 +51,14 @@ class LastPostUpdaterTest extends AbstractTestCase
 
         /** @var Thread[] $threadsWithLastPosts */
         $threadsWithLastPosts = $this->threadRepository->getThreadsWithLastPosts();
-        
+
         foreach ($threadsWithLastPosts as $thread) {
             $postIds = $thread->getLastPosts()
-                ->map(function (Post $post) { return $post->getId(); })
+                ->map(function (Post $post) {
+                    return $post->getId();
+                })
                 ->toArray();
-            
+
             $this->assertEquals($postIds, current($expectedLastPosts));
             next($expectedLastPosts);
         }
@@ -86,9 +88,9 @@ class LastPostUpdaterTest extends AbstractTestCase
         for ($i = $fromId; $i < $toId; $i++) {
             $thread->addPost($this->createPost($i, $thread));
         }
-        
+
         $this->entityManager->persist($thread);
-        
+
         return $thread;
     }
 

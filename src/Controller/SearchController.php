@@ -3,22 +3,21 @@
  * Created by PhpStorm.
  * User: main
  * Date: 4/30/2017
- * Time: 8:55 PM
+ * Time: 8:55 PM.
  */
 
 namespace phpClub\Controller;
 
-use Slim\Http\Response;
-use Slim\Http\Request;
-use Psr\Http\Message\ResponseInterface;
-use Slim\Views\PhpRenderer as View;
-use phpClub\Service\Searcher;
 use phpClub\Service\Authorizer;
+use phpClub\Service\Searcher;
+use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Views\PhpRenderer as View;
 
 /**
- * Class SearchController
+ * Class SearchController.
  *
- * @package phpClub\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class SearchController
@@ -49,10 +48,9 @@ class SearchController
 
     public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
-
         return $this->view->render($response, '/searchResults.phtml', [
             'logged' => $this->authorizer->isLoggedIn(),
-            'posts' => $this->searcher->search($args['searchQuery'])
+            'posts'  => $this->searcher->search($args['searchQuery']),
         ]);
     }
 }

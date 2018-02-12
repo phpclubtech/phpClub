@@ -14,7 +14,7 @@ class Paginator
         }
 
         $view = new DefaultView();
-        
+
         return $view->render($pagerfanta, [$this, 'generateRoute'], [
             'container_template' => '<nav class="pagerfanta">%pages%</nav>',
         ]);
@@ -22,6 +22,6 @@ class Paginator
 
     public function generateRoute(int $page): string
     {
-         return '/?page=' . $page;
+        return '/?page=' . $page;
     }
 }

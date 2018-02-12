@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use phpClub\FileStorage\FileStorageInterface;
 use Doctrine\ORM\EntityManager;
-use phpClub\ThreadImport\{RefLinkGenerator, ThreadImporter, LastPostUpdater};
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
+use phpClub\FileStorage\FileStorageInterface;
+use phpClub\ThreadImport\LastPostUpdater;
+use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\DvachThreadParser;
 use PHPUnit\Framework\TestCase;
-use phpClub\Entity\{File, Post, Thread};
 use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 
 abstract class AbstractTestCase extends TestCase
 {
     private static $container;
-    
+
     public function createThread($id): Thread
     {
         return new Thread($id);
@@ -50,7 +54,7 @@ abstract class AbstractTestCase extends TestCase
         if (!self::$container) {
             self::$container = require_once __DIR__ . '/../src/Bootstrap.php';
         }
-        
+
         return self::$container;
     }
 
@@ -59,9 +63,9 @@ abstract class AbstractTestCase extends TestCase
         /** @var DvachThreadParser $parser */
         $parser = $this->getContainer()->get(DvachThreadParser::class);
         $thread = $parser->extractThread(file_get_contents($pathToHtml));
-        
+
         // TODO: use resource
-        $fileStorage = new class implements FileStorageInterface {
+        $fileStorage = new class() implements FileStorageInterface {
             public function put(string $path, string $directory): string
             {
                 return __DIR__ . '/FileStorage/1.png';

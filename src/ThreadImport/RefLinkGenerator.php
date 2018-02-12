@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace phpClub\ThreadImport;
 
 use Doctrine\ORM\EntityManagerInterface;
-use phpClub\Entity\{Post, RefLink, Thread};
+use phpClub\Entity\Post;
+use phpClub\Entity\RefLink;
+use phpClub\Entity\Thread;
 
 class RefLinkGenerator
 {
@@ -36,9 +38,9 @@ class RefLinkGenerator
     }
 
     /**
-     * @param Post $forPost
+     * @param Post      $forPost
      * @param Post|null $reference
-     * @param int $depth
+     * @param int       $depth
      */
     private function recursiveInsertChain(Post $forPost, Post $reference = null, int $depth = 0): void
     {
@@ -48,7 +50,7 @@ class RefLinkGenerator
             $reflink = new Reflink($forPost, $forPost, $depth);
             $this->em->persist($reflink);
         }
-        
+
         $references = $this->parseReferences($reference);
 
         foreach ($references as $r) {
@@ -66,6 +68,7 @@ class RefLinkGenerator
 
     /**
      * @param Post $post
+     *
      * @return array
      */
     private function parseReferences(Post $post): array

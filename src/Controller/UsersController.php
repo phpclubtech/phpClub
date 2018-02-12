@@ -3,21 +3,20 @@
  * Created by PhpStorm.
  * User: main
  * Date: 4/30/2017
- * Time: 9:24 PM
+ * Time: 9:24 PM.
  */
 
 namespace phpClub\Controller;
 
-use Slim\Http\Response;
-use Slim\Http\Request;
-use Psr\Http\Message\ResponseInterface;
-use Slim\Views\PhpRenderer as View;
 use phpClub\Service\Authorizer;
+use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Views\PhpRenderer as View;
 
 /**
- * Class UsersController
+ * Class UsersController.
  *
- * @package phpClub\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class UsersController
@@ -92,7 +91,7 @@ class UsersController
             '/configure.phtml',
             [
                 'errors' => [],
-                'logged' => $user
+                'logged' => $user,
             ]
         );
     }

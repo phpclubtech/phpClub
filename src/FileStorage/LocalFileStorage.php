@@ -20,7 +20,7 @@ class LocalFileStorage implements FileStorageInterface
 
     /**
      * @param Filesystem $filesystem
-     * @param string $uploadRoot
+     * @param string     $uploadRoot
      */
     public function __construct(Filesystem $filesystem, string $uploadRoot)
     {
@@ -31,6 +31,7 @@ class LocalFileStorage implements FileStorageInterface
     /**
      * @param string $path
      * @param string $directory
+     *
      * @return string
      */
     public function put(string $path, string $directory): string
@@ -47,6 +48,7 @@ class LocalFileStorage implements FileStorageInterface
     /**
      * @param string $path
      * @param string $directory
+     *
      * @return bool
      */
     public function isFileExist(string $path, string $directory): bool

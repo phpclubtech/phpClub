@@ -9,8 +9,9 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use phpClub\BoardClient\DvachClient;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
 use PHPUnit\Framework\TestCase;
-use phpClub\Entity\{Thread, Post};
 
 class DvachClientTest extends TestCase
 {
@@ -30,7 +31,7 @@ class DvachClientTest extends TestCase
         /** @var Thread $phpThread93a */
         $phpThread93a = current($phpThreads);
         $this->assertCount(9, $phpThread93a->getPosts());
-        
+
         /** @var Post $opPost */
         $opPost = $phpThread93a->getPosts()->first();
         $this->assertCount(4, $opPost->getFiles());
@@ -39,7 +40,7 @@ class DvachClientTest extends TestCase
         $this->assertEquals(500, $opPost->getFiles()->first()->getHeight());
         $this->assertEquals(683, $opPost->getFiles()[1]->getHeight());
         $this->assertEquals('Аноним', $opPost->getAuthor());
-        
+
         $thirdPost = $phpThread93a->getPosts()[2];
         $this->assertContains('Первый в этом ИТТ треде.', $thirdPost->getText());
         $this->assertCount(1, $thirdPost->getFiles());
@@ -62,6 +63,7 @@ class DvachClientTest extends TestCase
         $mockHandler = new MockHandler($responses);
         $stack = HandlerStack::create($mockHandler);
         $client = new Client(['handler' => $stack]);
+
         return new DvachClient($client);
     }
 }
