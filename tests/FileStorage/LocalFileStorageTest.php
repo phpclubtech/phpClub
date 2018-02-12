@@ -22,15 +22,15 @@ class LocalFileStorageTest extends AbstractTestCase
         $testDirectory = vfsStream::setup();
         $this->fileStorage = new LocalFileStorage(new Filesystem(), $testDirectory->url());
     }
-    
+
     public function testFileStorage()
     {
         $file = $this->createFile(1);
 
         $this->assertFalse($this->fileStorage->isFileExist($file->getPath(), '92'));
-        
+
         $newPath = $this->fileStorage->put($file->getPath(), '92');
-        
+
         $this->assertTrue($this->fileStorage->isFileExist($file->getPath(), '92'));
         $this->assertNotEmpty($newPath);
     }
@@ -41,7 +41,7 @@ class LocalFileStorageTest extends AbstractTestCase
     public function testThrowsOnInvalidFilePath()
     {
         $file = new File('not-exists', 'not-exists', $this->createPost(1), 100, 100);
-        
+
         $this->fileStorage->put($file->getPath(), '92');
     }
 }

@@ -1,16 +1,17 @@
 <?php
+
 namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-/** 
-* @Entity(repositoryClass="phpClub\Repository\ThreadRepository")
-**/
+/**
+ * @Entity(repositoryClass="phpClub\Repository\ThreadRepository")
+ **/
 class Thread
 {
     /** @Id @Column(type="integer") **/
     private $id;
-    
+
     /**
      * @OneToMany(targetEntity="Post", mappedBy="thread", cascade={"all"})
      **/

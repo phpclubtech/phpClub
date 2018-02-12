@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\ThreadImport;
 
+use Doctrine\ORM\EntityManager;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
-use Doctrine\ORM\EntityManager;
 use phpClub\ThreadImport\RefLinkGenerator;
 use Tests\AbstractTestCase;
 
@@ -28,7 +28,7 @@ class RefLinkGeneratorTest extends AbstractTestCase
      * @var ThreadRepository
      */
     private $threadRepository;
-    
+
     /**
      * @var RefLinkRepository
      */
@@ -56,9 +56,11 @@ class RefLinkGeneratorTest extends AbstractTestCase
 
         foreach ($chains as $postId => $expectedChain) {
             $givenChain = $this->refLinkRepository->getChain($postId)
-                ->map(function (Post $post) { return $post->getId(); })
+                ->map(function (Post $post) {
+                    return $post->getId();
+                })
                 ->toArray();
-            
+
             $this->assertEquals($expectedChain, $givenChain);
         }
     }
@@ -82,11 +84,11 @@ class RefLinkGeneratorTest extends AbstractTestCase
                     825750 => [825576, 825608, 825667, 825684, 825750, 825768, 825875, 825969],
                     // Post is not exists
                     99999999999 => [],
-                ]
+                ],
             ],
         ];
     }
-    
+
     public function tearDown()
     {
         $this->entityManager->getConnection()->rollBack();

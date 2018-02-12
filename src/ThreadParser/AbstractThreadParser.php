@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use phpClub\Entity\{File, Post, Thread};
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
 use Symfony\Component\DomCrawler\Crawler;
 
 abstract class AbstractThreadParser
@@ -41,8 +43,10 @@ abstract class AbstractThreadParser
     /**
      * @param string $threadHtml
      * @param string $threadPath
-     * @return Thread
+     *
      * @throws \Exception
+     *
+     * @return Thread
      */
     public function extractThread(string $threadHtml, string $threadPath = ''): Thread
     {
@@ -68,11 +72,11 @@ abstract class AbstractThreadParser
                 $this->extractText($postNode),
                 $thread
             );
-            
+
             if (!$this->isThreadWithMissedFiles($thread)) {
                 $post->addFiles($this->extractFiles($postNode, $post, $threadPath));
             }
-            
+
             $thread->addPost($post);
         };
 
@@ -83,13 +87,15 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @return int
+     *
      * @throws \Exception
+     *
+     * @return int
      */
     protected function extractId(Crawler $postNode): int
     {
         $idXPath = $this->getIdXPath();
-        $idNode  = $postNode->filterXPath($idXPath);
+        $idNode = $postNode->filterXPath($idXPath);
 
         if (!count($idNode)) {
             throw new \Exception("Unable to parse post id, HTML: {$postNode->html()}");
@@ -102,12 +108,13 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
+     *
      * @return string
      */
     protected function extractTitle(Crawler $postNode): string
     {
         $titleXPath = $this->getTitleXPath();
-        $titleNode  = $postNode->filterXPath($titleXPath);
+        $titleNode = $postNode->filterXPath($titleXPath);
 
         if (!count($titleNode)) {
             return '';
@@ -118,13 +125,15 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @return string
+     *
      * @throws \Exception
+     *
+     * @return string
      */
     protected function extractAuthor(Crawler $postNode): string
     {
         $authorXPath = $this->getAuthorXPath();
-        $authorNode  = $postNode->filterXPath($authorXPath);
+        $authorNode = $postNode->filterXPath($authorXPath);
 
         if (!count($authorNode)) {
             throw new \Exception("Unable to parse post author, HTML: {$postNode->html()}");
@@ -135,13 +144,15 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @return \DateTimeImmutable
+     *
      * @throws \Exception
+     *
+     * @return \DateTimeImmutable
      */
     protected function extractDate(Crawler $postNode): \DateTimeImmutable
     {
         $dateXPath = $this->getDateXPath();
-        $dateNode  = $postNode->filterXPath($dateXPath);
+        $dateNode = $postNode->filterXPath($dateXPath);
 
         if (!count($dateNode)) {
             throw new \Exception("Unable to parse post date, HTML: {$postNode->html()}");
@@ -152,13 +163,15 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @return string
+     *
      * @throws \Exception
+     *
+     * @return string
      */
     protected function extractText(Crawler $postNode): string
     {
         $textXPath = $this->getTextXPath();
-        $textNode  = $postNode->filterXPath($textXPath);
+        $textNode = $postNode->filterXPath($textXPath);
 
         if (!count($textNode)) {
             throw new \Exception("Unable to parse post text, HTML: {$postNode->html()}");
@@ -169,8 +182,9 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @param Post $post
-     * @param string $threadPath
+     * @param Post    $post
+     * @param string  $threadPath
+     *
      * @return File[]
      */
     protected function extractFiles(Crawler $postNode, Post $post, string $threadPath): array
@@ -198,7 +212,7 @@ abstract class AbstractThreadParser
     {
         // 345388 - Thread #15 (Google cache)
         $threadsWithMissedFiles = ['345388'];
-        
+
         return in_array($thread->getId(), $threadsWithMissedFiles, $strict = true);
     }
 }

@@ -6,8 +6,8 @@ namespace phpClub\BoardClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\Entity\Thread;
+use phpClub\ThreadParser\ArhivachThreadParser;
 
 class ArhivachClient
 {
@@ -32,10 +32,10 @@ class ArhivachClient
     private $password;
 
     /**
-     * @param Client $guzzle
+     * @param Client               $guzzle
      * @param ArhivachThreadParser $threadParser
-     * @param string $email
-     * @param string $password
+     * @param string               $email
+     * @param string               $password
      */
     public function __construct(
         Client $guzzle,
@@ -51,44 +51,49 @@ class ArhivachClient
 
     /**
      * @param string[] $threadUrls
+     *
      * @return Thread[]
      */
     public function getPhpThreads(array $threadUrls = null): array
     {
         return array_map(function ($threadUrl) {
             $threadHtml = (string) $this->guzzle->get($threadUrl)->getBody();
+
             return $this->threadParser->extractThread($threadHtml);
         }, $threadUrls);
     }
 
     /**
      * @param Thread $thread
+     *
      * @return bool
      */
     public function isThreadArchived(Thread $thread): bool
     {
         $url = $this->generateArchiveLink($thread);
-        
+
         try {
             $this->guzzle->get($url);
         } catch (ClientException $e) {
             return false;
         }
-        
+
         return true;
     }
 
     /**
      * @param Thread $thread
+     *
      * @return string
      */
-    public function generateArchiveLink(Thread $thread): string 
+    public function generateArchiveLink(Thread $thread): string
     {
         return "http://arhivach.org/ajax/?act=locate_thread&url=https://2ch.hk/pr/res/{$thread->getId()}.html";
     }
 
     /**
      * @param Thread $thread
+     *
      * @return void
      */
     public function archive(Thread $thread): void

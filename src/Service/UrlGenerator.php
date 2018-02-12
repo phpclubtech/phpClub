@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace phpClub\Service;
 
-use phpClub\Entity\{Thread, Post};
 use phpClub\BoardClient\ArhivachClient;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
 use Slim\Interfaces\RouterInterface;
 
 class UrlGenerator
@@ -14,7 +15,7 @@ class UrlGenerator
      * @var RouterInterface
      */
     private $router;
-    
+
     /**
      * @var ArhivachClient
      */
@@ -51,7 +52,7 @@ class UrlGenerator
         // TODO: implement
         return '';
     }
-    
+
     public function toDvachIcon()
     {
         return '/media/images/2ch.ico';

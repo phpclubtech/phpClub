@@ -7,8 +7,8 @@ namespace phpClub\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
-* @Entity(repositoryClass="phpClub\Repository\PostRepository")
-**/
+ * @Entity(repositoryClass="phpClub\Repository\PostRepository")
+ **/
 class Post
 {
     /** @Id @Column(type="integer") **/
@@ -25,7 +25,7 @@ class Post
 
     /** @Column(type="boolean") */
     private $isOpPost;
-    
+
     /** @Column(type="boolean") */
     private $isFirstPost;
 
@@ -34,7 +34,7 @@ class Post
 
     /** @Column(type="string") **/
     private $author;
-    
+
     /**
      * @OneToMany(targetEntity="File", mappedBy="post", cascade={"all"})
      **/
@@ -126,7 +126,7 @@ class Post
 
     public function isOpPost(): bool
     {
-        return !! $this->isOpPost;
+        return (bool) $this->isOpPost;
     }
 
     public function isFirstPost(): bool

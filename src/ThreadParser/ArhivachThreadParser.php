@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use phpClub\Entity\{File, Post};
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ArhivachThreadParser extends AbstractThreadParser
@@ -46,13 +47,15 @@ class ArhivachThreadParser extends AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @return string
+     *
      * @throws \Exception
+     *
+     * @return string
      */
     protected function extractAuthor(Crawler $postNode): string
     {
         $authorXPath = $this->getAuthorXPath();
-        $authorNode  = $postNode->filterXPath($authorXPath);
+        $authorNode = $postNode->filterXPath($authorXPath);
 
         if (!count($authorNode)) {
             return '';
@@ -63,9 +66,11 @@ class ArhivachThreadParser extends AbstractThreadParser
 
     /**
      * @param Crawler $fileNode
-     * @param Post $post
-     * @return File
+     * @param Post    $post
+     *
      * @throws \Exception
+     *
+     * @return File
      */
     protected function extractFile(Crawler $fileNode, Post $post): File
     {
@@ -81,7 +86,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         if ($this->isOldArhivachThread($filePath)) {
             // Hack for old arhivach threads
             list($width, $height) = getimagesize($filePath);
-            
+
             return new File($filePath, str_replace('/img/', '/thumb/', $filePath), $post, $height, $width);
         }
 
@@ -94,15 +99,16 @@ class ArhivachThreadParser extends AbstractThreadParser
 
         $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');
         $clientName = count($clientNameNode) ? $clientNameNode->text() : null;
-        
+
         return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width, $clientName);
     }
 
     /**
      * @param string $fileName
+     *
      * @return bool
      */
-    private function isOldArhivachThread(string $fileName): bool 
+    private function isOldArhivachThread(string $fileName): bool
     {
         return strpos($fileName, 'abload.de') !== false;
     }

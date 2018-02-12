@@ -8,8 +8,10 @@ class DateConverter
 {
     /**
      * @param string $date
-     * @return \DateTimeImmutable
+     *
      * @throws \Exception
+     *
+     * @return \DateTimeImmutable
      */
     public function toDateTime(string $date): \DateTimeImmutable
     {
@@ -30,6 +32,7 @@ class DateConverter
 
     /**
      * @param string $date
+     *
      * @return string
      */
     private function normalizeDate(string $date): string
@@ -50,7 +53,7 @@ class DateConverter
         ];
 
         $withEngMonths = strtr($date, $rusToEng);
-        
+
         return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths));
     }
 }

@@ -3,15 +3,13 @@
  * Created by PhpStorm.
  * User: main
  * Date: 4/30/2017
- * Time: 5:50 PM
+ * Time: 5:50 PM.
  */
 
 namespace phpClub\Service;
 
-use Doctrine\ORM\EntityManager;
 use phpClub\Entity\User;
 use phpClub\Repository\UserRepository;
-use Symfony\Component\Cache\Simple\FilesystemCache;
 
 class Authorizer
 {
@@ -60,7 +58,7 @@ class Authorizer
             $errors = Validator::validateRegistrationPost($post);
 
             if ($this->userRepository->findOneBy(['email' => $post['email']])) {
-                $errors['email'] = "Почта уже занята";
+                $errors['email'] = 'Почта уже занята';
             }
 
             if (empty($errors)) {
@@ -181,12 +179,12 @@ class Authorizer
     }
 
     public function logout()
-    {        
+    {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (Validator::validateToken($_POST['token']) and $this->isLoggedIn()) {
-                setcookie('id', null, time()-1, '/');
-                setcookie('hash', null, time()-1, '/');
-                setcookie('token', null, time()-1, '/');
+                setcookie('id', null, time() - 1, '/');
+                setcookie('hash', null, time() - 1, '/');
+                setcookie('token', null, time() - 1, '/');
             }
         }
     }

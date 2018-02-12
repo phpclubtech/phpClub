@@ -1,9 +1,7 @@
 <?php
-namespace phpClub\Repository;
 
-use phpClub\Repository\BaseEntityRepository;
+namespace phpClub\Repository;
 
 class PostRepository extends BaseEntityRepository
 {
-
 }

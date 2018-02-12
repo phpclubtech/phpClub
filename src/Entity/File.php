@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace phpClub\Entity;
 
 /**
-* @Entity(repositoryClass="phpClub\Repository\FileRepository")
-**/
+ * @Entity(repositoryClass="phpClub\Repository\FileRepository")
+ **/
 class File
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
     private $id;
-        
+
     /**
      * @var string
      * @Column(type="string")
      */
     private $path;
-    
+
     /**
      * @var string
      * @Column(type="string")
@@ -34,7 +34,7 @@ class File
     private $height;
 
     /**
-     * The client-provided file name
+     * The client-provided file name.
      *
      * @var string
      * @Column(type="string", nullable=true)
@@ -69,9 +69,9 @@ class File
         return $this->post;
     }
 
-    public function hasSize(): bool 
+    public function hasSize(): bool
     {
-        return !! $this->size;
+        return (bool) $this->size;
     }
 
     public function getSize(): int
@@ -94,7 +94,7 @@ class File
         return $this->width;
     }
 
-    public function getPath(): string 
+    public function getPath(): string
     {
         return $this->path;
     }

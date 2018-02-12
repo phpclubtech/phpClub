@@ -1,9 +1,10 @@
 <?php
+
 namespace phpClub\Entity;
 
 /**
-* @Entity(repositoryClass="phpClub\Repository\RefLinkRepository")
-**/
+ * @Entity(repositoryClass="phpClub\Repository\RefLinkRepository")
+ **/
 class RefLink
 {
     /** @Id @Column(type="integer") @GeneratedValue **/

@@ -38,7 +38,7 @@ class ThreadImporter
      * @var RefLinkGenerator
      */
     private $refLinkManager;
-    
+
     /**
      * @var CacheInterface
      */
@@ -80,6 +80,7 @@ class ThreadImporter
 
     /**
      * @param Thread[] $threads
+     *
      * @return void
      */
     private function cascadeRemoveThreads(array $threads): void
@@ -117,7 +118,7 @@ class ThreadImporter
     private function updateFileSize(File $file): void
     {
         if (!$file->hasSize()) {
-            // TODO: use FileStorageInterface::getResource() 
+            // TODO: use FileStorageInterface::getResource()
             $file->setSize((int) (filesize(__DIR__ . '/../../public/' . $file->getPath()) / 1024));
         }
     }

@@ -20,7 +20,7 @@ class PaginatorTest extends AbstractTestCase
     {
         $this->paginator = $this->getContainer()->get(Paginator::class);
     }
-    
+
     public function testPaginatorIsNotRenderedWhenItemsCountIsLessThanMaxPerPage()
     {
         $pagerfanta = (new Pagerfanta(new ArrayAdapter([1, 2, 3, 4])))->setMaxPerPage(10);

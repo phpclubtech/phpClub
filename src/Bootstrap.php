@@ -2,69 +2,76 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Doctrine\Common\Cache\FilesystemCache as DoctrineCache;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
-use phpClub\Controller\{BoardController, SearchController, UsersController};
-use phpClub\Entity\{Post, Thread, User};
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use phpClub\BoardClient\ArhivachClient;
+use phpClub\BoardClient\DvachClient;
+use phpClub\Command\ImportThreadsCommand;
+use phpClub\Controller\BoardController;
+use phpClub\Controller\SearchController;
+use phpClub\Controller\UsersController;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
+use phpClub\Entity\User;
+use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\ThreadImport\RefLinkGenerator;
-use phpClub\ThreadParser\DateConverter;
-use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\Service\Paginator;
 use phpClub\Service\Searcher;
-use phpClub\Command\ImportThreadsCommand;
-use phpClub\FileStorage\LocalFileStorage;
-use phpClub\ThreadImport\ThreadImporter;
 use phpClub\Service\UrlGenerator;
-use phpClub\BoardClient\ArhivachClient;
-use phpClub\BoardClient\DvachClient;
+use phpClub\ThreadImport\LastPostUpdater;
+use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\ArhivachThreadParser;
+use phpClub\ThreadParser\DateConverter;
 use phpClub\ThreadParser\DvachThreadParser;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
-use Slim\Http\{Request, Response};
-use Symfony\Component\Cache\Simple\{ArrayCache, FilesystemCache};
-use Doctrine\Common\Cache\FilesystemCache as DoctrineCache;
-use Kevinrob\GuzzleCache\CacheMiddleware;
-use GuzzleHttp\{HandlerStack, Client};
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Slim\Views\PhpRenderer;
+use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
 $slimConfig = [
     'settings' => [
         'displayErrorDetails' => getenv('APP_ENV') !== 'prod',
-        'fileStorage' => LocalFileStorage::class,
+        'fileStorage'         => LocalFileStorage::class,
     ],
     'connections' => [
         'mysql' => [
-            'driver' => 'pdo_mysql',
-            'charset' => 'utf8',
-            'host' => getenv('DB_HOST'),
-            'user' => getenv('DB_USER'),
+            'driver'   => 'pdo_mysql',
+            'charset'  => 'utf8',
+            'host'     => getenv('DB_HOST'),
+            'user'     => getenv('DB_USER'),
             'password' => getenv('DB_PASSWORD'),
-            'dbname' => getenv('DB_NAME'),
+            'dbname'   => getenv('DB_NAME'),
         ],
         'mysql_test' => [
-            'driver' => 'pdo_mysql',
-            'charset' => 'utf8',
-            'host' => getenv('DB_HOST'),
-            'user' => getenv('DB_USER'),
+            'driver'   => 'pdo_mysql',
+            'charset'  => 'utf8',
+            'host'     => getenv('DB_HOST'),
+            'user'     => getenv('DB_USER'),
             'password' => getenv('DB_PASSWORD'),
-            'dbname' => getenv('TEST_DB_NAME'),
-        ]
+            'dbname'   => getenv('TEST_DB_NAME'),
+        ],
     ],
 ];
 
 $di = new Container($slimConfig);
 
 $di[EntityManager::class] = function (Container $di): EntityManager {
-    $paths     = array(__DIR__ . "/Entity/");
+    $paths = [__DIR__ . '/Entity/'];
     $isDevMode = false;
 
     $config = getenv('APP_ENV') === 'test' ? $di['connections']['mysql_test'] : $di['connections']['mysql'];
@@ -170,7 +177,7 @@ $di[PhpRenderer::class] = function (Container $di): PhpRenderer {
     return new PhpRenderer(__DIR__ . '/../templates', [
         // Shared variables
         'urlGenerator' => $di->get(UrlGenerator::class),
-        'paginator' => $di->get(Paginator::class),
+        'paginator'    => $di->get(Paginator::class),
     ]);
 };
 

@@ -6,13 +6,13 @@ class Validator
 {
     const PHPREGEXP = "/^(Клуб)[\s\w\W]*(PHP)[\s\w\W]*$/ui";
 
-    const EMAIL_ERROR = "Некорректный адрес";
-    const NAME_ERROR = "Имя должно быть короче 20 русских или английских символов";
-    const PASSWORD_ERROR = "Пароль должен быть длиньше 6 символов и короче 20";
-    const RETRY_PASSWORD_ERROR = "Пароли не совпадают";
-    const NO_MATCHES = "Совпадений не найдено";
+    const EMAIL_ERROR = 'Некорректный адрес';
+    const NAME_ERROR = 'Имя должно быть короче 20 русских или английских символов';
+    const PASSWORD_ERROR = 'Пароль должен быть длиньше 6 символов и короче 20';
+    const RETRY_PASSWORD_ERROR = 'Пароли не совпадают';
+    const NO_MATCHES = 'Совпадений не найдено';
 
-    const ARCHIVE_LINK_ERROR = "Ссылка должна начинаться с http(s):// и ссылаться либо на 2ch.hk/pr/arch/... либо на arhivach.org/thread/...";
+    const ARCHIVE_LINK_ERROR = 'Ссылка должна начинаться с http(s):// и ссылаться либо на 2ch.hk/pr/arch/... либо на arhivach.org/thread/...';
 
     public static function validateThreadSubject($subject)
     {
@@ -76,26 +76,26 @@ class Validator
 
     public static function isPasswordsEquals($password, $retryPassword): bool
     {
-        return ($password === $retryPassword);
+        return $password === $retryPassword;
     }
 
     public static function validateRegistrationPost($post)
     {
-        $errors = array();
+        $errors = [];
 
-        if (!Validator::validateEmail($post['email'])) {
+        if (!self::validateEmail($post['email'])) {
             $errors['email'] = self::EMAIL_ERROR;
         }
 
-        if (!Validator::validateName($post['name'])) {
+        if (!self::validateName($post['name'])) {
             $errors['name'] = self::NAME_ERROR;
         }
 
-        if (!Validator::validatePassword($post['password'])) {
+        if (!self::validatePassword($post['password'])) {
             $error['password'] = self::PASSWORD_ERROR;
         }
 
-        if (!Validator::isPasswordsEquals($post['password'], $post['retryPassword'])) {
+        if (!self::isPasswordsEquals($post['password'], $post['retryPassword'])) {
             $errors['retryPassword'] = self::RETRY_PASSWORD_ERROR;
         }
 
@@ -106,11 +106,11 @@ class Validator
     {
         $errors = [];
 
-        if (!Validator::validateEmail($post['email'])) {
+        if (!self::validateEmail($post['email'])) {
             $errors['email'] = self::EMAIL_ERROR;
         }
 
-        if (!Validator::validatePassword($post['password'])) {
+        if (!self::validatePassword($post['password'])) {
             $errors['password'] = self::PASSWORD_ERROR;
         }
 
@@ -120,7 +120,7 @@ class Validator
     public static function validateToken($token)
     {
         if (isset($_COOKIE['token'])) {
-            if ($token != "" and $_COOKIE['token'] != "" and $token === $_COOKIE['token']) {
+            if ($token != '' and $_COOKIE['token'] != '' and $token === $_COOKIE['token']) {
                 return true;
             }
         }

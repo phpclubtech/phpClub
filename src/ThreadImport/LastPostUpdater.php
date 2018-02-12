@@ -22,7 +22,7 @@ class LastPostUpdater
     public function updateLastPosts(array $threads): void
     {
         assert(count($threads));
-        
+
         $threadIds = array_map(function (Thread $thread) {
             return $thread->getId();
         }, $threads);
@@ -36,7 +36,7 @@ class LastPostUpdater
                                JOIN post p2 ON p.thread_id = p2.thread_id AND p.id <= p2.id AND p.thread_id IN (?)
                                GROUP BY p.thread_id, p.id
                                HAVING COUNT(*) <= 3 OR p.thread_id = p.id';
-        
+
         $this->connection->executeQuery($insertLastPostsSql, [$threadIds], [Connection::PARAM_INT_ARRAY]);
     }
 }

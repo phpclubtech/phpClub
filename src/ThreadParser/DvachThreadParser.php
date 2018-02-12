@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use phpClub\Entity\{File, Post};
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
 use Symfony\Component\DomCrawler\Crawler;
 
 class DvachThreadParser extends AbstractThreadParser
@@ -51,26 +52,30 @@ class DvachThreadParser extends AbstractThreadParser
 
     /**
      * @param Crawler $fileNode
-     * @param Post $post
-     * @return File
+     * @param Post    $post
+     *
      * @throws \Exception
+     *
+     * @return File
      */
     protected function extractFile(Crawler $fileNode, Post $post): File
     {
         list(, $fullName, $thumbName, $width, $height) = $this->extractOnClickJsArgs($fileNode);
-        
-        return new File(ltrim($fullName, "'"), $thumbName, $post, (int)$height, (int)$width);
+
+        return new File(ltrim($fullName, "'"), $thumbName, $post, (int) $height, (int) $width);
     }
 
     /**
      * @param Crawler $fileNode
-     * @return array
+     *
      * @throws \Exception
+     *
+     * @return array
      */
     private function extractOnClickJsArgs(Crawler $fileNode): array
     {
         $argsXPath = '//div[@class="image-link"]/a/@onclick | //a[@name="expandfunc"]/@onclick';
-        $argsNode  = $fileNode->filterXPath($argsXPath);
+        $argsNode = $fileNode->filterXPath($argsXPath);
 
         if (!count($argsNode)) {
             throw new \Exception("Unable to find expand params, HTML: {$fileNode->html()}");

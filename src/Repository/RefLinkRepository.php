@@ -1,15 +1,17 @@
 <?php
+
 namespace phpClub\Repository;
 
-use phpClub\Entity\RefLink;
 use Doctrine\Common\Collections\ArrayCollection;
+use phpClub\Entity\RefLink;
 
 class RefLinkRepository extends BaseEntityRepository
 {
     /**
-    * @param int $postId
-    * @return ArrayCollection
-    */
+     * @param int $postId
+     *
+     * @return ArrayCollection
+     */
     public function getChain(int $postId): ArrayCollection
     {
         /** @var RefLink[] $chain */

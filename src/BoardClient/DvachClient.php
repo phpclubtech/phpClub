@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace phpClub\BoardClient;
 
-use phpClub\Entity\{Thread, Post, File};
 use GuzzleHttp\Client;
+use phpClub\Entity\File;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
 
 class DvachClient
 {
@@ -38,24 +40,27 @@ class DvachClient
         $threads = $responseJson['threads'];
 
         $phpThreadsArray = array_filter($threads, [$this, 'looksLikePhpThread']);
-        $phpThreads      = array_map([$this, 'extractThread'], $phpThreadsArray);
+        $phpThreads = array_map([$this, 'extractThread'], $phpThreadsArray);
 
         return $phpThreads;
     }
 
     /**
      * @param array $threadArray
+     *
      * @return bool
      */
     private function looksLikePhpThread(array $threadArray): bool
     {
-        return !! preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
+        return (bool) preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
     }
 
     /**
      * @param array $phpThread
-     * @return Thread
+     *
      * @throws \Exception
+     *
+     * @return Thread
      */
     private function extractThread(array $phpThread): Thread
     {
@@ -80,8 +85,9 @@ class DvachClient
     }
 
     /**
-     * @param array $postArray
+     * @param array  $postArray
      * @param Thread $thread
+     *
      * @return Post
      */
     private function extractPost(array $postArray, Thread $thread): Post
@@ -98,13 +104,14 @@ class DvachClient
         foreach ($postArray['files'] as $fileArray) {
             $post->addFile($this->extractFile($fileArray, $post));
         }
-        
+
         return $post;
     }
 
     /**
      * @param array $fileArray
-     * @param Post $post
+     * @param Post  $post
+     *
      * @return File
      */
     private function extractFile(array $fileArray, Post $post): File
@@ -121,6 +128,7 @@ class DvachClient
 
     /**
      * @param Thread $thread
+     *
      * @return string
      */
     public function searchInArchive(Thread $thread): string

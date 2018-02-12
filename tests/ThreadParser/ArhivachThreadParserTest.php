@@ -84,9 +84,9 @@ class ArhivachThreadParserTest extends AbstractTestCase
         $givenFileNames = $posts[0]->getFiles()->map(function (File $file) {
             return $file->getName();
         })->toArray();
-        
+
         $expectedFileNames = ['php-noob-1.png', 'cat-cafe-osaka.jpg', 'l0-sensei.jpg', 'just-google-it.jpg'];
-        
+
         $this->assertEquals($expectedFileNames, $givenFileNames);
     }
 
@@ -141,7 +141,7 @@ class ArhivachThreadParserTest extends AbstractTestCase
 
     public function testFiles()
     {
-        $pathToHtml  = __DIR__ . '/../Fixtures/arhivach/83.html';
+        $pathToHtml = __DIR__ . '/../Fixtures/arhivach/83.html';
         $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
         $posts = $thread->getPosts();
         /** @var File[] $files */
