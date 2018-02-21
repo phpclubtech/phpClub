@@ -17,6 +17,8 @@ class Paginator
 
         return $view->render($pagerfanta, [$this, 'generateRoute'], [
             'container_template' => '<nav class="pagerfanta">%pages%</nav>',
+            'previous_message' => 'Предыдущая',
+            'next_message' => 'Следующая',
         ]);
     }
 
