@@ -1,6 +1,6 @@
 <?php
 /** @var \phpClub\Entity\Thread $thread */
-$title = $thread->getPosts()->first()->getTitle();
+$title = $thread->getPosts()->first()->getTitle() . ' | Архив';
 require __DIR__ . '/base/header.phtml';
 require __DIR__ . '/base/boardHeader.phtml';
 ?>

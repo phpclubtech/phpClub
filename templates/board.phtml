@@ -1,7 +1,7 @@
 <?php
 /** @var \phpClub\Entity\Thread[]|\Pagerfanta\Pagerfanta $threads */
 /** @var \phpClub\Service\Paginator $paginator */
-
+$title = 'Архив тредов клуба изучающих PHP';
 require __DIR__ . '/base/header.phtml';
 require __DIR__ . '/base/boardHeader.phtml';
 ?>
@@ -12,7 +12,7 @@ require __DIR__ . '/base/boardHeader.phtml';
 
     <hr>
 
-    <?php foreach ($threads as $thread) : ?>
+    <?php foreach ($threads as $thread): ?>
         <section class="posts">
             <form id="posts-form">
                 <div id="thread-<?= $thread->getId() ?>" class="thread">

@@ -103,7 +103,8 @@ class BoardController
 
     public function chainAction(Request $request, Response $response, array $args): ResponseInterface
     {
-        $chain = $this->refLinkRepository->getChain((int) $args['post']);
+        $postId = (int) $args['post'];
+        $chain = $this->refLinkRepository->getChain($postId);
 
         if ($chain->isEmpty()) {
             throw new NotFoundException($request, $response);
@@ -111,6 +112,7 @@ class BoardController
 
         return $this->view->render($response, '/chain.phtml', [
             'posts'  => $chain,
+            'postId' => $postId,
             'logged' => $this->authorizer->isLoggedIn(),
         ]);
     }

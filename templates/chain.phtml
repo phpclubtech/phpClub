@@ -1,10 +1,11 @@
+<?php $title = 'Ответы на пост #' . $postId ?>
 <?php include(__DIR__ . '/base/header.phtml') ?>
 <?php include(__DIR__ . '/base/boardHeader.phtml') ?>
 
 <section class="posts">
     <form id="posts-form">
         <div class="thread">
-            <?php foreach ($posts as $post) :?>
+            <?php foreach ($posts as $post): ?>
                 <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
             <?php endforeach; ?>
         </div>
