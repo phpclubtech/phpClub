@@ -1,3 +1,4 @@
 tests/* linguist-vendored
 tests/* linguist-generated=true
 public/media/js/swag.js linguist-generated=true
+public/media/* linguist-generated=true
