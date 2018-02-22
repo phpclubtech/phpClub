@@ -1,0 +1,16 @@
+language: php
+
+php:
+  - '7.1'
+
+services:
+  - mysql
+
+before_script:
+  - composer install
+  - echo -e "APP_ENV=dev\nDB_HOST=localhost\nDB_USER=root\nDB_PASSWORD=\nTEST_DB_NAME=phpclub_test" > .env
+  - mysql -e 'CREATE DATABASE phpclub_test;'
+  - composer migrate-test
+
+script:
+  - vendor/bin/phpunit --debug -v
