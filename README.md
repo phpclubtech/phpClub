@@ -24,4 +24,4 @@ Run `./bin/console import-threads` with following arguments:
 ## Testing
 1. Create test database, edit TEST_DB_NAME variable in `.env` file
 2. Run migrations for test database `composer migrate-test`
-3. Run tests using `composer test`
+3. Run tests using `./vendor/bin/phpunit`. To run single method add `--filter` option.

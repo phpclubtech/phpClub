@@ -27,7 +27,6 @@
         "symfony/var-dumper": "^3.3"
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
         "diff": "vendor/bin/doctrine-migrations migrations:diff",
         "migrate": "vendor/bin/doctrine-migrations migrations:migrate",
         "migrate-test": "APP_ENV=test vendor/bin/doctrine-migrations migrations:migrate"
