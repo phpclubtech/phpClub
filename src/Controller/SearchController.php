@@ -2,8 +2,12 @@
 
 namespace phpClub\Controller;
 
+use Pagerfanta\Pagerfanta;
+use phpClub\PagerfantaAdapter\SphinxAdapter;
 use phpClub\Service\Authorizer;
 use phpClub\Service\Searcher;
+use phpClub\Service\PaginationRenderer;
+use phpClub\Repository\PostRepository;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -27,20 +31,51 @@ class SearchController
      */
     protected $authorizer;
 
-    public function __construct(Searcher $searcher, Authorizer $authorizer, View $view)
-    {
+    /**
+     * @var PostRepository
+     */
+    private $postRepository;
+
+    /**
+     * @var PaginationRenderer
+     */
+    private $paginationRenderer;
+
+    public function __construct(
+        Searcher $searcher,
+        Authorizer $authorizer,
+        PostRepository $postRepository,
+        PaginationRenderer $paginationRenderer,
+        View $view
+    ) {
         $this->view = $view;
         $this->searcher = $searcher;
         $this->authorizer = $authorizer;
+        $this->postRepository = $postRepository;
+        $this->paginationRenderer = $paginationRenderer;
     }
 
     public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         $query = $request->getParam('q');
 
-        return $this->view->render($response, '/searchResults.phtml', [
-            'logged' => $this->authorizer->isLoggedIn(),
-            'posts'  => $this->searcher->search($query),
-        ]);
+        $page = $request->getParam('page', 1);
+
+        $pdo = new \PDO('mysql:host=127.0.0.1;port=9306');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $postRepository = $this->postRepository;
+
+        $posts = (new Pagerfanta(new SphinxAdapter($pdo, $postRepository, $query)))
+            ->setMaxPerPage(10)
+            ->setCurrentPage($page);
+
+        $viewArgs = [
+            'posts' => $posts,
+            'logged'     => $this->authorizer->isLoggedIn(),
+            'pagination' => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
+        ];
+
+        return $this->view->render($response, '/searchResults.phtml', $viewArgs);
     }
 }

@@ -23,6 +23,7 @@ use phpClub\Entity\User;
 use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
+use phpClub\Repository\PostRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\PaginationRenderer;
 use phpClub\Service\Searcher;
@@ -125,6 +126,10 @@ $di[ThreadRepository::class] = function (Container $di) {
     return $di->get(EntityManager::class)->getRepository(Thread::class);
 };
 
+$di[PostRepository::class] = function (Container $di) {
+    return $di->get(EntityManager::class)->getRepository(Post::class);
+};
+
 $di[RefLinkRepository::class] = function (Container $di) {
     return $di->get(EntityManager::class)->getRepository(\phpClub\Entity\RefLink::class);
 };
@@ -211,7 +216,13 @@ $di['BoardController'] = function (Container $di): BoardController {
 };
 
 $di['SearchController'] = function (Container $di): SearchController {
-    return new SearchController($di->get(Searcher::class), $di->get(Authorizer::class), $di->get(PhpRenderer::class));
+    return new SearchController(
+        $di->get(Searcher::class),
+        $di->get(Authorizer::class),
+        $di->get(PostRepository::class),
+        $di->get(PaginationRenderer::class),
+        $di->get(PhpRenderer::class)
+    );
 };
 
 $di['UsersController'] = function (Container $di): UsersController {

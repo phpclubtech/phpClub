@@ -1,3 +1,7 @@
+<?php
+/** @var \phpClub\Entity\Post[]|\Pagerfanta\Pagerfanta $posts */
+/** @var \phpClub\Service\Paginator $paginator */
+?>
 <?php $title = 'Результаты поиска' ?>
 <?php include(__DIR__ . '/base/header.phtml') ?>
 <?php include(__DIR__ . '/base/boardHeader.phtml') ?>
@@ -5,9 +9,13 @@
 <section class="posts">
     <form id="posts-form">
         <div class="thread">
+            <?= $pagination ?>
+
             <?php foreach ($posts as $post) :?>
                 <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
             <?php endforeach; ?>
+
+            <?= $pagination ?>
         </div>
         <hr>
     </form>
