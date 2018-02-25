@@ -82,9 +82,9 @@ class BoardController
             ->setCurrentPage($page);
 
         $viewArgs = [
-            'threads' => $threads,
-            'logged'  => $this->authorizer->isLoggedIn(),
-            'pagination' => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams())
+            'threads'    => $threads,
+            'logged'     => $this->authorizer->isLoggedIn(),
+            'pagination' => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
         if ($this->authorizer->isLoggedIn()) {
