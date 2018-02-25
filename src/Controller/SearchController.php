@@ -4,9 +4,9 @@ namespace phpClub\Controller;
 
 use Pagerfanta\Pagerfanta;
 use phpClub\PagerfantaAdapter\SphinxAdapter;
+use phpClub\Repository\PostRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\PaginationRenderer;
-use phpClub\Repository\PostRepository;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -63,7 +63,7 @@ class SearchController
             ->setCurrentPage($page);
 
         $viewArgs = [
-            'posts' => $posts,
+            'posts'      => $posts,
             'logged'     => $this->authorizer->isLoggedIn(),
             'pagination' => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
         ];

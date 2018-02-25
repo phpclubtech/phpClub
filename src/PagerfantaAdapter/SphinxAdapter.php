@@ -1,4 +1,5 @@
 <?php
+
 namespace phpClub\PagerfantaAdapter;
 
 use Pagerfanta\Adapter\AdapterInterface;
@@ -6,7 +7,6 @@ use phpClub\Repository\PostRepository;
 
 class SphinxAdapter implements AdapterInterface
 {
-
     /**
      * @var \PDO
      */
@@ -38,7 +38,7 @@ class SphinxAdapter implements AdapterInterface
 
         $query = $this->query;
 
-        $q = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT 1000");
+        $q = $pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT 1000');
         $q->bindValue(':search', $query);
         $q->execute();
 
@@ -46,6 +46,7 @@ class SphinxAdapter implements AdapterInterface
 
         return count($results);
     }
+
     /**
      * {@inheritdoc}
      */
