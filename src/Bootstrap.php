@@ -24,7 +24,7 @@ use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\Paginator;
+use phpClub\Service\PaginationRenderer;
 use phpClub\Service\Searcher;
 use phpClub\Service\UrlGenerator;
 use phpClub\ThreadImport\LastPostUpdater;
@@ -177,12 +177,12 @@ $di[PhpRenderer::class] = function (Container $di): PhpRenderer {
     return new PhpRenderer(__DIR__ . '/../templates', [
         // Shared variables
         'urlGenerator' => $di->get(UrlGenerator::class),
-        'paginator'    => $di->get(Paginator::class),
+        'paginator'    => $di->get(PaginationRenderer::class),
     ]);
 };
 
-$di[Paginator::class] = function (): Paginator {
-    return new Paginator();
+$di[PaginationRenderer::class] = function (Container $di): PaginationRenderer {
+    return new PaginationRenderer($di->get('router'));
 };
 
 $di[Authorizer::class] = function (Container $di): Authorizer {
@@ -205,7 +205,8 @@ $di['BoardController'] = function (Container $di): BoardController {
         $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
         $di->get(RefLinkGenerator::class),
-        $di->get(RefLinkRepository::class)
+        $di->get(RefLinkRepository::class),
+        $di->get(PaginationRenderer::class)
     );
 };
 

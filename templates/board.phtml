@@ -1,6 +1,6 @@
 <?php
 /** @var \phpClub\Entity\Thread[]|\Pagerfanta\Pagerfanta $threads */
-/** @var \phpClub\Service\Paginator $paginator */
+/** @var string $pagination */
 $title = 'Архив тредов клуба изучающих PHP';
 require __DIR__ . '/base/header.phtml';
 require __DIR__ . '/base/boardHeader.phtml';
@@ -8,7 +8,7 @@ require __DIR__ . '/base/boardHeader.phtml';
 
 <?php if (count($threads)): ?>
 
-    <?= $paginator->render($threads) ?>
+    <?= $pagination ?>
 
     <hr>
 
@@ -25,7 +25,7 @@ require __DIR__ . '/base/boardHeader.phtml';
         </section>
     <?php endforeach ?>
 
-    <?= $paginator->render($threads) ?>
+    <?= $pagination ?>
 
 <?php else: ?>
     

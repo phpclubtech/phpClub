@@ -24,13 +24,4 @@ class BaseEntityRepository extends EntityRepository
     {
         $this->getEntityManager()->remove($entity);
     }
-
-    public function paginate($queryOrQueryBuilder, int $page, int $perPage): Pagerfanta
-    {
-        $adapter = new DoctrineORMAdapter($queryOrQueryBuilder);
-
-        return (new Pagerfanta($adapter))
-            ->setCurrentPage($page)
-            ->setMaxPerPage($perPage);
-    }
 }

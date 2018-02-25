@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: main
- * Date: 4/30/2017
- * Time: 8:55 PM.
- */
 
 namespace phpClub\Controller;
 
@@ -14,35 +8,29 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\PhpRenderer as View;
+use Slim\Views\PhpRenderer;
 
-/**
- * Class SearchController.
- *
- * @author foobar1643 <foobar76239@gmail.com>
- */
 class SearchController
 {
     /**
-     * @var \Slim\Views\PhpRenderer
+     * @var PhpRenderer
      */
     protected $view;
 
     /**
-     * @var \phpClub\Service\Searcher
+     * @var Searcher
      */
     protected $searcher;
 
     /**
-     * @var \phpClub\Service\Authorizer
+     * @var Authorizer
      */
     protected $authorizer;
 
     public function __construct(Searcher $searcher, Authorizer $authorizer, View $view)
     {
         $this->view = $view;
-
         $this->searcher = $searcher;
-
         $this->authorizer = $authorizer;
     }
 

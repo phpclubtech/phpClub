@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace phpClub\Repository;
 
-use Pagerfanta\Pagerfanta;
+use Doctrine\ORM\Query;
 
 class ThreadRepository extends BaseEntityRepository
 {
     /**
-     * @param int $page
-     * @param int $perPage
-     *
-     * @return Pagerfanta
+     * @return Query
      */
-    public function getThreadsWithLastPosts(int $page = 1, int $perPage = 10): Pagerfanta
+    public function getThreadsWithLastPostsQuery(): Query
     {
         $dql = 'SELECT t, lp FROM phpClub\Entity\Thread t
                 JOIN t.lastPosts lp
                 ORDER BY t.id DESC, lp.id ASC';
 
-        return $this->paginate($this->getEntityManager()->createQuery($dql), $page, $perPage);
+        return $this->getEntityManager()->createQuery($dql);
     }
 }

@@ -2,9 +2,12 @@
 
 namespace phpClub\Controller;
 
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Pagerfanta;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
+use phpClub\Service\PaginationRenderer;
 use phpClub\ThreadImport\RefLinkGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -45,13 +48,19 @@ class BoardController
      */
     private $refLinkRepository;
 
+    /**
+     * @var PaginationRenderer
+     */
+    private $paginationRenderer;
+
     public function __construct(
         Authorizer $authorizer,
         PhpRenderer $view,
         CacheInterface $cache,
         ThreadRepository $threadRepository,
         RefLinkGenerator $refLinkManager,
-        RefLinkRepository $refLinkRepository
+        RefLinkRepository $refLinkRepository,
+        PaginationRenderer $paginationRenderer
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
@@ -59,15 +68,23 @@ class BoardController
         $this->threadRepository = $threadRepository;
         $this->refLinkManager = $refLinkManager;
         $this->refLinkRepository = $refLinkRepository;
+        $this->paginationRenderer = $paginationRenderer;
     }
 
     public function indexAction(Request $request, Response $response): ResponseInterface
     {
         $page = $request->getParam('page', 1);
 
+        $threadsQuery = $this->threadRepository->getThreadsWithLastPostsQuery();
+
+        $threads = (new Pagerfanta(new DoctrineORMAdapter($threadsQuery)))
+            ->setMaxPerPage(10)
+            ->setCurrentPage($page);
+
         $viewArgs = [
-            'threads' => $this->threadRepository->getThreadsWithLastPosts($page),
+            'threads' => $threads,
             'logged'  => $this->authorizer->isLoggedIn(),
+            'pagination' => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams())
         ];
 
         if ($this->authorizer->isLoggedIn()) {
