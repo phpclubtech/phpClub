@@ -5,7 +5,6 @@ namespace phpClub\Controller;
 use Pagerfanta\Pagerfanta;
 use phpClub\PagerfantaAdapter\SphinxAdapter;
 use phpClub\Service\Authorizer;
-use phpClub\Service\Searcher;
 use phpClub\Service\PaginationRenderer;
 use phpClub\Repository\PostRepository;
 use Psr\Http\Message\ResponseInterface;
@@ -20,11 +19,6 @@ class SearchController
      * @var PhpRenderer
      */
     protected $view;
-
-    /**
-     * @var Searcher
-     */
-    protected $searcher;
 
     /**
      * @var Authorizer
@@ -42,14 +36,12 @@ class SearchController
     private $paginationRenderer;
 
     public function __construct(
-        Searcher $searcher,
         Authorizer $authorizer,
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
         View $view
     ) {
         $this->view = $view;
-        $this->searcher = $searcher;
         $this->authorizer = $authorizer;
         $this->postRepository = $postRepository;
         $this->paginationRenderer = $paginationRenderer;

@@ -26,7 +26,6 @@ use phpClub\Repository\ThreadRepository;
 use phpClub\Repository\PostRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\PaginationRenderer;
-use phpClub\Service\Searcher;
 use phpClub\Service\UrlGenerator;
 use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\ThreadImport\RefLinkGenerator;
@@ -194,9 +193,6 @@ $di[Authorizer::class] = function (Container $di): Authorizer {
     return new Authorizer($di->get(EntityManager::class)->getRepository(User::class));
 };
 
-$di[Searcher::class] = function (Container $di): Searcher {
-    return new Searcher($di->get(EntityManager::class)->getRepository(Post::class));
-};
 
 $di[CacheInterface::class] = function (): CacheInterface {
     return getenv('APP_ENV') === 'prod' ? new FilesystemCache() : new ArrayCache();
@@ -217,7 +213,6 @@ $di['BoardController'] = function (Container $di): BoardController {
 
 $di['SearchController'] = function (Container $di): SearchController {
     return new SearchController(
-        $di->get(Searcher::class),
         $di->get(Authorizer::class),
         $di->get(PostRepository::class),
         $di->get(PaginationRenderer::class),
