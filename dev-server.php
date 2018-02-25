@@ -36,6 +36,6 @@ $_SERVER['SCRIPT_FILENAME'] = $_SERVER['DOCUMENT_ROOT'] .
 $_SERVER['SCRIPT_NAME'] = $scriptName;
 $_SERVER['PHP_SELF'] = $scriptName;
 
-unset($path, $staticPath, $ext);
-require __DIR__ . '/public' . $scriptName;
+unset($path, $staticPath, $scriptName, $ext);
+require __DIR__ . '/public' . $_SERVER['SCRIPT_NAME'];
 
