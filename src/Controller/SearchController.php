@@ -48,9 +48,11 @@ class SearchController
 
     public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
+        $query = $request->getParam('q');
+
         return $this->view->render($response, '/searchResults.phtml', [
             'logged' => $this->authorizer->isLoggedIn(),
-            'posts'  => $this->searcher->search($args['searchQuery']),
+            'posts'  => $this->searcher->search($query),
         ]);
     }
 }
