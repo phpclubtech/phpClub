@@ -58,7 +58,7 @@ class SphinxAdapter implements AdapterInterface
 
         $ids = [];
 
-        $q = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT :offset,:length");
+        $q = $pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT :offset,:length');
         $q->bindValue(':search', $query);
         $q->bindValue(':length', $length, \PDO::PARAM_INT);
         $q->bindValue(':offset', $offset, \PDO::PARAM_INT);
