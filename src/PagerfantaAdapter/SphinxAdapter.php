@@ -38,13 +38,13 @@ class SphinxAdapter implements AdapterInterface
 
         $query = $this->query;
 
-        $q = $pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT 1000');
+        $q = $pdo->prepare('SELECT COUNT(*) FROM index_posts WHERE MATCH (:search)');
         $q->bindValue(':search', $query);
         $q->execute();
 
-        $results = $q->fetchAll();
+        $count = $q->fetchColumn();
 
-        return count($results);
+        return $count;
     }
 
     /**
@@ -58,8 +58,10 @@ class SphinxAdapter implements AdapterInterface
 
         $ids = [];
 
-        $q = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT {$offset},{$length}");
+        $q = $pdo->prepare("SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT :offset,:length");
         $q->bindValue(':search', $query);
+        $q->bindValue(':length', $length, \PDO::PARAM_INT);
+        $q->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $q->execute();
 
         $results = $q->fetchAll();
