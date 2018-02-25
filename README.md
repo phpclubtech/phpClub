@@ -21,6 +21,14 @@ Run `./bin/console import-threads` with following arguments:
 2) Import threads 25, 79-95 from arhivach:
 - `./bin/console import-threads --source=arhivach`
 
+## Starting PHP builtin web server
+
+The following command will start a builtin web server. Point your browser to http://127.0.0.1:9001 to see the front page.
+
+```sh
+php -S 127.0.0.1:9001 -t public ../dev-server.php
+```
+
 ## Testing
 1. Create test database, edit TEST_DB_NAME variable in `.env` file
 2. Run migrations for test database `composer migrate-test`
