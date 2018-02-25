@@ -21,9 +21,9 @@ use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\Entity\User;
 use phpClub\FileStorage\LocalFileStorage;
+use phpClub\Repository\PostRepository;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
-use phpClub\Repository\PostRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\PaginationRenderer;
 use phpClub\Service\UrlGenerator;
@@ -192,7 +192,6 @@ $di[PaginationRenderer::class] = function (Container $di): PaginationRenderer {
 $di[Authorizer::class] = function (Container $di): Authorizer {
     return new Authorizer($di->get(EntityManager::class)->getRepository(User::class));
 };
-
 
 $di[CacheInterface::class] = function (): CacheInterface {
     return getenv('APP_ENV') === 'prod' ? new FilesystemCache() : new ArrayCache();
