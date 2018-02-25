@@ -7,8 +7,8 @@ use phpClub\Service\Searcher;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Views\PhpRenderer as View;
 use Slim\Views\PhpRenderer;
+use Slim\Views\PhpRenderer as View;
 
 class SearchController
 {
