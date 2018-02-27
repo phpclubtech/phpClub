@@ -7,7 +7,7 @@ use Pagerfanta\Pagerfanta;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\PaginationRenderer;
+use phpClub\Pagination\PaginationRenderer;
 use phpClub\ThreadImport\RefLinkGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace Pagination;
 
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
-use phpClub\Service\PaginationRenderer;
+use phpClub\Pagination\PaginationRenderer;
 use Slim\Route;
 use Slim\Router;
 use Symfony\Component\DomCrawler\Crawler;

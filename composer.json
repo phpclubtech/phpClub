@@ -6,7 +6,7 @@
         }
     },
     "require": {
-        "doctrine/orm": "@dev",
+        "doctrine/orm": "^2.6",
         "doctrine/migrations": "^1.5",
         "slim/slim": "^3.8",
         "slim/php-view": "^2.2",
@@ -15,7 +15,6 @@
         "symfony/filesystem": "^3.3",
         "symfony/console": "^3.3",
         "guzzlehttp/guzzle": "^6.3",
-        "spatie/dropbox-api": "^1.6",
         "evenement/evenement": "^3.0",
         "pagerfanta/pagerfanta": "^1.0",
         "vlucas/phpdotenv": "^2.4"

@@ -25,7 +25,7 @@ use phpClub\Repository\PostRepository;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Service\PaginationRenderer;
+use phpClub\Pagination\PaginationRenderer;
 use phpClub\Service\UrlGenerator;
 use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\ThreadImport\RefLinkGenerator;

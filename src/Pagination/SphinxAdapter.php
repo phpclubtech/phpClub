@@ -1,6 +1,6 @@
 <?php
 
-namespace phpClub\PagerfantaAdapter;
+namespace phpClub\Pagination;
 
 use Pagerfanta\Adapter\AdapterInterface;
 use phpClub\Repository\PostRepository;
@@ -52,25 +52,17 @@ class SphinxAdapter implements AdapterInterface
      */
     public function getSlice($offset, $length)
     {
-        $pdo = $this->pdo;
-
         $query = $this->query;
 
-        $ids = [];
-
-        $q = $pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT :offset,:length');
+        $q = $this->pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT :offset, :length');
         $q->bindValue(':search', $query);
         $q->bindValue(':length', $length, \PDO::PARAM_INT);
         $q->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $q->execute();
 
-        $results = $q->fetchAll();
+        $ids = array_column($q->fetchAll(), 'id');
 
-        foreach ($results as $result) {
-            $ids[] = $result['id'];
-        }
-
-        $posts = $this->postRepository->findBy(['id'=>$ids]);
+        $posts = $this->postRepository->findBy(['id' => $ids]);
 
         return $posts;
     }

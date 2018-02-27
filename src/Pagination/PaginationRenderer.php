@@ -1,6 +1,6 @@
 <?php
 
-namespace phpClub\Service;
+namespace phpClub\Pagination;
 
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\View\DefaultView;
