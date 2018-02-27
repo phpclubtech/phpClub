@@ -4,10 +4,10 @@ namespace phpClub\Controller;
 
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
+use phpClub\Pagination\PaginationRenderer;
 use phpClub\Repository\RefLinkRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Pagination\PaginationRenderer;
 use phpClub\ThreadImport\RefLinkGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
