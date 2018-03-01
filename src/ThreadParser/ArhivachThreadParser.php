@@ -81,7 +81,7 @@ class ArhivachThreadParser extends AbstractThreadParser
             throw new \Exception("Unable to parse file, HTML: {$imgNode->html()}");
         }
 
-        list(, $filePath, $width, $height) = preg_split("/','|',|,|\)/", $imgNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
+        [, $filePath, $width, $height] = preg_split("/','|',|,|\)/", $imgNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
 
         if ($this->isOldArhivachThread($filePath)) {
             // Hack for old arhivach threads

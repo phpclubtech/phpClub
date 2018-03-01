@@ -35,31 +35,31 @@ class SearchController
      */
     private $paginationRenderer;
 
+    /**
+     * @var \PDO
+     */
+    private $sphinxConnection;
+
     public function __construct(
         Authorizer $authorizer,
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
+        \PDO $sphinxConnection,
         View $view
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
         $this->postRepository = $postRepository;
         $this->paginationRenderer = $paginationRenderer;
+        $this->sphinxConnection = $sphinxConnection;
     }
 
     public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         $query = $request->getParam('q');
+        $page  = $request->getParam('page', 1);
 
-        $page = $request->getParam('page', 1);
-
-        $pdo = new \PDO('mysql:host=127.0.0.1;port=9306');
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-
-        $postRepository = $this->postRepository;
-
-        $posts = (new Pagerfanta(new SphinxAdapter($pdo, $postRepository, $query)))
-            ->setMaxPerPage(10)
+        $posts = (new Pagerfanta(new SphinxAdapter($this->sphinxConnection, $this->postRepository, $query)))
             ->setCurrentPage($page);
 
         $viewArgs = [

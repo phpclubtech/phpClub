@@ -25,13 +25,11 @@ class PaginationRenderer
             return '';
         }
 
-        $view = new DefaultView();
-
         $generateRoute = function (int $page) use ($queryParams, $route): string {
             return $this->router->pathFor($route->getName(), [], array_merge($queryParams, compact('page')));
         };
 
-        return $view->render($pagerfanta, $generateRoute, [
+        return (new DefaultView())->render($pagerfanta, $generateRoute, [
             'container_template' => '<nav class="pagerfanta">%pages%</nav>',
             'previous_message'   => 'Предыдущая',
             'next_message'       => 'Следующая',

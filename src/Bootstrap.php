@@ -65,6 +65,9 @@ $slimConfig = [
             'password' => getenv('DB_PASSWORD'),
             'dbname'   => getenv('TEST_DB_NAME'),
         ],
+        'sphinx' => [
+            'dsn' => getenv('SPHINX_DSN'),
+        ]
     ],
 ];
 
@@ -87,6 +90,7 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
 
     return $entityManager;
 };
+
 
 $di[\Doctrine\ORM\EntityManagerInterface::class] = function (Container $di) {
     return $di[EntityManager::class];
@@ -197,6 +201,13 @@ $di[CacheInterface::class] = function (): CacheInterface {
     return getenv('APP_ENV') === 'prod' ? new FilesystemCache() : new ArrayCache();
 };
 
+$di['SphinxConnection'] = function (Container $di) {
+    $pdo = new \PDO($di['sphinx']['dsn']);
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+    return $pdo;
+};
+
 /* Application controllers section */
 $di['BoardController'] = function (Container $di): BoardController {
     return new BoardController(
@@ -215,7 +226,8 @@ $di['SearchController'] = function (Container $di): SearchController {
         $di->get(Authorizer::class),
         $di->get(PostRepository::class),
         $di->get(PaginationRenderer::class),
-        $di->get(PhpRenderer::class)
+        $di->get(PhpRenderer::class),
+        $di->get('SphinxConnection')
     );
 };
 

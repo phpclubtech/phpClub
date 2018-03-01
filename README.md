@@ -6,6 +6,7 @@ Demonstration: http://phpclub.tech/
 2. `composer install`
 3. `cp .env.example .env`, config db connection
 4. Run migrations `composer migrate`
+5. `cp config/sphinx.conf.example config/sphinx.conf`
 
 ## Thread import syntax
 Run `./bin/console import-threads` with following arguments:
@@ -26,7 +27,7 @@ Run `./bin/console import-threads` with following arguments:
 The following command will start a builtin web server. Point your browser to http://127.0.0.1:9001 to see the front page.
 
 ```sh
-php -S 127.0.0.1:9001 -t public ../dev-server.php
+php -S 127.0.0.1:9001 -t public dev-server.php
 ```
 
 ## Testing
