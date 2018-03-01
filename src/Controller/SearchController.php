@@ -57,7 +57,7 @@ class SearchController
     public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
     {
         $query = $request->getParam('q');
-        $page  = $request->getParam('page', 1);
+        $page = $request->getParam('page', 1);
 
         $posts = (new Pagerfanta(new SphinxAdapter($this->sphinxConnection, $this->postRepository, $query)))
             ->setCurrentPage($page);
