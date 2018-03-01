@@ -44,8 +44,8 @@ class SearchController
         Authorizer $authorizer,
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
-        \PDO $sphinxConnection,
-        View $view
+        View $view,
+        \PDO $sphinxConnection
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;

@@ -202,7 +202,7 @@ $di[CacheInterface::class] = function (): CacheInterface {
 };
 
 $di['SphinxConnection'] = function (Container $di) {
-    $pdo = new \PDO($di['sphinx']['dsn']);
+    $pdo = new \PDO($di['connections']['sphinx']['dsn']);
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
     return $pdo;

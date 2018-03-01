@@ -12,3 +12,5 @@
 !/public/index.php
 !/public/media
 .env
+
+config/sphinx.conf
