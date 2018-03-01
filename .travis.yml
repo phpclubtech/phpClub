@@ -15,5 +15,9 @@ before_script:
 script:
   - vendor/bin/phpunit --testdox
 
+# Cache Composer dist downloads
+directories:
+  - $HOME/.cache/composer/files
+
 notifications:
   email: false
