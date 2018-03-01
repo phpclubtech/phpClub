@@ -3,10 +3,10 @@
 namespace phpClub\Controller;
 
 use Pagerfanta\Pagerfanta;
+use phpClub\Pagination\PaginationRenderer;
 use phpClub\Pagination\SphinxAdapter;
 use phpClub\Repository\PostRepository;
 use phpClub\Service\Authorizer;
-use phpClub\Pagination\PaginationRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
