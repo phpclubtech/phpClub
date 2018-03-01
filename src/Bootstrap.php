@@ -67,7 +67,7 @@ $slimConfig = [
         ],
         'sphinx' => [
             'dsn' => getenv('SPHINX_DSN'),
-        ]
+        ],
     ],
 ];
 
@@ -90,7 +90,6 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
 
     return $entityManager;
 };
-
 
 $di[\Doctrine\ORM\EntityManagerInterface::class] = function (Container $di) {
     return $di[EntityManager::class];
