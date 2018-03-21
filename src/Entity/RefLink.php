@@ -3,7 +3,7 @@
 namespace phpClub\Entity;
 
 /**
- * @Entity(repositoryClass="phpClub\Repository\RefLinkRepository")
+ * @Entity(repositoryClass="phpClub\Repository\ChainRepository")
  **/
 class RefLink
 {

@@ -5,10 +5,10 @@ namespace phpClub\Controller;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use phpClub\Pagination\PaginationRenderer;
-use phpClub\Repository\RefLinkRepository;
+use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadImport\ChainManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
@@ -39,14 +39,14 @@ class BoardController
     private $threadRepository;
 
     /**
-     * @var RefLinkGenerator
+     * @var ChainManager
      */
-    private $refLinkManager;
+    private $chainManager;
 
     /**
-     * @var RefLinkRepository
+     * @var ChainRepository
      */
-    private $refLinkRepository;
+    private $chainRepository;
 
     /**
      * @var PaginationRenderer
@@ -58,16 +58,16 @@ class BoardController
         PhpRenderer $view,
         CacheInterface $cache,
         ThreadRepository $threadRepository,
-        RefLinkGenerator $refLinkManager,
-        RefLinkRepository $refLinkRepository,
+        ChainManager $chainManager,
+        ChainRepository $chainRepository,
         PaginationRenderer $paginationRenderer
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
         $this->cache = $cache;
         $this->threadRepository = $threadRepository;
-        $this->refLinkManager = $refLinkManager;
-        $this->refLinkRepository = $refLinkRepository;
+        $this->chainManager = $chainManager;
+        $this->chainRepository = $chainRepository;
         $this->paginationRenderer = $paginationRenderer;
     }
 
@@ -120,7 +120,7 @@ class BoardController
     public function chainAction(Request $request, Response $response, array $args): ResponseInterface
     {
         $postId = (int) $args['post'];
-        $chain = $this->refLinkRepository->getChain($postId);
+        $chain = $this->chainRepository->getChain($postId);
 
         if ($chain->isEmpty()) {
             throw new NotFoundException($request, $response);

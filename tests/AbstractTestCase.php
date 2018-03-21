@@ -10,12 +10,13 @@ use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
 use phpClub\ThreadImport\LastPostUpdater;
-use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadImport\ChainManager;
 use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\DvachThreadParser;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
+use Tests\FileStorage\FileStorageMock;
 
 abstract class AbstractTestCase extends TestCase
 {
@@ -64,24 +65,11 @@ abstract class AbstractTestCase extends TestCase
         $parser = $this->getContainer()->get(DvachThreadParser::class);
         $thread = $parser->extractThread(file_get_contents($pathToHtml));
 
-        // TODO: use resource
-        $fileStorage = new class() implements FileStorageInterface {
-            public function put(string $path, string $directory): string
-            {
-                return __DIR__ . '/FileStorage/1.png';
-            }
-
-            public function isFileExist(string $path, string $directory): bool
-            {
-                return false;
-            }
-        };
-
         $importer = new ThreadImporter(
-            $fileStorage,
+            new FileStorageMock(),
             $this->getContainer()->get(EntityManager::class),
             $this->createMock(LastPostUpdater::class),
-            $this->createMock(RefLinkGenerator::class),
+            $this->createMock(ChainManager::class),
             $this->createMock(CacheInterface::class)
         );
 

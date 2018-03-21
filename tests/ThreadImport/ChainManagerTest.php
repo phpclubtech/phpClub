@@ -7,17 +7,17 @@ namespace Tests\ThreadImport;
 use Doctrine\ORM\EntityManager;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
-use phpClub\Repository\RefLinkRepository;
+use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
-use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadImport\ChainManager;
 use Tests\AbstractTestCase;
 
-class RefLinkGeneratorTest extends AbstractTestCase
+class ChainManagerTest extends AbstractTestCase
 {
     /**
-     * @var RefLinkGenerator
+     * @var ChainManager
      */
-    private $refLinkManager;
+    private $chainManager;
 
     /**
      * @var EntityManager
@@ -30,15 +30,15 @@ class RefLinkGeneratorTest extends AbstractTestCase
     private $threadRepository;
 
     /**
-     * @var RefLinkRepository
+     * @var ChainRepository
      */
-    private $refLinkRepository;
+    private $chainRepository;
 
     public function setUp()
     {
         $this->entityManager = $this->getContainer()->get(EntityManager::class);
-        $this->refLinkManager = $this->getContainer()->get(RefLinkGenerator::class);
-        $this->refLinkRepository = $this->getContainer()->get(RefLinkRepository::class);
+        $this->chainManager = $this->getContainer()->get(ChainManager::class);
+        $this->chainRepository = $this->getContainer()->get(ChainRepository::class);
         $this->threadRepository = $this->getContainer()->get(ThreadRepository::class);
         $this->entityManager->getConnection()->beginTransaction();
     }
@@ -48,15 +48,14 @@ class RefLinkGeneratorTest extends AbstractTestCase
      */
     public function testChain(string $threadHtmlPath, $threadId, array $chains)
     {
-        $this->markTestSkipped();
         $this->importThreadToDb($threadHtmlPath);
         /** @var Thread $thread */
         $thread = $this->threadRepository->find($threadId);
 
-        $this->refLinkManager->insertChain($thread);
+        $this->chainManager->insertChain($thread);
 
         foreach ($chains as $postId => $expectedChain) {
-            $givenChain = $this->refLinkRepository->getChain($postId)
+            $givenChain = $this->chainRepository->getChain($postId)
                 ->map(function (Post $post) {
                     return $post->getId();
                 })
@@ -80,9 +79,9 @@ class RefLinkGeneratorTest extends AbstractTestCase
                     // Post without references
                     829034 => [829034],
                     // Post from middle of the chain
-                    825608 => [825576, 825608, 825667, 825684, 825685, 825687, 825750, 825768, 825779, 825796, 825875, 825969],
+                    825608 => [825608, 825667, 825684, 825685, 825687, 825750, 825768, 825779, 825796, 825875, 825969],
                     // Post from middle of the chain
-                    825750 => [825576, 825608, 825667, 825684, 825750, 825768, 825875, 825969],
+                    825750 => [825608, 825667, 825684, 825750, 825768, 825875, 825969],
                     // Post is not exists
                     99999999999 => [],
                 ],

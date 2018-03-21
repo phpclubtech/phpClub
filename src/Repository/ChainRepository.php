@@ -5,7 +5,7 @@ namespace phpClub\Repository;
 use Doctrine\Common\Collections\ArrayCollection;
 use phpClub\Entity\RefLink;
 
-class RefLinkRepository extends BaseEntityRepository
+class ChainRepository extends BaseEntityRepository
 {
     /**
      * @param int $postId

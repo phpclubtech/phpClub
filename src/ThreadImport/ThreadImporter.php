@@ -35,9 +35,9 @@ class ThreadImporter
     private $lastPostUpdater;
 
     /**
-     * @var RefLinkGenerator
+     * @var ChainManager
      */
-    private $refLinkManager;
+    private $chainManager;
 
     /**
      * @var CacheInterface
@@ -48,13 +48,13 @@ class ThreadImporter
         FileStorageInterface $fileStorage,
         EntityManagerInterface $entityManager,
         LastPostUpdater $lastPostUpdater,
-        RefLinkGenerator $refLinkManager,
+        ChainManager $chainManager,
         CacheInterface $cache
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;
         $this->lastPostUpdater = $lastPostUpdater;
-        $this->refLinkManager = $refLinkManager;
+        $this->chainManager = $chainManager;
         $this->cache = $cache;
     }
 
@@ -68,7 +68,7 @@ class ThreadImporter
         foreach ($threads as $thread) {
             $this->saveFilesFromThread($thread);
             $this->entityManager->persist($thread);
-            $this->refLinkManager->insertChain($thread);
+            $this->chainManager->insertChain($thread);
             $this->emit(self::EVENT_THREAD_SAVED, [$thread]);
             $this->entityManager->flush();
             $this->entityManager->clear();
@@ -85,7 +85,6 @@ class ThreadImporter
      */
     private function cascadeRemoveThreads(array $threads): void
     {
-        /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
 
         $threadIds = array_map(function (Thread $thread) {
@@ -118,8 +117,7 @@ class ThreadImporter
     private function updateFileSize(File $file): void
     {
         if (!$file->hasSize()) {
-            // TODO: use FileStorageInterface::getResource()
-            $file->setSize((int) (filesize(__DIR__ . '/../../public/' . $file->getPath()) / 1024));
+            $file->setSize($this->fileStorage->getFileSize($file->getPath()));
         }
     }
 }

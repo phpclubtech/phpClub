@@ -9,16 +9,16 @@ use phpClub\Entity\Post;
 use phpClub\Entity\RefLink;
 use phpClub\Entity\Thread;
 
-class RefLinkGenerator
+class ChainManager
 {
     /**
      * @var EntityManagerInterface
      */
-    private $em;
+    private $entityManager;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->em = $em;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -26,7 +26,9 @@ class RefLinkGenerator
      */
     public function insertChain(Thread $thread): void
     {
-        if ($thread->getPosts()->first()->isOld()) {
+        /** @var Post $firstPost */
+        $firstPost = $thread->getPosts()->first();
+        if ($firstPost->isFirstPost() && $firstPost->isOld()) {
             return;
         }
 
@@ -34,7 +36,7 @@ class RefLinkGenerator
             $this->recursiveInsertChain($post);
         }
 
-        $this->em->flush();
+        $this->entityManager->flush();
     }
 
     /**
@@ -48,20 +50,20 @@ class RefLinkGenerator
 
         if ($depth === 0) {
             $reflink = new Reflink($forPost, $forPost, $depth);
-            $this->em->persist($reflink);
+            $this->entityManager->persist($reflink);
         }
 
         $references = $this->parseReferences($reference);
 
-        foreach ($references as $r) {
-            /** @var Post $r */
-            $r = $this->em->getRepository(Post::class)->find($r);
-            if ($r) {
-                $reflink = new RefLink($forPost, $r, $depth + 1);
-                $this->em->persist($reflink);
-                $reflink = new RefLink($r, $forPost, $depth * -1 - 1);
-                $this->em->persist($reflink);
-                $this->recursiveInsertChain($forPost, $r, $depth + 1);
+        foreach ($references as $reference) {
+            /** @var Post $reference */
+            $reference = $this->entityManager->getRepository(Post::class)->find($reference);
+            if ($reference && !$reference->isFirstPost()) {
+                $reflink = new RefLink($forPost, $reference, $depth + 1);
+                $this->entityManager->persist($reflink);
+                $reflink = new RefLink($reference, $forPost, $depth * -1 - 1);
+                $this->entityManager->persist($reflink);
+                $this->recursiveInsertChain($forPost, $reference, $depth + 1);
             }
         }
     }
@@ -77,5 +79,11 @@ class RefLinkGenerator
         preg_match_all($regexp, $post->getText(), $matches);
 
         return $matches[2];
+    }
+
+    public function removeAllChains(): void
+    {
+        $connection = $this->entityManager->getConnection();
+        $connection->executeQuery('DELETE FROM ref_link');
     }
 }

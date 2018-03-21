@@ -26,7 +26,7 @@ use phpClub\Entity\File;
         </span>
     </span>
 
-    <?php if (!$post->isOld()): ?>
+    <?php if (!$post->isOld() && !$post->isFirstPost()): ?>
         <a href="<?= $urlGenerator->toChain($post) ?>"><i class="fa fa-link" aria-hidden="true" title="Цепочка ответов"></i></a>
     <?php endif ?>
 

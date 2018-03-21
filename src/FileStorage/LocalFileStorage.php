@@ -55,4 +55,14 @@ class LocalFileStorage implements FileStorageInterface
     {
         return $this->filesystem->exists($this->uploadRoot . '/' . $directory . '/' . basename($path));
     }
+
+    /**
+     * @param string $path
+     *
+     * @return int
+     */
+    public function getFileSize(string $path): int
+    {
+        return (int) (filesize($this->uploadRoot . $path) / 1024);
+    }
 }

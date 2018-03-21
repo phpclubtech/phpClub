@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Doctrine\Common\Cache\FilesystemCache as DoctrineCache;
 use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -14,6 +17,7 @@ use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use phpClub\BoardClient\ArhivachClient;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Command\ImportThreadsCommand;
+use phpClub\Command\RebuildChainsCommand;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
@@ -23,12 +27,12 @@ use phpClub\Entity\User;
 use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Pagination\PaginationRenderer;
 use phpClub\Repository\PostRepository;
-use phpClub\Repository\RefLinkRepository;
+use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\UrlGenerator;
 use phpClub\ThreadImport\LastPostUpdater;
-use phpClub\ThreadImport\RefLinkGenerator;
+use phpClub\ThreadImport\ChainManager;
 use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DateConverter;
@@ -91,12 +95,12 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
     return $entityManager;
 };
 
-$di[\Doctrine\ORM\EntityManagerInterface::class] = function (Container $di) {
+$di[EntityManagerInterface::class] = function (Container $di) {
     return $di[EntityManager::class];
 };
 
-$di[RefLinkGenerator::class] = function (Container $di) {
-    return new RefLinkGenerator($di[EntityManager::class]);
+$di[ChainManager::class] = function (Container $di) {
+    return new ChainManager($di[EntityManager::class]);
 };
 
 $di[LastPostUpdater::class] = function (Container $di) {
@@ -132,7 +136,7 @@ $di[PostRepository::class] = function (Container $di) {
     return $di->get(EntityManager::class)->getRepository(Post::class);
 };
 
-$di[RefLinkRepository::class] = function (Container $di) {
+$di[ChainRepository::class] = function (Container $di) {
     return $di->get(EntityManager::class)->getRepository(\phpClub\Entity\RefLink::class);
 };
 
@@ -145,7 +149,7 @@ $di[ThreadImporter::class] = function (Container $di) {
         $di[$di['settings']['fileStorage']],
         $di[EntityManager::class],
         $di[LastPostUpdater::class],
-        $di[RefLinkGenerator::class],
+        $di[ChainManager::class],
         $di[CacheInterface::class]
     );
 };
@@ -156,6 +160,14 @@ $di[ImportThreadsCommand::class] = function (Container $di) {
         $di[DvachClient::class],
         $di[ArhivachClient::class],
         $di[DvachThreadParser::class]
+    );
+};
+
+$di[RebuildChainsCommand::class] = function (Container $di) {
+    return new RebuildChainsCommand(
+        $di[ChainManager::class],
+        $di[EntityManagerInterface::class],
+        $di[ThreadRepository::class]
     );
 };
 
@@ -214,8 +226,8 @@ $di['BoardController'] = function (Container $di): BoardController {
         $di->get(PhpRenderer::class),
         $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
-        $di->get(RefLinkGenerator::class),
-        $di->get(RefLinkRepository::class),
+        $di->get(ChainManager::class),
+        $di->get(ChainRepository::class),
         $di->get(PaginationRenderer::class)
     );
 };
