@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * @Entity(repositoryClass="phpClub\Repository\PostRepository")
@@ -46,6 +47,12 @@ class Post
      **/
     private $thread;
 
+    /**
+     * @OneToMany(targetEntity="RefLink", mappedBy="post");
+     * @OrderBy({"reference" = "ASC"})
+     */
+    private $replies;
+
     public function __construct(
         $id,
         string $title,
@@ -53,6 +60,7 @@ class Post
         \DateTimeImmutable $date,
         string $text,
         Thread $thread,
+        array $replies,
         array $files = [],
         bool $isOpPost = false,
         string $email = null
@@ -64,6 +72,7 @@ class Post
         $this->title = $title;
         $this->author = $author;
         $this->thread = $thread;
+        $this->replies = ArrayCollection($replies);
         $this->isOpPost = $isOpPost;
         $this->files = new ArrayCollection($files);
         $this->isFirstPost = $thread->getPosts()->isEmpty() || $id === $thread->getPosts()->first()->getId();
@@ -122,6 +131,18 @@ class Post
     public function getFiles()
     {
         return $this->files;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getReplies()
+    {
+        $criteria = Criteria::create();
+
+        $criteria->where(Criteria::expr()->eq('depth', -1));
+
+        return $this->replies->matching($criteria);
     }
 
     public function isOpPost(): bool

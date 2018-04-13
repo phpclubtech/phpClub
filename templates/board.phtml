@@ -10,20 +10,19 @@ require __DIR__ . '/base/boardHeader.phtml';
 
     <?= $pagination ?>
 
-    <hr>
+    <div class="threads">
+        <hr>
 
-    <?php foreach ($threads as $thread): ?>
-        <section class="posts">
-            <form id="posts-form">
-                <div id="thread-<?= $thread->getId() ?>" class="thread">
+        <?php foreach ($threads as $thread): ?>
+                <div class="thread" data-id="<?= $thread->getId() ?>">
                     <?php foreach ($thread->getLastPosts() as $post): ?>
                         <?= $this->fetch('/post.phtml', ['threads' => $threads, 'post' => $post, 'thread' => $thread]) ?>
                     <?php endforeach; ?>
                 </div>
+                
                 <hr>
-            </form>
-        </section>
-    <?php endforeach ?>
+        <?php endforeach ?>
+    </div>
 
     <?= $pagination ?>
 

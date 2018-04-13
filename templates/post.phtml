@@ -7,84 +7,69 @@
 use phpClub\Entity\File;
 ?>
 
-<div id="post-<?= $post->getId() ?>" class="<?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'post-wrapper' ?>">
-    <div class="post <?= ($post->isFirstPost()) ? 'oppost-wrapper' : 'reply' ?>" id="post-body-<?= $post->getId() ?>" data-num="<?= $post->getId() ?>">
-
-    <div class="post-details" id="post-details-<?= $post->getId() ?>">
-    <input name="delete" class="turnmeoff" value="<?= $post->getId() ?>" type="checkbox">
-
-    <span class="post-title"><?= $post->getTitle() ?></span>
-    <span class="ananimas"><?= $post->getAuthor() ?></span>
-
-    <span class="posttime-reflink">
-        <span class="posttime"><?= $post->getDate()->format('Y/m/d H:i:s') ?>&nbsp;</span>
-
-        <span class="reflink">
-            <a href="<?= $urlGenerator->toPostAnchor($post) ?>"
-               class="postbtn-reply-href"
-               id="<?= $post->getId() ?>">№<?= $post->getId()?></a>
+<div id="<?= $post->getId() ?>" class="post <?= ($post->isFirstPost()) ? 'op-post' : '' ?> clearfix" data-id="<?= $post->getId() ?>">
+    <div class="post-header clearfix">
+        <span class="title"><?= $post->getTitle() ?></span>
+        <span class="author"><?= $post->getAuthor() ?></span>
+        <span class="datetime"><?= $post->getDate()->format('Y/m/d H:i:s') ?>&nbsp;</span>
+        <span class="number">
+                <a href="<?= $urlGenerator->toPostAnchor($post) ?>" date-reflink-id="<?= $post->getId() ?>">№<?= $post->getId() ?></a>
         </span>
-    </span>
 
-    <?php if (!$post->isOld() && !$post->isFirstPost()): ?>
-        <a href="<?= $urlGenerator->toChain($post) ?>"><i class="fa fa-link" aria-hidden="true" title="Цепочка ответов"></i></a>
-    <?php endif ?>
+        <?php if (!$post->isOld() && !$post->isFirstPost()): ?>                        
+            <span class="chain">
+                <a href="<?= $urlGenerator->toChain($post) ?>"><i class="fa fa-link" aria-hidden="true" title="Цепочка ответов"></i></a>
+            </span>
+        <?php endif ?>
 
-    <?php if ($post->isFirstPost() && isset($thread)) : ?>
-        <span class="archive-links">
-            <a href="<?= $urlGenerator->toDvachArchiveThread($thread) ?>"><img src="<?= $urlGenerator->toDvachIcon() ?>" title="Искать в архиве 2ch.hk"></a>
-            
-            <a href="<?= $urlGenerator->toArhivachThread($thread) ?>"><img src="<?= $urlGenerator->toArhivachIcon() ?>" title="Искать в архиваче"></a>
-            <i class="fa fa-chain"></i>
-        </span>
-    <?php endif; ?>
+        <?php if ($post->isFirstPost() && isset($thread)) : ?>
+            <span class="archives">
+                <a href=""><img src="/media/images/2ch.ico" title="Искать в архиве 2ch.hk"></a>
+                <a href="http://arhivach.org/ajax/?act=locate_thread&amp;url=https://2ch.hk/pr/res/1152267.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
+                <i class="fa fa-chain"></i>
+            </span>
+        <?php endif; ?>
 
-    <?php if (isset($threads) and $post->isFirstPost()): ?>
-        <span class="desktop">
-            [<a class="orange" href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>]
-        </span>
-    <?php endif; ?>
+        <?php if (isset($threads) and $post->isFirstPost()): ?>
+            <span class="show">
+                [<a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>]
+            </span>
+        <?php endif; ?>
+    </div>
 
-    <br class="turnmeoff">
-</div>
-
-<?php if ($post->getFiles()->count() > 0) : ?>
-    <div class="images <?= ($post->getFiles()->count() > 1) ? 'images-multi' : 'images-single' ?> ">
-        <?php /** @var File $file */ ?>
-        <?php foreach($post->getFiles() as $file) :?>
-            <figure class="image">
-                <figcaption class="file-attr">
-                    <a class="desktop" target="_blank" href="<?= $file->getPath() ?>" id="title-<?= $post->getId() ?>" title="<?= $file->getName() ?>"><?= $file->getName() ?></a>
-
-                    <span class="filesize">(<?= $file->getSize() ?>, <?= $file->getWidth() ?>x<?= $file->getHeight() ?>)</span>
-                </figcaption>
-
-                <div id="exlink-<?= $post->getId() ?>-" class="image-link">
-                    <a href="<?= $file->getPath() ?>" target="_blank" onclick="return expand('<?= $post->getId() ?>-','<?= $file->getPath() ?>', '<?= $file->getThumbPath() ?>', '<?= $file->getWidth() ?>', '<?= $file->getHeight() ?>')">
-                        <img src="<?= $file->getThumbPath() ?>" alt="<?= $file->getHeight() ?>x<?=$file->getWidth() ?>" class="img preview">
+    <?php if ($post->getFiles()->count() > 0) : ?>
+        <div class="files <?= ($post->getFiles()->count() > 1) ? 'files-multiple' : '' ?>">
+            <?php /** @var File $file */ ?>
+            <?php foreach($post->getFiles() as $file) :?>
+                <figure class="file">
+                    <figcaption class="file-attributes">
+                        <a href="<?= $file->getPath() ?>" target="_blank" title="<?= $file->getName() ?>"><?= $file->getName() ?></a>
+                        <span class="filesize">(<?= $file->getSize() ?>, <?= $file->getWidth() ?>x<?= $file->getHeight() ?>)</span>
+                    </figcaption>
+                    <a href="<?= $file->getPath() ?>" class="file-link" target="_blank">
+                        <img class="preview" src="<?= $file->getThumbPath() ?>" alt="<?= $file->getHeight() ?>x<?=$file->getWidth() ?>">
                     </a>
-                </div>
-            </figure>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
-
-<blockquote id="m<?= $post->getId() ?>" class="post-message">
-    <?= $post->getText() ?>
-</blockquote>
-
-<div id="refmap-<?= $post->getId() ?>" class="ABU-refmap" style="display: none;"><em>Ответы: </em></div>
-
-<?php if (isset($threads) and $post->isFirstPost()) : ?>
-    <div class="oppost-options-mob mobile">
-        <div class="hide-view">
-            <a href="<?= $urlGenerator->toThread($thread) ?>" class="button-mob">В тред</a>
+                </figure>
+            <?php endforeach; ?>
         </div>
-    </div>
-<?php endif; ?>
-</div>
-</div>
+    <?php endif; ?>
 
-<?php if (isset($threads) and $post->isFirstPost()) : ?>
-    <span class="mess-post desktop">Нажмите <a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>, чтобы открыть.</span>
-<?php endif; ?>
+    <article class="text">
+        <?= $post->getText() ?>
+    </article>
+    
+    <?php if ($post->getReplies()->count() > 0) : ?>
+        <div class="refmap">
+            <em>Оветы: </em>
+
+            <?php foreach($post->getReplies() as $replie) :?>
+                <!-- reflinks data must be changed after prossing them in the parser  -->
+                <a class="post-reply-link" data-num="<?= $replie->getReference()->getId() ?>" data-thread="<?= $replie->getReference()->getThread()->getId() ?>" href="/pr/res/<?= $replie->getReference()->getThread()->getId() ?>.html#<?= $replie->getReference()->getId() ?>">&gt;&gt;<?= $replie->getReference()->getId() ?></a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($threads) and $post->isFirstPost()) : ?>
+        <span class="open">Нажмите <a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>, чтобы открыть.</span>
+    <?php endif; ?>
+</div>

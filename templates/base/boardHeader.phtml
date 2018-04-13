@@ -1,5 +1,5 @@
 <header>
-    <a class="phpClubLogo" href="/">phpClub</a>
+    <a class="logo" href="/">phpClub</a>
 
     <?php if ($logged) : ?>
         <ul class="authorization-menu">
@@ -14,12 +14,9 @@
         </ul>
     <?php endif; ?>
 
-    <div class="search-form">
-        <form method="get" name="search" action="/search">
-            <label>
-                <input type="text" name="q" value="<?= (isset($query)) ? htmlspecialchars($query, ENT_QUOTES) : '' ?>">
-            </label>
-            <input id="button" type="submit" value="Поиск">
-        </form>
-    </div>
+    <form method="get" name="search" class="search-form" action="/search">
+        <label>
+            <input type="text" name="q" placeholder="Поиск" value="">
+        </label>
+    </form>
 </header>
