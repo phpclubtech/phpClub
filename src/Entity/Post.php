@@ -48,6 +48,8 @@ class Post
     private $thread;
 
     /**
+     * @var ArrayCollection|RefLink[]
+     *
      * @OneToMany(targetEntity="RefLink", mappedBy="post");
      * @OrderBy({"reference" = "ASC"})
      */
@@ -60,7 +62,6 @@ class Post
         \DateTimeImmutable $date,
         string $text,
         Thread $thread,
-        array $replies,
         array $files = [],
         bool $isOpPost = false,
         string $email = null
@@ -72,7 +73,6 @@ class Post
         $this->title = $title;
         $this->author = $author;
         $this->thread = $thread;
-        $this->replies = ArrayCollection($replies);
         $this->isOpPost = $isOpPost;
         $this->files = new ArrayCollection($files);
         $this->isFirstPost = $thread->getPosts()->isEmpty() || $id === $thread->getPosts()->first()->getId();
@@ -134,7 +134,7 @@ class Post
     }
 
     /**
-     * @return ArrayCollection
+     * @return RefLink[]|ArrayCollection
      */
     public function getReplies()
     {
