@@ -62,7 +62,7 @@ class SphinxAdapter implements AdapterInterface
 
         $ids = array_column($q->fetchAll(), 'id');
 
-        $posts = $this->postRepository->findBy(['id' => $ids]);
+        $posts = $this->postRepository->findBy(['id' => $ids], ['date' => 'DESC']);
 
         return $posts;
     }
