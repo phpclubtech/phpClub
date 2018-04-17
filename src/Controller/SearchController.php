@@ -63,7 +63,7 @@ class SearchController
             ->setCurrentPage($page);
 
         $viewArgs = [
-            'query' => $query,
+            'query'      => $query,
             'posts'      => $posts,
             'logged'     => $this->authorizer->isLoggedIn(),
             'pagination' => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
