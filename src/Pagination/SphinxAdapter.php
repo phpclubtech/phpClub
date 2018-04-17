@@ -54,7 +54,7 @@ class SphinxAdapter implements AdapterInterface
     {
         $query = $this->query;
 
-        $q = $this->pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) ORDER BY id ASC LIMIT :offset, :length');
+        $q = $this->pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) AND is_first_post != 1 ORDER BY date DESC LIMIT :offset, :length OPTION max_matches=100000');
         $q->bindValue(':search', $query);
         $q->bindValue(':length', $length, \PDO::PARAM_INT);
         $q->bindValue(':offset', $offset, \PDO::PARAM_INT);

@@ -14,8 +14,11 @@ source base
 source src_posts: base
 {
 	sql_query		= \
-		SELECT id, thread_id, text, date, email, author, title \
+		SELECT id, thread_id, text, UNIX_TIMESTAMP(date) AS date, email, author, title, is_first_post \
 		FROM post
+
+	sql_attr_uint = is_first_post
+	sql_attr_timestamp = date
 }
 
 

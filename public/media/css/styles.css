@@ -54,6 +54,16 @@ header {
     font-size: 100%;
 }
 
+.result-search-form input[name="q"] {
+    box-sizing: border-box;
+    margin-top: 7px;
+    border: solid 2px #99c;
+    border-radius: 2px;
+    padding: 6px;
+    width: 100%;
+    font-size: 16px;
+}
+
 .pagerfanta {
     display: block;
     text-align: center;
@@ -65,7 +75,7 @@ header {
     padding: 10px;
 }
 
-.thread {
+.thread, .result-search-form, .results {
     padding: 0 8px;
 }
 
@@ -241,7 +251,11 @@ sup {vertical-align: super; font-size: smaller;}
     position: absolute;
     top: 2px;
     right: 2px;
-    opacity: 0.8;
+    opacity: 0.3;
+    border-radius: 50%;
+    padding: 0 2px;
+    color: black;
+    background: #FFF;
 }
 
 #lightbox .cross:hover {

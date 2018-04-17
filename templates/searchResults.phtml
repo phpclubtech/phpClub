@@ -6,19 +6,22 @@
 <?php include(__DIR__ . '/base/header.phtml') ?>
 <?php include(__DIR__ . '/base/boardHeader.phtml') ?>
 
-<section class="posts">
-    <form id="posts-form">
-        <div class="thread">
-            <?= $pagination ?>
+<form method="get" name="search" class="result-search-form" action="/search">
+    <label>
+        <input type="text" name="q" placeholder="Поиск" value="<?= (isset($query)) ? htmlspecialchars($query, ENT_QUOTES) : '' ?>">
+    </label>
+</form>
 
-            <?php foreach ($posts as $post) :?>
-                <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
-            <?php endforeach; ?>
+<?= $pagination ?>
 
-            <?= $pagination ?>
-        </div>
-        <hr>
-    </form>
-</section>
+<div class="results">
+    <?php foreach ($posts as $post) :?>
+        <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
+    <?php endforeach; ?>
+</div>
+
+<?= $pagination ?>
+
+<hr>
 
 <?php include(__DIR__ . '/base/footer.phtml') ?>
