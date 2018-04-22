@@ -52,17 +52,20 @@ class DvachThreadParser extends AbstractThreadParser
 
     /**
      * @param Crawler $fileNode
-     * @param Post    $post
      *
      * @throws \Exception
      *
      * @return File
      */
-    protected function extractFile(Crawler $fileNode, Post $post): File
+    protected function extractFile(Crawler $fileNode): File
     {
         [, $fullName, $thumbName, $width, $height] = $this->extractOnClickJsArgs($fileNode);
 
-        return new File(ltrim($fullName, "'"), $thumbName, $post, (int) $height, (int) $width);
+        return (new File())
+            ->setPath(ltrim($fullName, "'"))
+            ->setThumbPath($thumbName)
+            ->setHeight((int) $height)
+            ->setWidth((int) $width);
     }
 
     /**

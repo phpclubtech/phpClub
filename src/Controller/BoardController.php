@@ -39,11 +39,6 @@ class BoardController
     private $threadRepository;
 
     /**
-     * @var ChainManager
-     */
-    private $chainManager;
-
-    /**
      * @var ChainRepository
      */
     private $chainRepository;
@@ -58,7 +53,6 @@ class BoardController
         PhpRenderer $view,
         CacheInterface $cache,
         ThreadRepository $threadRepository,
-        ChainManager $chainManager,
         ChainRepository $chainRepository,
         PaginationRenderer $paginationRenderer
     ) {
@@ -66,7 +60,6 @@ class BoardController
         $this->authorizer = $authorizer;
         $this->cache = $cache;
         $this->threadRepository = $threadRepository;
-        $this->chainManager = $chainManager;
         $this->chainRepository = $chainRepository;
         $this->paginationRenderer = $paginationRenderer;
     }

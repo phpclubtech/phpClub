@@ -12,10 +12,10 @@ use phpClub\Entity\Thread;
 class DvachClient
 {
     // Fixes 2ch.hk API poor naming
-    const POST_AUTHOR = 'name';
-    const POST_TITLE = 'subject';
-    const POST_TEXT = 'comment';
-    const THREAD_TITLE = 'subject';
+    private const POST_AUTHOR = 'name';
+    private const POST_TITLE = 'subject';
+    private const POST_TEXT = 'comment';
+    private const THREAD_TITLE = 'subject';
 
     /**
      * @var Client
@@ -78,7 +78,9 @@ class DvachClient
         $thread = new Thread($threadId);
 
         foreach ($postsArray as $postArray) {
-            $thread->addPost($this->extractPost($postArray, $thread));
+            $post = $this->extractPost($postArray);
+            $post->setThread($thread);
+            $thread->addPost($post);
         }
 
         return $thread;
@@ -86,23 +88,21 @@ class DvachClient
 
     /**
      * @param array  $postArray
-     * @param Thread $thread
      *
      * @return Post
      */
-    private function extractPost(array $postArray, Thread $thread): Post
+    private function extractPost(array $postArray): Post
     {
-        $post = new Post(
-            $postArray['num'],
-            $postArray[self::POST_TITLE],
-            $postArray[self::POST_AUTHOR],
-            (new \DateTimeImmutable())->setTimestamp($postArray['timestamp']),
-            $postArray[self::POST_TEXT],
-            $thread
-        );
+        $post = new Post($postArray['num']);
+        $post->setTitle($postArray[self::POST_TITLE])
+            ->setAuthor($postArray[self::POST_AUTHOR])
+            ->setDate((new \DateTimeImmutable())->setTimestamp($postArray['timestamp']))
+            ->setText($postArray[self::POST_TEXT]);
 
         foreach ($postArray['files'] as $fileArray) {
-            $post->addFile($this->extractFile($fileArray, $post));
+            $file = $this->extractFile($fileArray);
+            $file->setPost($post);
+            $post->addFile($file);
         }
 
         return $post;
@@ -110,20 +110,17 @@ class DvachClient
 
     /**
      * @param array $fileArray
-     * @param Post  $post
      *
      * @return File
      */
-    private function extractFile(array $fileArray, Post $post): File
+    private function extractFile(array $fileArray): File
     {
-        return new File(
-            'https://2ch.hk' . $fileArray['path'],
-            'https://2ch.hk' . $fileArray['thumbnail'],
-            $post,
-            $fileArray['height'],
-            $fileArray['width'],
-            $fileArray['fullname'] ?? $fileArray['name']
-        );
+        return (new File())
+            ->setPath('https://2ch.hk' . $fileArray['path'])
+            ->setThumbPath('https://2ch.hk' . $fileArray['thumbnail'])
+            ->setHeight($fileArray['height'])
+            ->setWidth($fileArray['width'])
+            ->setClientName($fileArray['fullname'] ?? $fileArray['name']);
     }
 
     /**

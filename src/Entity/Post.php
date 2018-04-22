@@ -25,7 +25,7 @@ class Post
     private $email;
 
     /** @Column(type="boolean") */
-    private $isOpPost;
+    private $isOpPost = false;
 
     /** @Column(type="boolean") */
     private $isFirstPost;
@@ -55,27 +55,36 @@ class Post
      */
     private $replies;
 
-    public function __construct(
-        $id,
-        string $title,
-        string $author,
-        \DateTimeImmutable $date,
-        string $text,
-        Thread $thread,
-        array $files = [],
-        bool $isOpPost = false,
-        string $email = null
-    ) {
+    public function __construct($id)
+    {
         $this->id = $id;
-        $this->text = $text;
-        $this->date = $date;
-        $this->email = $email;
-        $this->title = $title;
-        $this->author = $author;
+        $this->files = new ArrayCollection();
+        $this->replies = new ArrayCollection();
+    }
+
+    public function setThread(Thread $thread): self
+    {
         $this->thread = $thread;
-        $this->isOpPost = $isOpPost;
-        $this->files = new ArrayCollection($files);
-        $this->isFirstPost = $thread->getPosts()->isEmpty() || $id === $thread->getPosts()->first()->getId();
+        $this->isFirstPost = $thread->getPosts()->isEmpty() || $this->id === $thread->getPosts()->first()->getId();
+        return $this;
+    }
+
+    public function setAuthor(string $author): self
+    {
+        $this->author = $author;
+        return $this;
+    }
+
+    public function setText(string $text): self
+    {
+        $this->text = $text;
+        return $this;
+    }
+
+    public function setDate(\DateTimeImmutable $date): self
+    {
+        $this->date = $date;
+        return $this;
     }
 
     public function getId()
@@ -83,16 +92,23 @@ class Post
         return $this->id;
     }
 
-    public function addFile(File $file)
+    public function addFile(File $file): void
     {
         $this->files->add($file);
+        $file->setPost($this);
     }
 
-    public function addFiles(array $files)
+    public function addFiles(array $files): void
     {
         foreach ($files as $file) {
             $this->addFile($file);
         }
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
     }
 
     public function getTitle()
@@ -118,6 +134,12 @@ class Post
     public function getDate()
     {
         return $this->date;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+        return $this;
     }
 
     public function getEmail()
@@ -147,7 +169,13 @@ class Post
 
     public function isOpPost(): bool
     {
-        return (bool) $this->isOpPost;
+        return $this->isOpPost;
+    }
+
+    public function setIsOpPost(bool $isOpPost): self
+    {
+        $this->isOpPost = $isOpPost;
+        return $this;
     }
 
     public function isFirstPost(): bool

@@ -28,25 +28,22 @@ abstract class AbstractTestCase extends TestCase
 
     public function createPost($id, Thread $thread = null): Post
     {
-        return new Post(
-            $id,
-            'title ' . $id,
-            'author ' . $id,
-            new \DateTimeImmutable(),
-            'text ' . $id,
-            $thread ?: $this->createThread($id)
-        );
+        return (new Post($id))
+            ->setTitle('title ' . $id)
+            ->setAuthor('author ' . $id)
+            ->setDate(new \DateTimeImmutable())
+            ->setText('text ' . $id)
+            ->setThread($thread ?: $this->createThread($id));
     }
 
     public function createFile(int $id): File
     {
-        return new File(
-            __DIR__ . '/FileStorage/1.png',
-            __DIR__ . '/FileStorage/2.png',
-            $this->createPost($id),
-            100,
-            200
-        );
+        return (new File())
+            ->setPath(__DIR__ . '/FileStorage/1.png')
+            ->setThumbPath(__DIR__ . '/FileStorage/2.png')
+            ->setHeight(100)
+            ->setWidth(200)
+            ->setPost($this->createPost($id));
     }
 
     public function getContainer(): Container

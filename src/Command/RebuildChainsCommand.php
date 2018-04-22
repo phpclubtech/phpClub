@@ -19,24 +19,15 @@ class RebuildChainsCommand extends Command
     private $chainManager;
 
     /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
      * @var ThreadRepository
      */
     private $threadRepository;
 
-    public function __construct(
-        ChainManager $chainManager,
-        EntityManagerInterface $entityManager,
-        ThreadRepository $threadRepository
-    ) {
-        parent::__construct();
+    public function __construct(ChainManager $chainManager, ThreadRepository $threadRepository)
+    {
         $this->chainManager = $chainManager;
-        $this->entityManager = $entityManager;
         $this->threadRepository = $threadRepository;
+        parent::__construct();
     }
 
     protected function configure()

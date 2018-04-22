@@ -38,7 +38,7 @@ abstract class AbstractThreadParser
 
     abstract protected function getFilesXPath(): string;
 
-    abstract protected function extractFile(Crawler $fileNode, Post $post): File;
+    abstract protected function extractFile(Crawler $fileNode): File;
 
     /**
      * @param string $threadHtml
@@ -64,17 +64,18 @@ abstract class AbstractThreadParser
         }
 
         $extractPost = function (Crawler $postNode) use ($thread, $threadPath) {
-            $post = new Post(
-                $this->extractId($postNode),
-                $this->extractTitle($postNode),
-                $this->extractAuthor($postNode),
-                $this->extractDate($postNode),
-                $this->extractText($postNode),
-                $thread
-            );
+            $post = (new Post($this->extractId($postNode)))
+                ->setTitle($this->extractTitle($postNode))
+                ->setAuthor($this->extractAuthor($postNode))
+                ->setDate($this->extractDate($postNode))
+                ->setText($this->extractText($postNode))
+                ->setThread($thread);
 
             if (!$this->isThreadWithMissedFiles($thread)) {
-                $post->addFiles($this->extractFiles($postNode, $post, $threadPath));
+                $files = $this->extractFiles($postNode, $threadPath);
+                foreach ($files as $file) {
+                    $post->addFile($file);
+                }
             }
 
             $thread->addPost($post);
@@ -187,13 +188,13 @@ abstract class AbstractThreadParser
      *
      * @return File[]
      */
-    protected function extractFiles(Crawler $postNode, Post $post, string $threadPath): array
+    protected function extractFiles(Crawler $postNode, string $threadPath): array
     {
         $filesXPath = $this->getFilesXPath();
         $fileNodes = $postNode->filterXPath($filesXPath);
 
-        $extractFile = function (Crawler $fileNode) use ($post, $threadPath) {
-            $file = $this->extractFile($fileNode, $post);
+        $extractFile = function (Crawler $fileNode) use ($threadPath) {
+            $file = $this->extractFile($fileNode);
 
             if ($threadPath && !filter_var($file->getPath(), FILTER_VALIDATE_URL)) {
                 $file->updatePaths(

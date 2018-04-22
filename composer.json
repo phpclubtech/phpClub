@@ -21,7 +21,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^6.2",
-        "Kevinrob/guzzle-cache-middleware": "^2.1",
         "mikey179/vfsStream": "^1.6",
         "symfony/var-dumper": "^3.3"
     },

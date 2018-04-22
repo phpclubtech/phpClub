@@ -100,7 +100,7 @@ $di[EntityManagerInterface::class] = function (Container $di) {
 };
 
 $di[ChainManager::class] = function (Container $di) {
-    return new ChainManager($di[EntityManager::class]);
+    return new ChainManager($di[EntityManager::class], $di[PostRepository::class]);
 };
 
 $di[LastPostUpdater::class] = function (Container $di) {
@@ -164,24 +164,11 @@ $di[ImportThreadsCommand::class] = function (Container $di) {
 };
 
 $di[RebuildChainsCommand::class] = function (Container $di) {
-    return new RebuildChainsCommand(
-        $di[ChainManager::class],
-        $di[EntityManagerInterface::class],
-        $di[ThreadRepository::class]
-    );
+    return new RebuildChainsCommand($di[ChainManager::class], $di[ThreadRepository::class]);
 };
 
 $di[Client::class] = function () {
     return new Client();
-};
-
-$di['Guzzle.cacheable'] = function () {
-    $ttl = 3600;
-    $stack = HandlerStack::create();
-    $cacheStorage = new DoctrineCacheStorage(new DoctrineCache('/tmp/'));
-    $stack->push(new CacheMiddleware(new GreedyCacheStrategy($cacheStorage, $ttl)));
-
-    return new Client(['handler' => $stack]);
 };
 
 $di[DvachClient::class] = function ($di) {
@@ -226,7 +213,6 @@ $di['BoardController'] = function (Container $di): BoardController {
         $di->get(PhpRenderer::class),
         $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
-        $di->get(ChainManager::class),
         $di->get(ChainRepository::class),
         $di->get(PaginationRenderer::class)
     );
@@ -246,17 +232,6 @@ $di['UsersController'] = function (Container $di): UsersController {
     return new UsersController($di->get(Authorizer::class), $di->get(PhpRenderer::class));
 };
 
-/* Error handler for altering PHP errors output */
-$di['PHPErrorHandler'] = function () {
-    return function (int $errno, string $errstr, string $errfile, int $errline) {
-        if (!(error_reporting() & $errno)) {
-            return;
-        }
-
-        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-    };
-};
-
 $di['notFoundHandler'] = function (Container $di) {
     return function (Request $request, Response $response) use ($di) {
         return $di->get(PhpRenderer::class)
@@ -265,6 +240,13 @@ $di['notFoundHandler'] = function (Container $di) {
     };
 };
 
-set_error_handler($di->get('PHPErrorHandler'));
+/* Error handler for altering PHP errors output */
+set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
+    if (!(error_reporting() & $errno)) {
+        return;
+    }
+
+    throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+});
 
 return $di;

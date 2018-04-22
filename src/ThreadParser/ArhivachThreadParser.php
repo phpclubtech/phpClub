@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace phpClub\ThreadParser;
 
 use phpClub\Entity\File;
-use phpClub\Entity\Post;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ArhivachThreadParser extends AbstractThreadParser
@@ -66,13 +65,12 @@ class ArhivachThreadParser extends AbstractThreadParser
 
     /**
      * @param Crawler $fileNode
-     * @param Post    $post
      *
      * @throws \Exception
      *
      * @return File
      */
-    protected function extractFile(Crawler $fileNode, Post $post): File
+    protected function extractFile(Crawler $fileNode): File
     {
         $fileXPath = '//a[@class="expand_image"]';
         $imgNode = $fileNode->filterXPath($fileXPath);
@@ -85,9 +83,13 @@ class ArhivachThreadParser extends AbstractThreadParser
 
         if ($this->isOldArhivachThread($filePath)) {
             // Hack for old arhivach threads
-            list($width, $height) = getimagesize($filePath);
+            [$width, $height] = getimagesize($filePath);
 
-            return new File($filePath, str_replace('/img/', '/thumb/', $filePath), $post, $height, $width);
+            return (new File())
+                ->setPath($filePath)
+                ->setThumbPath(str_replace('/img/', '/thumb/', $filePath))
+                ->setHeight($height)
+                ->setWidth($width);
         }
 
         $thumbXPath = '//div[@class="post_image"]/img';
@@ -100,7 +102,12 @@ class ArhivachThreadParser extends AbstractThreadParser
         $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');
         $clientName = count($clientNameNode) ? $clientNameNode->text() : null;
 
-        return new File($filePath, $thumbNode->attr('src'), $post, (int) $height, (int) $width, $clientName);
+        return (new File)
+            ->setPath($filePath)
+            ->setThumbPath($thumbNode->attr('src'))
+            ->setHeight((int) $height)
+            ->setWidth((int) $width)
+            ->setClientName($clientName);
     }
 
     /**

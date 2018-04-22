@@ -29,13 +29,17 @@ class Thread
 
     /**
      * @param $id
-     * @param Post[] $posts
      */
-    public function __construct($id, array $posts = [])
+    public function __construct($id)
     {
         $this->id = $id;
-        $this->posts = new ArrayCollection($posts);
+        $this->posts = new ArrayCollection();
         $this->lastPosts = new ArrayCollection();
+    }
+
+    public function setPosts(array $posts = []): self
+    {
+        $this->posts = $posts;
     }
 
     public function addPost(Post $post)

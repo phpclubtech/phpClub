@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use phpClub\Entity\Post;
 use phpClub\Entity\RefLink;
 use phpClub\Entity\Thread;
+use phpClub\Repository\PostRepository;
 
 class ChainManager
 {
@@ -16,9 +17,15 @@ class ChainManager
      */
     private $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    /**
+     * @var PostRepository
+     */
+    private $postRepository;
+
+    public function __construct(EntityManagerInterface $entityManager, PostRepository $postRepository)
     {
         $this->entityManager = $entityManager;
+        $this->postRepository = $postRepository;
     }
 
     /**
@@ -57,7 +64,7 @@ class ChainManager
 
         foreach ($references as $reference) {
             /** @var Post $reference */
-            $reference = $this->entityManager->getRepository(Post::class)->find($reference);
+            $reference = $this->postRepository->find($reference);
             if ($reference && !$reference->isFirstPost()) {
                 $reflink = new RefLink($forPost, $reference, $depth + 1);
                 $this->entityManager->persist($reflink);

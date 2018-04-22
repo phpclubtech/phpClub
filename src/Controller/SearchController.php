@@ -54,7 +54,7 @@ class SearchController
         $this->sphinxConnection = $sphinxConnection;
     }
 
-    public function searchAction(Request $request, Response $response, array $args = []): ResponseInterface
+    public function searchAction(Request $request, Response $response): ResponseInterface
     {
         $query = $request->getParam('q');
         $page = $request->getParam('page', 1);
