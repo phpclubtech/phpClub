@@ -87,7 +87,7 @@ class DvachClient
     }
 
     /**
-     * @param array  $postArray
+     * @param array $postArray
      *
      * @return Post
      */

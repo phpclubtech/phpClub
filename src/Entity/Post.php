@@ -66,24 +66,28 @@ class Post
     {
         $this->thread = $thread;
         $this->isFirstPost = $thread->getPosts()->isEmpty() || $this->id === $thread->getPosts()->first()->getId();
+
         return $this;
     }
 
     public function setAuthor(string $author): self
     {
         $this->author = $author;
+
         return $this;
     }
 
     public function setText(string $text): self
     {
         $this->text = $text;
+
         return $this;
     }
 
     public function setDate(\DateTimeImmutable $date): self
     {
         $this->date = $date;
+
         return $this;
     }
 
@@ -108,6 +112,7 @@ class Post
     public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -139,6 +144,7 @@ class Post
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -175,6 +181,7 @@ class Post
     public function setIsOpPost(bool $isOpPost): self
     {
         $this->isOpPost = $isOpPost;
+
         return $this;
     }
 

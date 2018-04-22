@@ -102,7 +102,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');
         $clientName = count($clientNameNode) ? $clientNameNode->text() : null;
 
-        return (new File)
+        return (new File())
             ->setPath($filePath)
             ->setThumbPath($thumbNode->attr('src'))
             ->setHeight((int) $height)
