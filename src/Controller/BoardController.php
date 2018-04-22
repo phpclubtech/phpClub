@@ -8,7 +8,6 @@ use phpClub\Pagination\PaginationRenderer;
 use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
-use phpClub\ThreadImport\ChainManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;

@@ -102,36 +102,42 @@ class File
     public function setPath(string $path): File
     {
         $this->path = $path;
+
         return $this;
     }
 
     public function setThumbPath(string $thumbPath): File
     {
         $this->thumbPath = $thumbPath;
+
         return $this;
     }
 
     public function setWidth($width)
     {
         $this->width = $width;
+
         return $this;
     }
 
     public function setHeight($height)
     {
         $this->height = $height;
+
         return $this;
     }
 
     public function setClientName(string $clientName): File
     {
         $this->clientName = $clientName;
+
         return $this;
     }
 
     public function setPost(Post $post): File
     {
         $this->post = $post;
+
         return $this;
     }
 }

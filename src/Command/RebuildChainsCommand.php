@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace phpClub\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use phpClub\Repository\ThreadRepository;
 use phpClub\ThreadImport\ChainManager;
 use Symfony\Component\Console\Command\Command;
