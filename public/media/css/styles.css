@@ -1,4 +1,5 @@
 body {
+    position: relative;
     margin: 0;
     background: #FFF;
     font-family: "Fira Sans", "Source Sans Pro", Helvetica, Arial, sans-serif;
@@ -99,8 +100,12 @@ header {
     color: #793862;
 }
 
+.post-header {
+    margin-bottom: 2px;
+}
+
 .post-header .author {
-        color: #333;
+    color: #333;
 }
 
 .post-header .datetime {
@@ -153,16 +158,26 @@ header {
 }
 
 .filesize {
+    display: block;
     font-size: 0.9em;
 }
 
 .text {
+    overflow: auto;
     margin: 12px 36px;
     color: black;
 }
 
 .oppost .text {
     color: inherit;
+}
+
+.files + .text {
+    margin: 0 12px 36px;
+}
+
+.files-multiple + .text {
+    margin: 12px 36px;
 }
 
 
@@ -177,8 +192,8 @@ header {
 
 span.spoiler, span.spoiler a {background:#BBBBBB;color:#BBBBBB;}
 span.spoiler a[href*="youtube.com"] {border-bottom:none;}
-span.spoiler:hover{color:#333333;}
-span.spoiler:hover a {color: #FF6600;}
+span.spoiler:hover{color:black;}
+span.spoiler:hover a {color: #4f48a8;}
 
 sub {vertical-align: sub;font-size: smaller;}
 sup {vertical-align: super; font-size: smaller;}
@@ -237,7 +252,10 @@ sup {vertical-align: super; font-size: smaller;}
 #lightbox {
     position: fixed;
     top: 0;
+    right: 0;
+    bottom: 0;
     left: 0;
+    margin: auto;
     z-index: 9999;
     box-shadow: rgb(0, 0, 0) 0px 4px 30px;
     border-radius: 2px;
@@ -245,27 +263,30 @@ sup {vertical-align: super; font-size: smaller;}
     max-height: 66%;
 }
 
-/* not visible on the dark backhround */
 #lightbox .cross {
-    display: none;
     position: absolute;
     top: 2px;
-    right: 2px;
-    opacity: 0.3;
+    right: -20px;
+    opacity: 0.6;
     border-radius: 50%;
     padding: 0 2px;
     color: black;
-    background: #FFF;
 }
 
 #lightbox .cross:hover {
     cursor: pointer;
+    opacity: 0.9;
 }
 
 #lightbox img, #lightbox video {
-    display: block;
-    width: 100%;
-    height: 100%;
+}
+
+#lightbox .loading-error {
+    border-radius: 0 0 2px 2px;
+    border-color: #EABFBF;
+    padding: .75rem;
+    background: #F4DFDF;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
 }
 
 .nav-arrows {
@@ -345,6 +366,10 @@ sup {vertical-align: super; font-size: smaller;}
     }
 
     .text {
+        margin: 1em;
+    }
+
+    .files-multiple + .text {
         margin: 1em;
     }
 }

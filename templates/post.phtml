@@ -62,9 +62,9 @@ use phpClub\Entity\File;
         <div class="refmap">
             <em>Ответы: </em>
 
-            <?php foreach($post->getReplies() as $replie) :?>
+            <?php foreach($post->getReplies() as $reply) :?>
                 <!-- reflinks data must be changed after prossing them in the parser  -->
-                <a class="post-reply-link" data-num="<?= $replie->getReference()->getId() ?>" data-thread="<?= $replie->getReference()->getThread()->getId() ?>" href="/pr/res/<?= $replie->getReference()->getThread()->getId() ?>.html#<?= $replie->getReference()->getId() ?>">&gt;&gt;<?= $replie->getReference()->getId() ?></a>
+                <a class="post-reply-link" data-num="<?= $reply->getReference()->getId() ?>" data-thread="<?= $reply->getReference()->getThread()->getId() ?>" href="/pr/res/<?= $reply->getReference()->getThread()->getId() ?>.html#<?= $reply->getReference()->getId() ?>">&gt;&gt;<?= $reply->getReference()->getId() ?></a>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

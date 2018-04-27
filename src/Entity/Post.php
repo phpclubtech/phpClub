@@ -166,9 +166,11 @@ class Post
      */
     public function getReplies()
     {
+        $repliesDepth = -1;
+
         $criteria = Criteria::create();
 
-        $criteria->where(Criteria::expr()->eq('depth', -1));
+        $criteria->where(Criteria::expr()->eq('depth', $repliesDepth));
 
         return $this->replies->matching($criteria);
     }

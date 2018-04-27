@@ -1,4 +1,143 @@
 $(document).ready(function() {
+    var popup = new PopUp();
+    var postPreview = new PostPreview();
+    var arrows = new Arrows();
+});
+
+function PopUp() {
+    this.lightbox = $('#lightbox');
+    this.fullsize = $('.fullsize');
+    this.cross = $('.cross');
+
+    this.visible = false;
+
+    this.handle();
+}
+
+PopUp.prototype.handle = function() {
+    $(window).click(function(e) {
+        this.fullsize = $('.fullsize');
+
+        if ($(e.target).closest('.file-link').length == 0) {
+            if (!$(e.target).is('.fullsize')) {
+                if (this.visible) {
+                    this.hide();
+                }
+            }
+        } else {
+            this.fullsize.remove();
+
+            var src = $(e.target).closest('.file-link').attr('href');
+            var ext = this.getExtenstion(src);
+
+            switch (ext) {
+                case 'jpg': case 'png': case 'gif':
+                    var content = $('<img/>', {class: 'fullsize', src: src});
+
+                    $(content).on('load', function() {
+                        this.fullsize = $('.fullsize');
+
+                        this.lightbox.append(content);
+                      
+                        this.resize(content);
+                    }.bind(this));
+
+                    break;
+
+                case 'mp4': case 'webm':
+                    var content = $('<video/>', {class: 'fullsize', src: src, controls: 'controls'});
+                    
+                    $(content).on('canplay', function() {
+                        this.fullsize = $('.fullsize');
+
+                        this.lightbox.append(content);
+                      
+                        this.resize(content);
+                    }.bind(this));
+
+                    break;
+
+                default:
+                    return;
+            }
+
+            e.preventDefault();
+
+            $(content).on('error', function() {
+                this.fullsize.remove();
+
+                var error = $('<div/>', {class: 'fullsize loading-error'}).text('Loading error');
+
+                this.lightbox.append(error);
+
+                // somehow sizes of .loading-error div equals -24px
+                this.resize(content);
+
+                this.lightbox.show();
+              
+                this.visible = true;
+            }.bind(this));
+
+            this.lightbox.show();
+          
+            this.visible = true;
+        }
+    }.bind(this));
+
+    this.cross.click(function() {
+        this.hide();
+    }.bind(this));
+
+    $(document).keyup(function(e) {
+         if (e.keyCode == 27) {
+            if (this.visible) {
+                this.hide();
+            }
+        }
+    }.bind(this));
+}
+
+PopUp.prototype.hide = function() {
+    this.lightbox.hide();
+    this.fullsize.remove();
+
+    this.visible = false;
+}
+
+PopUp.prototype.getExtenstion = function(src) {
+    return src.split('.').pop().toLowerCase();
+}
+
+PopUp.prototype.resize = function(content) {
+    var maxWidth = $(window).width() / 100 * 66;
+    var maxHeight = $(window).height() / 100 * 66;
+
+    var cWidth = content.width();
+    var cHeight = content.height();
+
+    if (maxWidth < maxHeight) {
+        if (cWidth > maxWidth) {
+            content.width(maxWidth);
+        }
+    } else {
+        if (cHeight > maxHeight) {
+            content.height(maxHeight);
+        }
+    }
+
+    var width = content.width();
+    var height = content.height();
+
+    this.lightbox.width(width);
+    this.lightbox.height(height);
+}
+
+
+function PostPreview() {
+    this.handle();
+}
+
+PostPreview.prototype.handle = function() {
     $(document).on('mouseover', '.post-reply-link', function() {
         var id = $(this).data('num');
 
@@ -26,138 +165,70 @@ $(document).ready(function() {
             $('.post-preview').remove();
         }
     });
+}
 
 
-    var lightbox = $('#lightbox');
-    var a = $('.file-link');
+function Arrows() {
+    this.up = $('#up-nav-arrow');
+    this.down = $('#down-nav-arrow');
 
-    $(window).click(function(e) {
-        var fullsize = $('.fullsize');
+    this.waiting = false, this.endScrollHandle;
 
-        if ($(a).has(e.target).length == 0 && !$(e.target).is('.file-link')) {
-            if (!$(e.target).is('.fullsize')) {
-                hideLightbox(lightbox, fullsize);
-            }
-        } else {
-            fullsize.remove();
+    this.endScrollHandle = setTimeout(function () {
+        this.scroll();
+    }.bind(this), 333);
 
-            var src = $(e.target).closest(a).attr('href');
-            var ext = getExtenstion(src);
+    this.down.show();
 
-            switch (ext) {
-                case 'jpg': case 'png': case 'gif':
-                    var content = $('<img/>', {class: 'fullsize', src: src});
+    this.handle();
+}
 
-                    $(content).on('load', function() {
-                        centerContent(content, lightbox);
-                    });
-
-                    break;
-
-                case 'mp4': case 'webm':
-                    var content = $('<video/>', {class: 'fullsize', src: src, controls: 'controls'});
-                    
-                    $(content)[0].oncanplay = function() {
-                        centerContent(content, lightbox);
-                    };
-
-                    break;
-
-                default:
-                    return;
-            }
-
-            e.preventDefault();
-
-            lightbox.append(content);
-            lightbox.show();
-        }
-    });
-
-    var cross = $('.cross');
-
-    lightbox.hover(
-        function() {
-            cross.show();
-        },
-
-        function() {
-            cross.hide();
-        }
-    );
-
-    cross.click(function() {
-        var fullsize = $('.fullsize');
-
-        hideLightbox(lightbox, fullsize);
-    });
-
-    $(document).keyup(function(e) {
-         if (e.keyCode == 27) {
-            if (lightbox.css('display') == 'block') {                
-                var fullsize = $('.fullsize');
-
-                hideLightbox(lightbox, fullsize);
-            }
-        }
-    });
-
-    function getExtenstion(src) {
-        return src.split('.').pop().toLowerCase();
-    }
-
-    function centerContent(content, lightbox) {
-        var width = $(window).width();
-        var cWidth = $(content).width();
-
-        var height = $(window).height();
-        var cHeight = $(content).height();
-
-        var top = (height - cHeight) / 2;
-        var left = (width - cWidth) / 2;
-
-        lightbox.css('top', top);
-        lightbox.css('left', left);
-    }
-
-    function hideLightbox(lightbox, fullsize) {
-        lightbox.hide();
-        fullsize.remove();
-    }
-
-
-    var up = $('#up-nav-arrow');
-    var down = $('#down-nav-arrow');
-
-    down.show();
-
+Arrows.prototype.handle = function() {
     $(window).scroll(function() {
-        var dHeight = $(document).height();
-        var wHeight = $(window).height()
+        console.log(this.waiting);
 
-        var scroll = $(this).scrollTop();
-
-        if (scroll > wHeight) {
-            up.show();
-        } else {
-            up.hide();
+        if (this.waiting) {
+            return;
         }
 
-        if (scroll + wHeight < dHeight - wHeight) {
-            down.show();
-        } else {
-            down.hide();
-        }
-    });
+        this.waiting = true;
 
-    up.click(function() {
+        clearTimeout(this.endScrollHandle);
+
+        this.scroll();
+
+        setTimeout(function () {
+            this.waiting = false;
+        }.bind(this), 333);
+    }.bind(this));
+
+    //is it fine to add several events in the same function? 
+    this.up.click(function() {
         $(window).scrollTop(0);
     });
 
-    down.click(function() {
+    this.down.click(function() {
         var height = $(document).height();
 
         $(window).scrollTop(height);
     });
-});
+}
 
+Arrows.prototype.scroll = function() {
+    var dHeight = $(document).height();
+    var wHeight = $(window).height()
+
+    var scroll = $(window).scrollTop();
+
+    if (scroll > wHeight) {
+      this.up.show();
+    } else {
+      this.up.hide();
+    }
+
+    if (scroll + wHeight < dHeight - wHeight) {
+        this.down.show();
+    } else {
+        this.down.hide();
+    }
+}
