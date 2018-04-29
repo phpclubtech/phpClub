@@ -1,17 +1,18 @@
 $(document).ready(function() {
-    var popup = new PopUp();
-    var postPreview = new PostPreview();
-    var arrows = new Arrows();
+    var popup = (new PopUp()).handle();
+
+    var postPreview = (new PostPreview()).handle();
+    
+    var arrows = (new Arrows()).handle();
 });
 
 function PopUp() {
     this.lightbox = $('#lightbox');
     this.fullsize = $('.fullsize');
+    this.loading = $('#loading');
     this.cross = $('.cross');
 
     this.visible = false;
-
-    this.handle();
 }
 
 PopUp.prototype.handle = function() {
@@ -27,6 +28,8 @@ PopUp.prototype.handle = function() {
         } else {
             this.fullsize.remove();
 
+            this.loading.show(); //The show of #loading doesn't makes PopUp.visible = true
+
             var src = $(e.target).closest('.file-link').attr('href');
             var ext = this.getExtenstion(src);
 
@@ -35,9 +38,15 @@ PopUp.prototype.handle = function() {
                     var content = $('<img/>', {class: 'fullsize', src: src});
 
                     $(content).on('load', function() {
+                        this.loading.hide();
+
                         this.fullsize = $('.fullsize');
 
                         this.lightbox.append(content);
+
+                        this.lightbox.show();
+
+                        this.visible = true;
                       
                         this.resize(content);
                     }.bind(this));
@@ -51,6 +60,10 @@ PopUp.prototype.handle = function() {
                         this.fullsize = $('.fullsize');
 
                         this.lightbox.append(content);
+
+                        this.lightbox.show();
+                        
+                        this.visible = true;
                       
                         this.resize(content);
                     }.bind(this));
@@ -64,23 +77,21 @@ PopUp.prototype.handle = function() {
             e.preventDefault();
 
             $(content).on('error', function() {
+                this.loading.hide();
+
                 this.fullsize.remove();
 
                 var error = $('<div/>', {class: 'fullsize loading-error'}).text('Loading error');
 
                 this.lightbox.append(error);
 
-                // somehow sizes of .loading-error div equals -24px
-                this.resize(content);
-
                 this.lightbox.show();
-              
-                this.visible = true;
-            }.bind(this));
 
-            this.lightbox.show();
-          
-            this.visible = true;
+                this.visible = true;
+
+                // somehow sizes of .loading-error is wrong
+                this.resize(error);
+            }.bind(this));
         }
     }.bind(this));
 
@@ -95,10 +106,13 @@ PopUp.prototype.handle = function() {
             }
         }
     }.bind(this));
+
+    return this;
 }
 
 PopUp.prototype.hide = function() {
     this.lightbox.hide();
+    this.loading.hide();
     this.fullsize.remove();
 
     this.visible = false;
@@ -134,7 +148,7 @@ PopUp.prototype.resize = function(content) {
 
 
 function PostPreview() {
-    this.handle();
+
 }
 
 PostPreview.prototype.handle = function() {
@@ -165,6 +179,8 @@ PostPreview.prototype.handle = function() {
             $('.post-preview').remove();
         }
     });
+
+    return this;
 }
 
 
@@ -179,14 +195,10 @@ function Arrows() {
     }.bind(this), 333);
 
     this.down.show();
-
-    this.handle();
 }
 
 Arrows.prototype.handle = function() {
     $(window).scroll(function() {
-        console.log(this.waiting);
-
         if (this.waiting) {
             return;
         }
@@ -212,6 +224,8 @@ Arrows.prototype.handle = function() {
 
         $(window).scrollTop(height);
     });
+
+    return this;
 }
 
 Arrows.prototype.scroll = function() {

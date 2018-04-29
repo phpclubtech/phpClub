@@ -32,6 +32,7 @@ header {
 .logo {
     font-size: 30px;
     font-weight: bold;
+    font-style: italic;
     color: #22242f;
     text-decoration: none;
 }
@@ -151,7 +152,6 @@ header {
     display: block;
 }
 
-/* Text below the image doesn't moves right from a border */
 .file-link .preview {
     float: left;
     margin-right: 16px;
@@ -259,8 +259,7 @@ sup {vertical-align: super; font-size: smaller;}
     z-index: 9999;
     box-shadow: rgb(0, 0, 0) 0px 4px 30px;
     border-radius: 2px;
-    max-width: 66%;
-    max-height: 66%;
+    background: #FFF;
 }
 
 #lightbox .cross {
@@ -282,11 +281,24 @@ sup {vertical-align: super; font-size: smaller;}
 }
 
 #lightbox .loading-error {
+    display: inline-block;
     border-radius: 0 0 2px 2px;
     border-color: #EABFBF;
     padding: .75rem;
     background: #F4DFDF;
     box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
+}
+
+#loading {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    width: 32px;
+    height: 32px;
+    z-index: 999;
 }
 
 .nav-arrows {
