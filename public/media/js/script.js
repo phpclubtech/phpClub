@@ -26,7 +26,7 @@ PopUp.prototype.handle = function() {
                 }
             }
         } else {
-            this.fullsize.remove();
+            this.hide();
 
             this.loading.show(); //The show of #loading doesn't makes PopUp.visible = true
 
@@ -57,6 +57,8 @@ PopUp.prototype.handle = function() {
                     var content = $('<video/>', {class: 'fullsize', src: src, controls: 'controls'});
                     
                     $(content).on('canplay', function() {
+                        this.loading.hide();
+
                         this.fullsize = $('.fullsize');
 
                         this.lightbox.append(content);
@@ -79,9 +81,9 @@ PopUp.prototype.handle = function() {
             $(content).on('error', function() {
                 this.loading.hide();
 
-                this.fullsize.remove();
-
                 var error = $('<div/>', {class: 'fullsize loading-error'}).text('Loading error');
+
+                this.fullsize = $('.fullsize');
 
                 this.lightbox.append(error);
 
