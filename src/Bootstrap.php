@@ -16,6 +16,7 @@ use phpClub\Command\RebuildChainsCommand;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
+use phpClub\Controller\ApiController;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\Entity\User;
@@ -225,6 +226,10 @@ $di['SearchController'] = function (Container $di): SearchController {
 
 $di['UsersController'] = function (Container $di): UsersController {
     return new UsersController($di->get(Authorizer::class), $di->get(PhpRenderer::class));
+};
+
+$di['ApiController'] = function (Container $di): ApiController {
+    return new ApiController($di->get(PostRepository::class));
 };
 
 $di['notFoundHandler'] = function (Container $di) {

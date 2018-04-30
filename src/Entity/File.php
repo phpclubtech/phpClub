@@ -48,6 +48,11 @@ class File
      **/
     private $post;
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     public function getPost(): Post
     {
         return $this->post;
@@ -60,7 +65,9 @@ class File
 
     public function getSize(): int
     {
-        return $this->size;
+        return 0;
+
+        //return $this->size;
     }
 
     public function setSize(int $size): void

@@ -25,7 +25,7 @@ use phpClub\Entity\File;
         <?php if ($post->isFirstPost() && isset($thread)) : ?>
             <span class="archives">
                 <a href=""><img src="/media/images/2ch.ico" title="Искать в архиве 2ch.hk"></a>
-                <a href="http://arhivach.org/ajax/?act=locate_thread&amp;url=https://2ch.hk/pr/res/1152267.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
+                <a href="http://arhivach.org/ajax/?act=locate_thread&amp;url=https://2ch.hk/pr/res/<?= $post->getThread()->getId() ?>.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
                 <i class="fa fa-chain"></i>
             </span>
         <?php endif; ?>

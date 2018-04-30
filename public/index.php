@@ -18,4 +18,7 @@ $application->map(['GET', 'POST'], '/config/', 'UsersController:configureAction'
 
 $application->post('/logout/', 'UsersController:logOutAction');
 
+/* API */
+$application->get('/api/board/get/message/{id:[0-9]+}/', 'ApiController:getPost');
+
 $application->run();

@@ -1,10 +1,30 @@
 $(document).ready(function() {
-    var popup = (new PopUp()).handle();
+    var api = new API();
 
-    var postPreview = (new PostPreview()).handle();
+    var postPreview = (new PostPreview(api)).handle();
+
+    var popup = (new PopUp()).handle();
     
     var arrows = (new Arrows()).handle();
 });
+
+function API() {
+
+}
+
+API.prototype.getPost= function(id) {
+    var promise = $.get({
+      url: '/api/board/get/message/' + id + '/',
+      dataType: 'json'
+    });
+
+    return promise;
+}
+
+API.prototype.handleError = function(jqXHR, textStatus) {
+    console.log(jqXHR.status, textStatus);
+}
+
 
 function PopUp() {
     this.lightbox = $('#lightbox');
@@ -38,17 +58,7 @@ PopUp.prototype.handle = function() {
                     var content = $('<img/>', {class: 'fullsize', src: src});
 
                     $(content).on('load', function() {
-                        this.loading.hide();
-
-                        this.fullsize = $('.fullsize');
-
-                        this.lightbox.append(content);
-
-                        this.lightbox.show();
-
-                        this.visible = true;
-                      
-                        this.resize(content);
+                        this.show(content);
                     }.bind(this));
 
                     break;
@@ -57,17 +67,7 @@ PopUp.prototype.handle = function() {
                     var content = $('<video/>', {class: 'fullsize', src: src, controls: 'controls'});
                     
                     $(content).on('canplay', function() {
-                        this.loading.hide();
-
-                        this.fullsize = $('.fullsize');
-
-                        this.lightbox.append(content);
-
-                        this.lightbox.show();
-                        
-                        this.visible = true;
-                      
-                        this.resize(content);
+                        this.show(content);
                     }.bind(this));
 
                     break;
@@ -79,20 +79,10 @@ PopUp.prototype.handle = function() {
             e.preventDefault();
 
             $(content).on('error', function() {
-                this.loading.hide();
-
+                // somehow sizes of .loading-error is wrong
                 var error = $('<div/>', {class: 'fullsize loading-error'}).text('Loading error');
 
-                this.fullsize = $('.fullsize');
-
-                this.lightbox.append(error);
-
-                this.lightbox.show();
-
-                this.visible = true;
-
-                // somehow sizes of .loading-error is wrong
-                this.resize(error);
+                this.show(error);
             }.bind(this));
         }
     }.bind(this));
@@ -118,6 +108,20 @@ PopUp.prototype.hide = function() {
     this.fullsize.remove();
 
     this.visible = false;
+}
+
+PopUp.prototype.show = function(content) {
+    this.loading.hide();
+
+    this.fullsize = $('.fullsize');
+
+    this.lightbox.append(content);
+
+    this.lightbox.show();
+    
+    this.visible = true;
+    
+    this.resize(content);
 }
 
 PopUp.prototype.getExtenstion = function(src) {
@@ -149,27 +153,49 @@ PopUp.prototype.resize = function(content) {
 }
 
 
-function PostPreview() {
-
+function PostPreview(api) {
+    this.api = api;
 }
 
 PostPreview.prototype.handle = function() {
+    var that = this;
+
     $(document).on('mouseover', '.post-reply-link', function() {
         var id = $(this).data('num');
 
         var post = $('.post[data-id="' + id +'"]');
 
-        var clone = post.clone();
+        if (post.length != 0) {
+            var clone = post.clone();
 
-        var offset = $(this).offset();
-        var width = $(this).width();
-        var height = $(this).height();
+            that.render(this, clone);
+        } else {
+            that.api.getPost(id).then(
+                function(data) {
+                    data['data']['date'] = new Date(data['data']['date']['date']);
 
-        clone.addClass('post-preview');
-        clone.css('top', offset.top + height);
-        clone.css('left', offset.left + width / 2);
+                    var template = $('#post-template').html();
+                    var html = ejs.render(template, {post: data['data']});
 
-        $('body').append(clone);
+                    var preview = $(html);
+
+                    that.render(this, preview);
+                }.bind(this),
+
+                function(jqXHR, textStatus) {
+                    var error = $('<div/>', {class: 'loading-error'}).text('Loading error');
+
+                    var template = error.prop('outerHTML');
+                    var html = ejs.render(template, {});
+
+                    var preview = $(html);
+
+                    that.render(this, preview);
+
+                    that.api.handleError(jqXHR, textStatus);
+                }.bind(this)
+            );
+        }
     });
 
     $(document).on('mouseleave', '.post-preview', function(e) {
@@ -183,6 +209,23 @@ PostPreview.prototype.handle = function() {
     });
 
     return this;
+}
+
+PostPreview.prototype.render = function(replyLink, preview) {
+    var offset = $(replyLink).offset();
+    var width = $(replyLink).width();
+    var height = $(replyLink).height();
+
+    preview.addClass('post-preview');
+
+    if (preview.hasClass('op-post')) {
+        preview.removeClass('op-post');
+    }
+
+    preview.css('top', offset.top + height);
+    preview.css('left', offset.left + width / 2);
+
+    $('body').append(preview);
 }
 
 

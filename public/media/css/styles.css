@@ -280,7 +280,7 @@ sup {vertical-align: super; font-size: smaller;}
 #lightbox img, #lightbox video {
 }
 
-#lightbox .loading-error {
+.loading-error {
     display: inline-block;
     border-radius: 0 0 2px 2px;
     border-color: #EABFBF;
