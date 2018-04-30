@@ -65,9 +65,7 @@ class File
 
     public function getSize(): int
     {
-        return 0;
-
-        //return $this->size;
+        return $this->size;
     }
 
     public function setSize(int $size): void
