@@ -29,48 +29,48 @@ class ApiController
             if ($post) {
                 $json = [
                     'data' => [
-                        'id' => $post->getId(),
-                        'thread' =>$post->getThread()->getId(),
-                        'title' => $post->getTitle(),
-                        'author' => $post->getAuthor(),
-                        'email' => $post->getEmail(),
-                        'date' => $post->getDate(),
-                        'text' => $post->getText(),
-                        'files' => [],
-                        'replies' => [],
-                        'isOpPost' => $post->isOpPost(),
+                        'id'          => $post->getId(),
+                        'thread'      => $post->getThread()->getId(),
+                        'title'       => $post->getTitle(),
+                        'author'      => $post->getAuthor(),
+                        'email'       => $post->getEmail(),
+                        'date'        => $post->getDate(),
+                        'text'        => $post->getText(),
+                        'files'       => [],
+                        'replies'     => [],
+                        'isOpPost'    => $post->isOpPost(),
                         'isFirstPost' => $post->isFirstPost(),
-                        'isOld' => $post->isOld()
+                        'isOld'       => $post->isOld(),
                     ],
 
-                    'status' => "OK" 
+                    'status' => 'OK',
                 ];
 
                 foreach ($post->getFiles() as $file) {
                     $json['data']['files'][] = [
-                        'id' => $file->getId(),
-                        'name' => $file->getName(),
-                        'size' => $file->getSize(),
-                        'width' => $file->getWidth(),
-                        'height' => $file->getHeight(),
-                        'path' => $file->getPath(),
-                        'thumbPath' => $file->getThumbPath()
+                        'id'        => $file->getId(),
+                        'name'      => $file->getName(),
+                        'size'      => $file->getSize(),
+                        'width'     => $file->getWidth(),
+                        'height'    => $file->getHeight(),
+                        'path'      => $file->getPath(),
+                        'thumbPath' => $file->getThumbPath(),
                     ];
                 }
 
                 foreach ($post->getReplies() as $reply) {
                     $json['data']['replies'][] = [
-                        'id' => $reply->getReference()->getId(),
-                        'thread' => $reply->getReference()->getThread()->getId()
+                        'id'     => $reply->getReference()->getId(),
+                        'thread' => $reply->getReference()->getThread()->getId(),
                     ];
                 }
 
                 return $response->withJson($json, 200, JSON_PRETTY_PRINT);
             }
 
-            return $response->withJson(['status' => "The Post with that id not found"], 204);
+            return $response->withJson(['status' => 'The Post with that id not found'], 204);
         }
 
-        return $response->withJson(['status' => "No id value"], 400);
+        return $response->withJson(['status' => 'No id value'], 400);
     }
 }
