@@ -172,7 +172,7 @@ $di[Client::class] = function () {
 
     $client = new Client([
         'timeout' => 10,
-        'curl' => [
+        'curl'    => [
 //            CURLOPT_PROXY => 'user:password@ip:port',
         ],
     ]);
