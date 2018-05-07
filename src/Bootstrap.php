@@ -164,7 +164,20 @@ $di[RebuildChainsCommand::class] = function (Container $di) {
 };
 
 $di[Client::class] = function () {
-    return new Client();
+    $proxy = getenv('GUZZLE_PROXY');
+
+    if (!$proxy) {
+        throw new \Exception(sprintf('GUZZLE_PROXY env variable is empty or not defined'));
+    }
+
+    $client = new Client([
+        'timeout' => 10,
+        'curl' => [
+//            CURLOPT_PROXY => 'user:password@ip:port',
+        ],
+    ]);
+
+    return $client;
 };
 
 $di[DvachClient::class] = function ($di) {
