@@ -27,7 +27,43 @@ class DateConverter
             return $dateTime;
         }
 
-        throw new \Exception("Unable to parse date: {$date}");
+        throw new DateParseException("Unable to parse date: {$date}");
+    }
+
+    /**
+     * Parses datetime like '02 Май, 19:34' from m2-ch.ru
+     */
+    public function parseMDvachDate(string $rawDate, int $year): \DateTimeInterface
+    {
+        if (!preg_match("/(\d+)\s+(\w+),\s*(\d+):(\d+)/u", $rawDate, $m)) {
+            throw new DateParseException("Invalid date format: '$rawDate'");
+        }
+
+        $day = $m[1];
+        $hours = $m[3];
+        $minutes = $m[4];
+
+        $monthNames = [
+            'Янв' => 1,
+            'Фев' => 2,
+            'Мар' => 3,
+            'Апр' => 4,
+            'Май' => 5,
+            'Июн' => 6,
+            'Июл' => 7,
+            'Авг' => 8,
+            'Сен' => 9,
+            'Окт' => 10,
+            'Ноя' => 11,
+            'Дек' => 12,
+        ];
+
+        $month = $monthNames[$m[2]];
+
+        $mskTimezone = new \DateTimeZone('Europe/Moscow');
+        $dateTime = new \DateTimeImmutable("$year-$month-$day $hours:$minutes", $mskTimezone);
+        
+        return $dateTime;
     }
 
     /**

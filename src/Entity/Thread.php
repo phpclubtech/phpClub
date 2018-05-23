@@ -30,7 +30,7 @@ class Thread
     /**
      * @param $id
      */
-    public function __construct($id)
+    public function __construct(int $id)
     {
         $this->id = $id;
         $this->posts = new ArrayCollection();

@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
+use Tests\AbstractTestCase;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
+use phpClub\ThreadParser\AbstractThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
-use Tests\AbstractTestCase;
 
 class DvachHtmlParserTest extends AbstractTestCase
 {
@@ -274,5 +275,11 @@ class DvachHtmlParserTest extends AbstractTestCase
         $this->assertCount(1, $posts[1]->getFiles());
         $this->assertCount(1, $posts[2]->getFiles());
         $this->assertCount(0, $posts[3]->getFiles());
+    }
+
+    public function testCloudflareEmailDecoder()
+    {
+        $email = AbstractThreadParser::decodeCfEmail('50243835373c253510243f223d31393c7e3f2237');
+        $this->assertEquals('theglue@tormail.org', $email);
     }
 }

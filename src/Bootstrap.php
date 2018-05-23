@@ -9,6 +9,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client;
+use Psr\SimpleCache\CacheInterface;
+use Slim\Container;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Views\PhpRenderer;
+use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 use phpClub\BoardClient\ArhivachClient;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Command\ImportThreadsCommand;
@@ -32,13 +39,7 @@ use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DateConverter;
 use phpClub\ThreadParser\DvachThreadParser;
-use Psr\SimpleCache\CacheInterface;
-use Slim\Container;
-use Slim\Http\Request;
-use Slim\Http\Response;
-use Slim\Views\PhpRenderer;
-use Symfony\Component\Cache\Simple\ArrayCache;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use phpClub\ThreadParser\MDvachThreadParser;
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
@@ -119,6 +120,10 @@ $di[DvachThreadParser::class] = function ($di) {
     return new DvachThreadParser($di[DateConverter::class]);
 };
 
+$di[MDvachThreadParser::class] = function ($di) {
+    return new MDvachThreadParser($di[DateConverter::class]);
+};
+
 $di[DateConverter::class] = function () {
     return new DateConverter();
 };
@@ -154,7 +159,8 @@ $di[ImportThreadsCommand::class] = function (Container $di) {
         $di[ThreadImporter::class],
         $di[DvachClient::class],
         $di[ArhivachClient::class],
-        $di[DvachThreadParser::class]
+        $di[DvachThreadParser::class],
+        $di[MDvachThreadParser::class]
     );
 };
 

@@ -47,8 +47,6 @@ class ArhivachThreadParser extends AbstractThreadParser
     /**
      * @param Crawler $postNode
      *
-     * @throws \Exception
-     *
      * @return string
      */
     protected function extractAuthor(Crawler $postNode): string
@@ -66,8 +64,6 @@ class ArhivachThreadParser extends AbstractThreadParser
     /**
      * @param Crawler $fileNode
      *
-     * @throws \Exception
-     *
      * @return File
      */
     protected function extractFile(Crawler $fileNode): File
@@ -76,7 +72,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $imgNode = $fileNode->filterXPath($fileXPath);
 
         if (!count($imgNode)) {
-            throw new \Exception("Unable to parse file, HTML: {$imgNode->html()}");
+            throw new ThreadParseException("Unable to parse image node, HTML: {$imgNode->html()}");
         }
 
         [, $filePath, $width, $height] = preg_split("/','|',|,|\)/", $imgNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
@@ -96,7 +92,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $thumbNode = $imgNode->filterXPath($thumbXPath);
 
         if (!count($thumbNode)) {
-            throw new \Exception("Unable to parse thumb, HTML: {$thumbNode->html()}");
+            throw new ThreadParseException("Unable to parse thumb, HTML: {$thumbNode->html()}");
         }
 
         $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');

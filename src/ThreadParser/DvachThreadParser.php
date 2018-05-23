@@ -18,7 +18,7 @@ class DvachThreadParser extends AbstractThreadParser
     protected function getAuthorXPath(): string
     {
         return '//span[starts-with(@class,"poster") or @class="ananimas"][normalize-space(string())]
-                | //span[@class="name"]/text()
+                | //span[@class="name"]
                 | //div/a[@class="post-email"]/text()
                 | //span[@class="mod"]/text()';
     }
@@ -35,7 +35,9 @@ class DvachThreadParser extends AbstractThreadParser
 
     protected function getTextXPath(): string
     {
-        return '//blockquote/p | //blockquote[not(p)]';
+        // star is for post element
+        return './*/blockquote[contains(@class, "postMessage") or contains(@class, "post-message")]';
+        // return '//blockquote/p | //blockquote[not(p)]';
     }
 
     protected function getTitleXPath(): string
@@ -53,8 +55,6 @@ class DvachThreadParser extends AbstractThreadParser
     /**
      * @param Crawler $fileNode
      *
-     * @throws \Exception
-     *
      * @return File
      */
     protected function extractFile(Crawler $fileNode): File
@@ -71,8 +71,6 @@ class DvachThreadParser extends AbstractThreadParser
     /**
      * @param Crawler $fileNode
      *
-     * @throws \Exception
-     *
      * @return array
      */
     private function extractOnClickJsArgs(Crawler $fileNode): array
@@ -81,7 +79,7 @@ class DvachThreadParser extends AbstractThreadParser
         $argsNode = $fileNode->filterXPath($argsXPath);
 
         if (!count($argsNode)) {
-            throw new \Exception("Unable to find expand params, HTML: {$fileNode->html()}");
+            throw new ThreadParseException("Unable to find expand params, HTML: {$fileNode->html()}");
         }
 
         $params = $argsNode->text();

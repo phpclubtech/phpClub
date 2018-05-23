@@ -30,7 +30,7 @@ class DateConverterTest extends TestCase
 
     /**
      * @dataProvider provideInvalidDates
-     * @expectedException \Exception
+     * @expectedException phpClub\ThreadParser\DateParseException
      */
     public function testInvalidArgument($invalidDate)
     {
@@ -45,4 +45,18 @@ class DateConverterTest extends TestCase
             [''],
         ];
     }
+
+    public function testMDvachDateParser()
+    {
+        $dateTime = $this->dateConverter->parseMDvachDate('02 Май, 19:34', 2013);
+        $this->assertEquals('2013-05-02 19:34', $dateTime->format('Y-m-d H:i'));
+    }
+
+    /**
+     * @expectedException phpClub\ThreadParser\DateParseException
+     */
+    public function testMDvachInvalidDate()
+    {
+        $dateTime = $this->dateConverter->parseMDvachDate('absolutely invalid date', 2013);
+    }    
 }

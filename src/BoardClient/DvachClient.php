@@ -64,7 +64,7 @@ class DvachClient
      */
     private function extractThread(array $phpThread): Thread
     {
-        $threadId = $phpThread['num'];
+        $threadId = intval($phpThread['num']);
 
         $responseBody = $this->guzzle->get("https://2ch.hk/pr/res/{$threadId}.json")->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);

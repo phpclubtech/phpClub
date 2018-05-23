@@ -26,7 +26,7 @@ abstract class AbstractTestCase extends TestCase
         return new Thread($id);
     }
 
-    public function createPost($id, Thread $thread = null): Post
+    public function createPost(int $id, Thread $thread = null): Post
     {
         return (new Post($id))
             ->setTitle('title ' . $id)

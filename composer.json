@@ -12,6 +12,7 @@
         "slim/php-view": "^2.2",
         "symfony/cache": "^3.3",
         "symfony/dom-crawler": "^3.3",
+        "symfony/css-selector": "^3.3",
         "symfony/filesystem": "^3.3",
         "symfony/console": "^3.3",
         "guzzlehttp/guzzle": "^6.3",

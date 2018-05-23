@@ -55,7 +55,7 @@ class Post
      */
     private $replies;
 
-    public function __construct($id)
+    public function __construct(int $id)
     {
         $this->id = $id;
         $this->files = new ArrayCollection();
@@ -91,7 +91,7 @@ class Post
         return $this;
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
