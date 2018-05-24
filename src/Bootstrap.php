@@ -191,8 +191,8 @@ $di[UrlGenerator::class] = function (Container $di) {
 $di[PhpRenderer::class] = function (Container $di): PhpRenderer {
     return new PhpRenderer(__DIR__ . '/../templates', [
         // Shared variables
-        'urlGenerator' => $di->get(UrlGenerator::class),
-        'paginator' => $di->get(PaginationRenderer::class),
+        'urlGenerator'   => $di->get(UrlGenerator::class),
+        'paginator'      => $di->get(PaginationRenderer::class),
         'arhivachClient' => $di->get(ArhivachClient::class),
     ]);
 };
