@@ -5,7 +5,7 @@ Demonstration: http://phpclub.tech/
 1. `git clone https://github.com/someApprentice/phpClub.git`
 2. `composer install`
 3. `cp .env.example .env`, config db connection
-4. Run migrations `composer migrate`
+4. Run migrations `make migrate`
 5. `cp config/sphinx.conf.example config/sphinx.conf`
 
 ## Thread import syntax
@@ -32,5 +32,5 @@ php -S 127.0.0.1:9001 -t public dev-server.php
 
 ## Testing
 1. Create test database, edit TEST_DB_NAME variable in `.env` file
-2. Run migrations for test database `composer migrate-test`
+2. Run migrations for test database `make migrate-test`
 3. Run tests using `./vendor/bin/phpunit`. To run single method add `--filter` option.
