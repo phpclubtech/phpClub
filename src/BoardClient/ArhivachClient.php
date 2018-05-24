@@ -88,7 +88,7 @@ class ArhivachClient
      */
     public function generateArchiveLink(Thread $thread): string
     {
-        return "http://arhivach.org/ajax/?act=locate_thread&url=https://2ch.hk/pr/res/{$thread->getId()}.html";
+        return "http://arhivach.cf/ajax/?act=locate_thread&url=https://2ch.hk/pr/res/{$thread->getId()}.html";
     }
 
     /**

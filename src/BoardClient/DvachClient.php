@@ -40,9 +40,8 @@ class DvachClient
         $threads = $responseJson['threads'];
 
         $phpThreadsArray = array_filter($threads, [$this, 'looksLikePhpThread']);
-        $phpThreads = array_map([$this, 'extractThread'], $phpThreadsArray);
 
-        return $phpThreads;
+        return array_map([$this, 'extractThread'], $phpThreadsArray);
     }
 
     /**
