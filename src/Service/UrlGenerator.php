@@ -42,12 +42,12 @@ class UrlGenerator
         return $this->router->pathFor('chain', ['post' => $post->getId()]);
     }
 
-    public function toArhivachThread(Thread $thread): string
+    public function toArhivachThread(): string
     {
-        return $this->arhivachClient->generateArchiveLink($thread);
+        return $this->arhivachClient->generateArchiveLink();
     }
 
-    public function toDvachArchiveThread(Thread $thread): string
+    public function toDvachArchiveThread(): string
     {
         // TODO: implement
         return '';
