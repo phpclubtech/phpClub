@@ -68,7 +68,7 @@ class ApiController
                 return $response->withJson($json, 200, JSON_PRETTY_PRINT);
             }
 
-            return $response->withJson(['status' => 'The Post with that id not found'], 204);
+            return $response->withJson(['status' => 'The Post with that id not found'], 404);
         }
 
         return $response->withJson(['status' => 'No id value'], 400);
