@@ -86,7 +86,7 @@ class ArhivachClient
      */
     public function generateArchiveLink(): string
     {
-        return "http://arhivach.cf/ajax/?act=locate_thread&url=";
+        return 'http://arhivach.cf/ajax/?act=locate_thread&url=';
     }
 
     /**
