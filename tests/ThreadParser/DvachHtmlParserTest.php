@@ -51,8 +51,12 @@ class DvachHtmlParserTest extends AbstractTestCase
         $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
         $posts = $thread->getPosts();
 
-        // It is enough to check only posts count, because $threadParser throws an exception when parsing fails
-        $this->assertGreaterThan(490, $posts->count());
+        if (!preg_match("~15-fixed\.html$~", $pathToThreadHtml)) {
+            // It is enough to check only posts count, because $threadParser throws an exception when parsing fails
+            $this->assertGreaterThan(490, $posts->count());
+        } else {
+            $this->assertGreaterThan(300, $posts->count());
+        }
         $this->assertNotEmpty($posts->first()->getAuthor());
         $this->assertNotEmpty($posts->first()->getId());
         $this->assertNotEmpty($posts->first()->getText());
@@ -61,13 +65,13 @@ class DvachHtmlParserTest extends AbstractTestCase
     public function provideThreadsHtml()
     {
         return [
-            [__DIR__ . '/../Fixtures/dvach/1.html'],
+            [__DIR__ . '/../Fixtures/dvach/1-fixed.html'],
             [__DIR__ . '/../Fixtures/dvach/2.html'],
             [__DIR__ . '/../Fixtures/dvach/3.html'],
-            [__DIR__ . '/../Fixtures/dvach/4b.html'],
+            [__DIR__ . '/../Fixtures/dvach/4b-fixed.html'],
             [__DIR__ . '/../Fixtures/dvach/6.html'],
             [__DIR__ . '/../Fixtures/dvach/10.html'],
-            [__DIR__ . '/../Fixtures/dvach/15.html'],
+            [__DIR__ . '/../Fixtures/dvach/15-fixed.html'],
             [__DIR__ . '/../Fixtures/dvach/17.html'],
             [__DIR__ . '/../Fixtures/dvach/18.html'],
             [__DIR__ . '/../Fixtures/dvach/19.html'],
@@ -166,10 +170,10 @@ class DvachHtmlParserTest extends AbstractTestCase
 
     public function testThreadFromGoogleCache()
     {
-        $pathToHtml = __DIR__ . '/../Fixtures/dvach/15.html';
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/15-fixed.html';
         $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
         $posts = $thread->getPosts();
-        $this->assertGreaterThan(600, $posts->count());
+        $this->assertGreaterThan(300, $posts->count());
         $this->assertEquals('!xnn2uE3AU.', $posts[0]->getAuthor());
         $this->assertContains('пробелы между строчками и всё заработало', $posts[7]->getText());
         $this->assertContains('будет идти потоковое видео?', $posts->last()->getText());
@@ -193,7 +197,7 @@ class DvachHtmlParserTest extends AbstractTestCase
     public function testFilesCount()
     {
         // All this checks are required!
-        $pathToHtml = __DIR__ . '/../Fixtures/dvach/1.html';
+        $pathToHtml = __DIR__ . '/../Fixtures/dvach/1-fixed.html';
         $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());

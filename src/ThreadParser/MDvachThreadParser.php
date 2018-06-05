@@ -23,7 +23,12 @@ class MDvachThreadParser extends AbstractThreadParser
     protected function getAuthorXPath(): string
     {
         // TODO: now it catches only tripcode and sage, what about normal name? 
-        return '//span[@class="postertrip"] | //span[@class="sage"]';
+        return '//span[@class="sage"]';
+    }
+
+    protected function getTripCodeXPath(): string 
+    {
+        return '//span[@class="postertrip"]';
     }
 
     protected function getDateXPath(): string
@@ -55,13 +60,14 @@ class MDvachThreadParser extends AbstractThreadParser
     {
         $authorXPath = $this->getAuthorXPath();
         $authorNode = $postNode->filterXPath($authorXPath);
+        $author = trim(DOMUtil::getTextFromCrawler($authorNode));
+
+        $tripXPath = $this->getTripCodeXPath();
+        $tripNode = $postNode->filterXPath($tripXPath);
+        $trip = trim(DOMUtil::getTextFromCrawler($tripNode));
 
         // Author can be missing
-        if (!count($authorNode)) {
-            return '';
-        }
-
-        return $authorNode->text();
+        return $author !== '' ? $author : $trip;
     }    
 
     protected function extractDate(Crawler $postNode): \DateTimeInterface

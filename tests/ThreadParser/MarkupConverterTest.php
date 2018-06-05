@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Crawler;
 use phpClub\ThreadParser\InvalidMarkupException;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\Util\DOMUtil;
@@ -82,6 +83,35 @@ class MarkupConverterTest extends TestCase
         ';
 
         $body = DOMUtil::createFragment($markup);
-        $this->markupConverter->transformBody($body);
+        $result = $this->markupConverter->transformBody($body);
+        $this->assertNotEmpty($result);
+    }
+
+    public function testRemovesArhivachVideoPreview()
+    {
+        $arhivachConverter = new MarkupConverter(true);
+
+        $markup = '
+            <a href="https://www.youtube.com/watch?v=cGrIAFycpwA" target="_blank" 
+                rel="nofollow noopener noreferrer">
+                    https://www.youtube.com/watch?v=cGrIAFycpwA
+            </a>
+            <span href="#" class="media-expand-button">[Развернуть]</span>
+            <p>test</p>
+        ';
+
+        $body = DOMUtil::createFragment($markup);
+        $result = $arhivachConverter->transformBody($body);
+
+        $crawler = new Crawler($result);
+        $preview = $crawler->filter('.media-expand-button');
+
+        $this->assertEquals(0, $preview->count());
+
+        $link = $crawler->filter('a');
+        $this->assertEquals(1, $link->count());
+
+        $para = $crawler->filter('p');
+        $this->assertEquals(1, $para->count());
     }
 }

@@ -14,6 +14,7 @@ use phpClub\BoardClient\ArhivachClient;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Entity\Thread;
 use phpClub\ThreadImport\ThreadImporter;
+use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\ThreadParser\ThreadParseException;
@@ -41,6 +42,11 @@ class ImportThreadsCommand extends Command
     private $dvachThreadParser;
 
     /**
+     * @var ArhivachThreadParser
+     */
+    private $arhivachThreadParser;
+
+    /**
      * @var MDvachThreadParser
      */
     private $mDvachThreadParser;
@@ -50,13 +56,15 @@ class ImportThreadsCommand extends Command
         DvachClient $dvachApiClient,
         ArhivachClient $arhivachClient,
         DvachThreadParser $dvachThreadParser,
-        MDvachThreadParser $mDvachThreadParser
+        MDvachThreadParser $mDvachThreadParser,
+        ArhivachThreadParser $arhivachThreadParser
     ) {
         $this->threadImporter = $threadImporter;
         $this->dvachApiClient = $dvachApiClient;
         $this->arhivachClient = $arhivachClient;
         $this->dvachThreadParser = $dvachThreadParser;
         $this->mDvachThreadParser = $mDvachThreadParser;
+        $this->arhivachThreadParser = $arhivachThreadParser;
 
         parent::__construct();
     }
@@ -188,12 +196,6 @@ class ImportThreadsCommand extends Command
 
         $threads = [];
         $threadNumber = 0;
-        // $progress = new ProgressBar($output, count($htmlPaths));
-        // $progress->setFormatDefinition('custom', '%current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %message%');
-        // $progress->setFormat('custom');
-        // $progress->setMessage('init');
-
-        // $progress->start();
 
         foreach ($htmlPaths as $path) {
             
@@ -201,10 +203,14 @@ class ImportThreadsCommand extends Command
             $threadNumber++;
             $html = file_get_contents($path);
             $isMDvach = $this->isMDvachPage($html);
+            $isArhivach = $this->looksLikeArchivachPage($html);
 
             try {
+                // TODO: allow to choose parser manually
                 if ($isMDvach) {
                     $thread = $this->mDvachThreadParser->extractThread($html, dirname($path));
+                } elseif ($isArhivach) {
+                    $thread = $this->arhivachThreadParser->extractThread($html, dirname($path));
                 } else {
                     $thread = $this->dvachThreadParser->extractThread($html, dirname($path));
                 }
@@ -232,13 +238,7 @@ class ImportThreadsCommand extends Command
                 basename($path),
                 count($thread->getPosts())
             ));
-
-            // $progress->advance();
-            // $output->writeln(sprintf(" %d posts", count($thread->getPosts())));
         }
-
-        // $progress->finish();
-        // $output->writeln('');
 
         return $threads;
     }
@@ -248,6 +248,24 @@ class ImportThreadsCommand extends Command
         // <title>#272705 - Программирование - М.Двач</title>
         // hacks hacks
         return (bool)preg_match("/<title>[^<>]*М.Двач/u", $html);
+    }
+
+    /**
+     * Checks whether the file looks like archivach HTML page
+     */
+    private function looksLikeArchivachPage(string $html): bool
+    {
+        // <link rel="shortcut icon" href="http://arhivach.org/favicon.ico">
+        if (preg_match('~<link[^<>]+href="[^<>"]+arhivach\.org/favicon~', $html)) {
+            return true;
+        }
+
+        // <link rel="canonical" href="http://arhivach.org/thread/266631/">
+        if (preg_match('~<link[^<>]+rel="canonical"[^<>]+href="[^<>"]+arhivach\.org/~', $html)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function getDefaultArhivachThreads(): array

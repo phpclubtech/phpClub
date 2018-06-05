@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\Util;
 
+use Symfony\Component\DomCrawler\Crawler;
+
 class DOMUtil
 {
     /**
@@ -166,5 +168,22 @@ class DOMUtil
             throw new \Exception("Transformer must return either null, or \DOMNode, or \DOMDocumentFragment");
         }
     }
+
+    public static function hasClass(string $classList, string $class)
+    {
+        $classes = preg_split("/\s+/", trim($classList));
+        return in_array($class, $classes, true);
+    }
+
+    public static function getTextFromCrawler(Crawler $crawler): string
+    {
+        // We get an exception trying to get text from empty Crawler
+        if (!$crawler->count()) {
+            return '';
+        }
+
+        return $crawler->text();
+    }
+    
 }
 

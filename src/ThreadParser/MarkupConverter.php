@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
+use phpClub\Util\DOMUtil;
+
 /**
  * Validates and transforms HTML markup inside post body. 
  */
@@ -56,6 +58,16 @@ class MarkupConverter
     ];
 
     /**
+     * Allows additional tags that are present in arhivach code
+     */
+    private $isArhivachMode = false;
+
+    public function __construct(bool $isArhivachMode = false)
+    {
+        $this->isArhivachMode = $isArhivachMode;
+    }
+
+    /**
      * Validates and transforms post HTML markup. Throws an exception if
      * unexpected HTML tag is found. This might mean that either 
      * a new type of markup was added (and this code needs to be updated) 
@@ -69,25 +81,27 @@ class MarkupConverter
      *
      * The method modifies passed DOM tree in place.
      *
+     * It returns a modified DOM node or null if there is nothing left and
+     * all content was removed.
+     *
      * @param \DOMDocumentFragment|\DOMElement|\DOMText $body 
      */
-    public function transformBody(\DOMNode $body): void
+    public function transformBody(\DOMNode $body): ?\DOMNode
     {
         $type = $body->nodeType;
 
         if ($type == XML_TEXT_NODE) {
             // Nothing to do
-            return;
+            return $body;
         }
 
         if ($type == XML_DOCUMENT_FRAG_NODE) {
-            $this->transformIterable($body->childNodes);
-            return;
-        } 
+            $this->transformChildren($body);
+            return $body;
+        }
 
         if ($type === XML_ELEMENT_NODE) {
-            $this->transformElementRecursively($body);
-            return;
+            return $this->transformElementRecursively($body);
         }
 
         throw new \InvalidArgumentException("Invalid DOM Node type; only text, element or document fragment node is allowed, given type='$type'");
@@ -97,18 +111,36 @@ class MarkupConverter
      * Processes all child nodes of a node, but doesn't do anything 
      * with the node itself.
      *
+     * Can modify or remove children.
+     *
      * @param $nodeList iterable List of \DOMNodes 
      */
-    public function transformIterable(iterable $nodeList): void
+    public function transformChildren(\DOMNode $node): void
     {
-        foreach ($nodeList as $node) {
-            if ($node instanceof \DOMElement) {
-                $this->transformElementRecursively($node);
+        // Delay removing children not to break loop over them
+        $toRemove = [];
+
+        foreach ($node->childNodes as $child) {
+            if ($child instanceof \DOMElement) {
+                $keep = $this->transformElementRecursively($child);
+                if (!$keep) {
+                    $toRemove[] = $child;
+                }
             }
+        }
+
+        foreach ($toRemove as $child) {
+            $node->removeChild($child);
         }
     }    
 
-    private function transformElementRecursively(\DOMElement $node): void
+    /**
+     * Validates an element and its descendants. Returns: 
+     *
+     * - true to keep element
+     * - false to remove it
+     */
+    private function transformElementRecursively(\DOMElement $node): bool
     {
         $name = mb_strtolower($node->nodeName);
 
@@ -118,25 +150,24 @@ class MarkupConverter
 
         if ($name == 'a') {
             // For links, we remove script attributes like onmouseover
+            // on both dvach & arhivach
             $node->removeAttribute('onmouseover');
             $node->removeAttribute('onmouseout');
             $node->removeAttribute('onclick');
-        }
-
-        // Validate attributes list
-        $allowedAttrs = self::$allowedTags[$name];
-
-        foreach ($node->attributes as $attrNode) {
-            if (!in_array($attrNode->name, $allowedAttrs)) {
-                $attrName = $attrNode->name;
-                throw new InvalidMarkupException("Attribute '$attrName' is not allowed for tag '$name'");
-            }
         }
 
         if ($name == 'span') {
             $class = $node->getAttribute('class');
             if (!$class) {
                 throw new InvalidMarkupException("span node must have a class set");
+            }
+
+            if ($this->isArhivachMode) {
+                if (DOMUtil::hasClass($class, 'media-expand-button')) {
+                    // Archivach youtube video preview, remove it 
+                    // <span href="#" class="media-expand-button">[Развернуть]</span>
+                    return false;
+                }
             }
 
             if (!array_key_exists($class, self::$allowedSpanClasses)) {
@@ -152,11 +183,21 @@ class MarkupConverter
             }
         }
 
-        // Validate and transform children
-        foreach ($node->childNodes as $child) {
-            if ($child instanceof \DOMElement) {
-                $this->transformElementRecursively($child);
+        // Validate attributes list
+        $allowedAttrs = self::$allowedTags[$name];
+
+        foreach ($node->attributes as $attrNode) {
+            if (!in_array($attrNode->name, $allowedAttrs)) {
+                $attrName = $attrNode->name;
+                throw new InvalidMarkupException("Attribute '$attrName' is not allowed for tag '$name'");
             }
+        }        
+
+        if (!$node->hasChildNodes()) {
+            return true;
         }
+
+        $this->transformChildren($node);
+        return true;
     }
 }

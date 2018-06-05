@@ -40,6 +40,7 @@ use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DateConverter;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\MDvachThreadParser;
+use phpClub\ThreadParser\MarkupConverter;
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
@@ -112,16 +113,24 @@ $di[ArhivachClient::class] = function (Container $di) {
     );
 };
 
+$di['ArhivachMarkupConverter'] = function ($di) {
+    return new MarkupConverter(true);
+};
+
+$di['DvachMarkupConverter'] = function ($di) {
+    return new MarkupConverter(false);
+};
+
 $di[ArhivachThreadParser::class] = function ($di) {
-    return new ArhivachThreadParser($di[DateConverter::class]);
+    return new ArhivachThreadParser($di[DateConverter::class], $di['ArhivachMarkupConverter']);
 };
 
 $di[DvachThreadParser::class] = function ($di) {
-    return new DvachThreadParser($di[DateConverter::class]);
+    return new DvachThreadParser($di[DateConverter::class], $di['DvachMarkupConverter']);
 };
 
 $di[MDvachThreadParser::class] = function ($di) {
-    return new MDvachThreadParser($di[DateConverter::class]);
+    return new MDvachThreadParser($di[DateConverter::class], $di['DvachMarkupConverter']);
 };
 
 $di[DateConverter::class] = function () {
@@ -160,7 +169,8 @@ $di[ImportThreadsCommand::class] = function (Container $di) {
         $di[DvachClient::class],
         $di[ArhivachClient::class],
         $di[DvachThreadParser::class],
-        $di[MDvachThreadParser::class]
+        $di[MDvachThreadParser::class],
+        $di[ArhivachThreadParser::class]
     );
 };
 

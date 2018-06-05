@@ -9,6 +9,7 @@ use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\ThreadParser\MarkupConverter;
+use phpClub\ThreadParser\ThreadParseException;
 use phpClub\Util\DOMUtil;
 
 abstract class AbstractThreadParser
@@ -26,9 +27,9 @@ abstract class AbstractThreadParser
     /**
      * @param DateConverter $dateConverter
      */
-    public function __construct(DateConverter $dateConverter)
+    public function __construct(DateConverter $dateConverter, MarkupConverter $markupConverter)
     {
-        $this->markupConverter = new MarkupConverter;
+        $this->markupConverter = $markupConverter;
         $this->dateConverter = $dateConverter;
     }
 
@@ -39,6 +40,8 @@ abstract class AbstractThreadParser
     abstract protected function getTitleXPath(): string;
 
     abstract protected function getAuthorXPath(): string;
+
+    abstract protected function getTripCodeXPath(): string;
 
     abstract protected function getDateXPath(): string;
 
@@ -56,7 +59,7 @@ abstract class AbstractThreadParser
      */
     public function extractThread(string $threadHtml, string $threadPath = ''): Thread
     {
-        $hasCloudflareEmails = strstr($threadHtml, '__cf_email__');
+        $hasCloudflareEmails = $this->hasCloudflareEmails($threadHtml);
         $threadCrawler = new Crawler($threadHtml);
 
         $postsXPath = $this->getPostsXPath();
@@ -72,24 +75,22 @@ abstract class AbstractThreadParser
 
         $extractPost = function (Crawler $postNode) use ($thread, $threadPath, $hasCloudflareEmails) {
 
-            if ($hasCloudflareEmails) {
-                $postNode = $this->restoreCloudflareEmails($postNode);
+            try {
+                $post = $this->extractSinglePost($postNode, $thread, $threadPath, $hasCloudflareEmails);
+            } catch (ThreadParseException $e) {
+                // Add details if an exception is thrown
+                
+                $details = sprintf(
+                    "%s: %s\nPost HTML: \n%s",
+                    get_class($e),
+                    $e->getMessage(),
+                    DOMUtil::getOuterHtml($postNode->getNode(0))
+                );
+
+                throw new ThreadParseException($details, 0, $e);
             }
 
-            $post = (new Post($this->extractId($postNode)))
-                ->setTitle($this->extractTitle($postNode))
-                ->setAuthor($this->extractAuthor($postNode))
-                ->setDate($this->extractDate($postNode))
-                ->setText($this->extractText($postNode))
-                ->setThread($thread);
-
-            if (!$this->isThreadWithMissedFiles($thread)) {
-                $files = $this->extractFiles($postNode, $threadPath);
-                foreach ($files as $file) {
-                    $post->addFile($file);
-                }
-            }
-
+            $post->setThread($thread);
             $thread->addPost($post);
         };
 
@@ -98,6 +99,32 @@ abstract class AbstractThreadParser
         $this->assertThatPostIdsAreUnique($thread);
 
         return $thread;
+    }
+
+    private function extractSinglePost(
+        Crawler $postNode, 
+        Thread $thread, 
+        string $threadPath, 
+        bool $hasCloudflareEmails): Post
+    {
+        if ($hasCloudflareEmails) {
+            $postNode = $this->restoreCloudflareEmails($postNode);
+        }
+
+        $post = (new Post($this->extractId($postNode)))
+            ->setTitle($this->extractTitle($postNode))
+            ->setAuthor($this->extractAuthor($postNode))
+            ->setDate($this->extractDate($postNode))
+            ->setText($this->extractText($postNode));            
+
+        if (!$this->isThreadWithMissedFiles($thread)) {
+            $files = $this->extractFiles($postNode, $threadPath);
+            foreach ($files as $file) {
+                $post->addFile($file);
+            }
+        }
+
+        return $post;
     }
 
     protected function assertThatPostIdsAreUnique(Thread $thread)
@@ -127,7 +154,7 @@ abstract class AbstractThreadParser
         $idNode = $postNode->filterXPath($idXPath);
 
         if (!count($idNode)) {
-            throw new ThreadParseException("Unable to parse post id, HTML: {$this->getOuterHtml($postNode)}");
+            throw new ThreadParseException("Unable to parse post id");
         }
 
         $postId = preg_replace('/[^\d]+/', '', $idNode->text());
@@ -163,10 +190,18 @@ abstract class AbstractThreadParser
         $authorNode = $postNode->filterXPath($authorXPath);
 
         if (!count($authorNode)) {
-            throw new ThreadParseException("Unable to parse post author, HTML: {$this->getOuterHtml($postNode)}");
+            throw new ThreadParseException("Unable to parse post author");
         }
 
-        return $authorNode->text();
+        $author = trim($authorNode->text());
+
+        $tripXPath = $this->getTripCodeXPath();
+        $tripNode = $postNode->filterXPath($tripXPath);
+        $trip = trim(DOMUtil::getTextFromCrawler($tripNode));
+
+        // As currently we don't distinguish between names and trip codes,
+        // parse both and return first non-empty value
+        return $author !== '' ? $author : $trip;        
     }
 
     /**
@@ -180,7 +215,7 @@ abstract class AbstractThreadParser
         $dateNode = $postNode->filterXPath($dateXPath);
 
         if (!count($dateNode)) {
-            throw new ThreadParseException("Unable to parse post date, HTML: {$this->getOuterHtml($postNode)}");
+            throw new ThreadParseException("Unable to parse post date");
         }
 
         return $this->dateConverter->toDateTime($dateNode->text());
@@ -197,12 +232,12 @@ abstract class AbstractThreadParser
         $blockquoteNode = $postNode->filterXPath($textXPath);
 
         if (!count($blockquoteNode)) {
-            throw new ThreadParseException("Unable to parse post text, HTML: {$this->getOuterHtml($postNode)}");
+            throw new ThreadParseException("Unable to parse post text");
         }
 
         // $textNode is an iterable
         $blockquoteDomNode = $blockquoteNode->getNode(0);
-        $this->markupConverter->transformIterable($blockquoteDomNode->childNodes);
+        $this->markupConverter->transformChildren($blockquoteDomNode);
 
         return trim($blockquoteNode->html());
     }
@@ -243,10 +278,9 @@ abstract class AbstractThreadParser
         return in_array($thread->getId(), $threadsWithMissedFiles, $strict = true);
     }
 
-    protected function getOuterHtml(Crawler $post)
+    protected function hasCloudflareEmails(string $html)
     {
-        $node = $post->getNode(0);
-        return DOMUtil::getOuterHtml($node);
+        return false !== strstr($html, '__cf_email__');
     }
 
     /**

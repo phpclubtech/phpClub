@@ -17,11 +17,16 @@ class DvachThreadParser extends AbstractThreadParser
 
     protected function getAuthorXPath(): string
     {
-        return '//span[starts-with(@class,"poster") or @class="ananimas"][normalize-space(string())]
+        return '//span[starts-with(@class,"postername") or @class="ananimas"]
                 | //span[@class="name"]
                 | //div/a[@class="post-email"]/text()
                 | //span[@class="mod"]/text()';
     }
+
+    protected function getTripCodeXPath(): string
+    {
+        return '//span[starts-with(@class,"postertrip")]';
+    }    
 
     protected function getDateXPath(): string
     {

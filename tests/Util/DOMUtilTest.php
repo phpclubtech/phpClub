@@ -165,4 +165,14 @@ class DOMUtilTest extends TestCase
     {
         return preg_replace("/>\s+</", '><', $html);
     }
+
+    public function testHasClassWorks()
+    {
+        $this->assertTrue(DOMUtil::hasClass('a b-c d', 'a'));
+        $this->assertTrue(DOMUtil::hasClass('a b-c d', 'b-c'));
+
+        // Negative cases
+        $this->assertFalse(DOMUtil::hasClass('a b-c d', 'b'));
+        $this->assertFalse(DOMUtil::hasClass('    ', 'a'));
+    }
 }

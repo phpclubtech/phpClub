@@ -23,3 +23,9 @@
 - `<span class="pomyanem">(Автор этого поста был забанен.. Помянем.)</span>` - с треда 59 (Сент 2015)
 
 Если парсер обнаруживает какую-то другую разметку, выбрасывается исключение. 
+
+## Дополнительная разметка в arhivach 
+
+```html
+<a href="https://www.youtube.com/watch?v=cGrIAFycpwA" target="_blank" rel="nofollow noopener noreferrer">https://www.youtube.com/watch?v=cGrIAFycpwA</a><span href="#" class="media-expand-button">[Развернуть]</span>
+```
