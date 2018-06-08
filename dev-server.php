@@ -12,7 +12,7 @@
  *
  * Reference: http://php.net/manual/en/features.commandline.webserver.php
  *
- * Command to start server: php -S 127.0.0.1:9001 -t public ../dev-server.php
+ * Command to start server: php -S 127.0.0.1:9001 -t public dev-server.php
  *
  * For sake of simplicity we do not support PATH_INFO here
  * (/script.php/path/info will be routed to index.php)

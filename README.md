@@ -27,7 +27,7 @@ Run `./bin/console import-threads` with following arguments:
 The following command will start a builtin web server. Point your browser to http://127.0.0.1:9001 to see the front page.
 
 ```sh
-php -S 127.0.0.1:9001 -t public ../dev-server.php
+php -S 127.0.0.1:9001 -t public dev-server.php
 ```
 
 ## Testing
