@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
+use phpClub\ThreadParser\Exception\DateParseException;
+
 class DateConverter
 {
-    /** @var \DateTimeZone */
+    /**
+     * @var \DateTimeZone
+     */
     private $timeZone;
 
+    /**
+     * @param \DateTimeZone $timeZone The timezone that date belongs to.
+     */
     public function __construct(\DateTimeZone $timeZone)
     {
         $this->timeZone = $timeZone;
@@ -16,7 +23,6 @@ class DateConverter
 
     /**
      * @param string        $date
-     * @param \DateTimeZone $timeZone The timezone that date belongs to.
      *
      * @throws \Exception
      *
@@ -54,13 +60,11 @@ class DateConverter
      */
     public function parseMDvachDate(string $rawDate, int $year): \DateTimeInterface
     {
-        if (!preg_match("/(\d+)\s+(\w+),\s*(\d+):(\d+)/u", $rawDate, $m)) {
+        if (!preg_match("/(\d+)\s+(\w+),\s*(\d+):(\d+)/u", $rawDate, $matches)) {
             throw new DateParseException("Invalid date format: '$rawDate'");
         }
 
-        $day = $m[1];
-        $hours = $m[3];
-        $minutes = $m[4];
+        [, $day, $month, $hours, $minutes] = $matches;
 
         $monthNames = [
             'Янв' => 1,
@@ -77,7 +81,7 @@ class DateConverter
             'Дек' => 12,
         ];
 
-        $month = $monthNames[$m[2]];
+        $month = $monthNames[$month];
 
         // m2-ch always uses Moscow timezone
         $mskTimezone = new \DateTimeZone('Europe/Moscow');

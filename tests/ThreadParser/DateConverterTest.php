@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\ThreadParser;
 
 use phpClub\ThreadParser\DateConverter;
+use phpClub\ThreadParser\Exception\DateParseException;
 use PHPUnit\Framework\TestCase;
 
 class DateConverterTest extends TestCase
@@ -30,10 +31,10 @@ class DateConverterTest extends TestCase
 
     /**
      * @dataProvider provideInvalidDates
-     * @expectedException phpClub\ThreadParser\DateParseException
      */
     public function testInvalidArgument($invalidDate)
     {
+        $this->expectException(DateParseException::class);
         $this->dateConverter->toDateTime($invalidDate);
     }
 
@@ -52,11 +53,9 @@ class DateConverterTest extends TestCase
         $this->assertEquals('2013-05-02 19:34', $dateTime->format('Y-m-d H:i'));
     }
 
-    /**
-     * @expectedException phpClub\ThreadParser\DateParseException
-     */
     public function testMDvachInvalidDate()
     {
+        $this->expectException(DateParseException::class);
         $dateTime = $this->dateConverter->parseMDvachDate('absolutely invalid date', 2013);
     }
 }

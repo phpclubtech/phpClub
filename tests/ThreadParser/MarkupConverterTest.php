@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
-use phpClub\ThreadParser\InvalidMarkupException;
+use phpClub\ThreadParser\Exception\InvalidMarkupException;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\Util\DOMUtil;
 use PHPUnit\Framework\TestCase;

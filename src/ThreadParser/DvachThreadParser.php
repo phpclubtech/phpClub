@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace phpClub\ThreadParser;
 
 use phpClub\Entity\File;
-use phpClub\Entity\Post;
+use phpClub\ThreadParser\Exception\ThreadParseException;
 use Symfony\Component\DomCrawler\Crawler;
 
 class DvachThreadParser extends AbstractThreadParser

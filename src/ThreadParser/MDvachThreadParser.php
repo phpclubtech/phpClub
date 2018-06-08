@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace phpClub\ThreadParser;
 
 use phpClub\Entity\File;
-use phpClub\Entity\Post;
+use phpClub\ThreadParser\Exception\ThreadParseException;
 use phpClub\Util\DOMUtil;
 use Symfony\Component\DomCrawler\Crawler;
 

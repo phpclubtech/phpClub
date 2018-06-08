@@ -50,7 +50,7 @@ class LastPostUpdaterTest extends AbstractTestCase
         ];
 
         /** @var Thread[] $threadsWithLastPosts */
-        $threadsWithLastPosts = $this->threadRepository->getThreadsWithLastPosts();
+        $threadsWithLastPosts = $this->threadRepository->getThreadsWithLastPostsQuery()->getResult();
 
         foreach ($threadsWithLastPosts as $thread) {
             $postIds = $thread->getLastPosts()

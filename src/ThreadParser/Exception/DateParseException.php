@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\ThreadParser\Exception;
 
 /**
  * Thrown when datetime cannot be parsed.

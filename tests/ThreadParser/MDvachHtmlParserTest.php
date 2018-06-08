@@ -11,7 +11,7 @@ use Tests\AbstractTestCase;
 class MDvachHtmlParserTest extends AbstractTestCase
 {
     /**
-     * @var DvachThreadParser
+     * @var MDvachThreadParser
      */
     private $threadParser;
 

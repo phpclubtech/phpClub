@@ -6,8 +6,8 @@ namespace Tests\ThreadParser;
 
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
-use phpClub\ThreadParser\AbstractThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
+use phpClub\ThreadParser\Internal\CloudflareEmailDecoder;
 use Tests\AbstractTestCase;
 
 class DvachHtmlParserTest extends AbstractTestCase
@@ -283,7 +283,9 @@ class DvachHtmlParserTest extends AbstractTestCase
 
     public function testCloudflareEmailDecoder()
     {
-        $email = AbstractThreadParser::decodeCfEmail('50243835373c253510243f223d31393c7e3f2237');
+        /** @var CloudflareEmailDecoder $cloudflareEmailDecoder */
+        $cloudflareEmailDecoder = $this->getContainer()->get(CloudflareEmailDecoder::class);
+        $email = $cloudflareEmailDecoder->decodeCfEmail('50243835373c253510243f223d31393c7e3f2237');
         $this->assertEquals('theglue@tormail.org', $email);
     }
 }

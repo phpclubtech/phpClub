@@ -33,6 +33,7 @@ use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DateConverter;
 use phpClub\ThreadParser\DvachThreadParser;
+use phpClub\ThreadParser\Internal\CloudflareEmailDecoder;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\ThreadParser\MDvachThreadParser;
 use Psr\SimpleCache\CacheInterface;
@@ -126,21 +127,25 @@ $di[ArhivachThreadParser::class] = function ($di) {
     $tz = new \DateTimeZone('Europe/Moscow');
     $dateConverter = new DateConverter($tz);
 
-    return new ArhivachThreadParser($dateConverter, $di['ArhivachMarkupConverter']);
+    return new ArhivachThreadParser($dateConverter, $di['ArhivachMarkupConverter'], $di[CloudflareEmailDecoder::class]);
 };
 
 $di[DvachThreadParser::class] = function ($di) {
     $tz = new \DateTimeZone('Europe/Moscow');
     $dateConverter = new DateConverter($tz);
 
-    return new DvachThreadParser($dateConverter, $di['DvachMarkupConverter']);
+    return new DvachThreadParser($dateConverter, $di['DvachMarkupConverter'], $di[CloudflareEmailDecoder::class]);
 };
 
 $di[MDvachThreadParser::class] = function ($di) {
     $tz = new \DateTimeZone('Europe/Moscow');
     $dateConverter = new DateConverter($tz);
 
-    return new MDvachThreadParser($dateConverter, $di['DvachMarkupConverter']);
+    return new MDvachThreadParser($dateConverter, $di['DvachMarkupConverter'], $di[CloudflareEmailDecoder::class]);
+};
+
+$di[CloudflareEmailDecoder::class] = function () {
+    return new CloudflareEmailDecoder();
 };
 
 $di[ThreadRepository::class] = function (Container $di) {
@@ -216,7 +221,8 @@ $di[Authorizer::class] = function (Container $di): Authorizer {
 };
 
 $di[CacheInterface::class] = function (): CacheInterface {
-    return getenv('APP_ENV') === 'prod' ? new FilesystemCache() : new ArrayCache();
+    // TODO: fix pagination for file cache
+    return new ArrayCache();
 };
 
 $di['SphinxConnection'] = function (Container $di) {

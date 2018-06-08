@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-namespace phpClub\ThreadParser;
+namespace phpClub\ThreadParser\Exception;
 
 /**
  * Thrown when something is wrong with thread's HTML.

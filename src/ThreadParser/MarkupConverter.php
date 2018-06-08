@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
+use phpClub\ThreadParser\Exception\InvalidMarkupException;
 use phpClub\Util\DOMUtil;
 
 /**
@@ -151,7 +152,7 @@ class MarkupConverter
             throw new InvalidMarkupException("Tag '$name' is not allowed in markup");
         }
 
-        if ($name == 'a') {
+        if ($name === 'a') {
             // For links, we remove script attributes like onmouseover
             // on both dvach & arhivach
             $node->removeAttribute('onmouseover');
@@ -165,7 +166,7 @@ class MarkupConverter
             }
         }
 
-        if ($name == 'span') {
+        if ($name === 'span') {
             $class = $node->getAttribute('class');
             if (!$class) {
                 throw new InvalidMarkupException('span node must have a class set');
@@ -184,7 +185,7 @@ class MarkupConverter
             }
         }
 
-        if ($name == 'a') {
+        if ($name === 'a') {
             $class = $node->getAttribute('class');
 
             if ($class && !array_key_exists($class, self::$allowedAClasses)) {

@@ -41,7 +41,7 @@ class DOMUtil
         $html = $doc->documentElement;
         $body = null;
         foreach ($html->childNodes as $node) {
-            if (mb_strtolower($node->nodeName) == 'body') {
+            if (mb_strtolower($node->nodeName) === 'body') {
                 $body = $node;
                 break;
             }
