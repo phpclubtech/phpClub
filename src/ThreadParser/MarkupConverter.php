@@ -154,6 +154,12 @@ class MarkupConverter
             $node->removeAttribute('onmouseover');
             $node->removeAttribute('onmouseout');
             $node->removeAttribute('onclick');
+
+            if ($this->isArhivachMode) {
+                // <a href="http://arhivach.org/thread/25318/#356101" 
+                // style="color: rgb(120, 120, 120);">&gt;&gt;356101</a>
+                $node->removeAttribute('style');
+            }
         }
 
         if ($name == 'span') {

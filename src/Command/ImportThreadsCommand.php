@@ -265,6 +265,13 @@ class ImportThreadsCommand extends Command
             return true;
         }
 
+        // <meta name="keywords" content="архивач, архива.ч, архив тредов, 
+        // архивы 2ch.hk, копипаста, сохраненные треды двача, сохранить тред, 
+        // имиджборд, archivach">
+        if (preg_match('~<meta\b[^<>]+name="keywords"[^<>]+(архива\.ч)~', $html)) {
+            return true;
+        }
+
         return false;
     }
 
