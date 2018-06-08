@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use Symfony\Component\DomCrawler\Crawler;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
-use phpClub\ThreadParser\MarkupConverter;
-use phpClub\ThreadParser\ThreadParseException;
 use phpClub\Util\DOMUtil;
+use Symfony\Component\DomCrawler\Crawler;
 
 abstract class AbstractThreadParser
 {
@@ -20,7 +18,7 @@ abstract class AbstractThreadParser
     protected $dateConverter;
 
     /**
-     * @var MarkupConverter 
+     * @var MarkupConverter
      */
     protected $markupConverter;
 
@@ -74,13 +72,12 @@ abstract class AbstractThreadParser
         $thread = new Thread($this->extractId($firstPost));
 
         $extractPost = function (Crawler $postNode) use ($thread, $threadPath, $hasCloudflareEmails) {
-
             try {
                 $post = $this->extractSinglePost($postNode, $thread, $threadPath, $hasCloudflareEmails);
             } catch (ThreadParseException $e) {
                 // Add details if an exception is thrown
                 $html = DOMUtil::getOuterHtml($postNode->getNode(0));
-                
+
                 $details = sprintf(
                     "%s: %s\nPost HTML: \n%s...",
                     get_class($e),
@@ -103,9 +100,9 @@ abstract class AbstractThreadParser
     }
 
     private function extractSinglePost(
-        Crawler $postNode, 
-        Thread $thread, 
-        string $threadPath, 
+        Crawler $postNode,
+        Thread $thread,
+        string $threadPath,
         bool $hasCloudflareEmails): Post
     {
         if ($hasCloudflareEmails) {
@@ -116,7 +113,7 @@ abstract class AbstractThreadParser
             ->setTitle($this->extractTitle($postNode))
             ->setAuthor($this->extractAuthor($postNode))
             ->setDate($this->extractDate($postNode))
-            ->setText($this->extractText($postNode));            
+            ->setText($this->extractText($postNode));
 
         if (!$this->isThreadWithMissedFiles($thread)) {
             $files = $this->extractFiles($postNode, $threadPath);
@@ -155,7 +152,7 @@ abstract class AbstractThreadParser
         $idNode = $postNode->filterXPath($idXPath);
 
         if (!count($idNode)) {
-            throw new ThreadParseException("Unable to parse post id");
+            throw new ThreadParseException('Unable to parse post id');
         }
 
         $postId = preg_replace('/[^\d]+/', '', $idNode->text());
@@ -191,7 +188,7 @@ abstract class AbstractThreadParser
         $authorNode = $postNode->filterXPath($authorXPath);
 
         if (!count($authorNode)) {
-            throw new ThreadParseException("Unable to parse post author");
+            throw new ThreadParseException('Unable to parse post author');
         }
 
         $author = trim($authorNode->text());
@@ -202,7 +199,7 @@ abstract class AbstractThreadParser
 
         // As currently we don't distinguish between names and trip codes,
         // parse both and return first non-empty value
-        return $author !== '' ? $author : $trip;        
+        return $author !== '' ? $author : $trip;
     }
 
     /**
@@ -216,7 +213,7 @@ abstract class AbstractThreadParser
         $dateNode = $postNode->filterXPath($dateXPath);
 
         if (!count($dateNode)) {
-            throw new ThreadParseException("Unable to parse post date");
+            throw new ThreadParseException('Unable to parse post date');
         }
 
         return $this->dateConverter->toDateTime($dateNode->text());
@@ -233,7 +230,7 @@ abstract class AbstractThreadParser
         $blockquoteNode = $postNode->filterXPath($textXPath);
 
         if (!count($blockquoteNode)) {
-            throw new ThreadParseException("Unable to parse post text");
+            throw new ThreadParseException('Unable to parse post text');
         }
 
         // $textNode is an iterable
@@ -285,16 +282,16 @@ abstract class AbstractThreadParser
     }
 
     /**
-     * Removes cloudflare-encoded emails from post body
+     * Removes cloudflare-encoded emails from post body.
      *
      * Returns a new Crawler with a copy of DOM tree.
      */
     public static function restoreCloudflareEmails(Crawler $post): Crawler
     {
-        //    Cloudflare replaces email with code (formatted): 
-        //    
-        //    <a class="__cf_email__" 
-        //        href="http://www.cloudflare.com/email-protection" 
+        //    Cloudflare replaces email with code (formatted):
+        //
+        //    <a class="__cf_email__"
+        //        href="http://www.cloudflare.com/email-protection"
         //        data-cfemail="50243835373c253510243f223d31393c7e3f2237">[email&nbsp;protected]</a>
         //        <script type="text/javascript">
         //          /* <![CDATA[ */
@@ -315,14 +312,13 @@ abstract class AbstractThreadParser
         //          }catch(e){}})();
         //          /* ]]> */
         //        </script>
-        //        
+        //
         //    We replace it with decoded email
-        
+
         assert($post->count() == 1);
         $postNode = $post->getNode(0);
 
         $replacement = DOMUtil::transformDomTree($postNode, function (\DOMNode $node) {
-
             $nodeName = strtolower($node->nodeName);
 
             if ($nodeName == 'a') {
@@ -339,6 +335,7 @@ abstract class AbstractThreadParser
                 $email = self::decodeCfEmail($encodedEmail);
 
                 $textNode = $node->ownerDocument->createTextNode($email);
+
                 return $textNode;
             }
 
@@ -351,23 +348,23 @@ abstract class AbstractThreadParser
                 return null;
             }
 
-            return $node;     
+            return $node;
         });
 
-        $newCrawler = new Crawler;
+        $newCrawler = new Crawler();
         $newCrawler->addNodes($replacement);
 
         return $newCrawler;
-    }  
+    }
 
     /**
-     * Decodes emails from data-cfemail attribute:
+     * Decodes emails from data-cfemail attribute:.
      *
      * 123456abcdef => some@example.com
      */
     public static function decodeCfEmail($cfeString)
     {
-        if (!preg_match("/^([0-9a-fA-F]{2}){2,}$/", $cfeString)) {
+        if (!preg_match('/^([0-9a-fA-F]{2}){2,}$/', $cfeString)) {
             throw new \Exception("Invalid data-cfemail string: '$cfeString'");
         }
 
@@ -375,7 +372,7 @@ abstract class AbstractThreadParser
         $key = hexdec(mb_substr($cfeString, 0, 2));
         $length = mb_strlen($cfeString);
 
-        for ($i=2; $i < $length; $i+=2) { 
+        for ($i = 2; $i < $length; $i += 2) {
             $byte = hexdec(mb_substr($cfeString, $i, 2)) ^ $key;
             $result .= chr($byte);
         }

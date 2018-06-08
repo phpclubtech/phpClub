@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use Symfony\Component\DomCrawler\Crawler;
 use phpClub\Entity\File;
 use phpClub\Util\DOMUtil;
+use Symfony\Component\DomCrawler\Crawler;
 
 class ArhivachThreadParser extends AbstractThreadParser
 {
@@ -23,7 +23,7 @@ class ArhivachThreadParser extends AbstractThreadParser
     protected function getTripCodeXPath(): string
     {
         return '//span[@class="poster_trip"]';
-    }    
+    }
 
     protected function getDateXPath(): string
     {
@@ -66,7 +66,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $trip = trim(DOMUtil::getTextFromCrawler($tripNode));
 
         // Author can be missing
-        return $author !== '' ? $author : $trip;        
+        return $author !== '' ? $author : $trip;
     }
 
     /**

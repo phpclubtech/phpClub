@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\DomCrawler\Crawler;
 use phpClub\ThreadParser\InvalidMarkupException;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\Util\DOMUtil;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 class MarkupConverterTest extends TestCase
 {
@@ -17,7 +17,7 @@ class MarkupConverterTest extends TestCase
 
     public function setUp()
     {
-        $this->markupConverter = new MarkupConverter;
+        $this->markupConverter = new MarkupConverter();
     }
 
     public function testDetectsInvalidTags()

@@ -15,10 +15,10 @@ class Post
     /** @Id @Column(type="integer") **/
     private $id;
 
-    /** 
-     * Contains HTML code
-     * 
-     * @Column(type="text") 
+    /**
+     * Contains HTML code.
+     *
+     * @Column(type="text")
      */
     private $text;
 
@@ -136,7 +136,7 @@ class Post
     }
 
     /**
-     * Returns post body as HTML code
+     * Returns post body as HTML code.
      */
     public function getText()
     {

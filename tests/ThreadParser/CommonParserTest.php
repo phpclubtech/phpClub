@@ -1,22 +1,23 @@
-<?php 
+<?php
+
 
 declare(strict_types=1);
 
 namespace ThreadParser;
 
-use Symfony\Component\DomCrawler\Crawler;
-use Tests\AbstractTestCase;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
 use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\Util\DOMUtil;
+use Symfony\Component\DomCrawler\Crawler;
+use Tests\AbstractTestCase;
 
 /**
  * Test thread files parsing.
  *
- * For every thread, there is a number of "samples" that 
+ * For every thread, there is a number of "samples" that
  * look like this:
  *
  * ["text", 123456, "some text"]
@@ -24,7 +25,7 @@ use phpClub\Util\DOMUtil;
  * It means that post 123456 contains text "some text".
  */
 class CommonParserTest extends AbstractTestCase
-{    
+{
     /** @var array [path => Thread] */
     private static $threadCache = [];
 
@@ -48,13 +49,13 @@ class CommonParserTest extends AbstractTestCase
 
     public function provideDvachSamples(): array
     {
-        $dir = dirname(__DIR__);        
+        $dir = dirname(__DIR__);
 
         $threads = [
-            'dvach/2.html'    =>  [$dir . '/Fixtures/dvach/2.html', $this->getDvachThread2Samples()],
-            'dvach/30.html'   =>  [$dir . '/Fixtures/dvach/30.html', $this->getDvachThread30Samples()],
-            'dvach/34.html'   =>  [$dir . '/Fixtures/dvach/34.html', $this->getDvachThread34Samples()],
-            'dvach/82.html'   =>  [$dir . '/Fixtures/dvach/82.html', $this->getDvachThread82Samples()]
+            'dvach/2.html'    => [$dir . '/Fixtures/dvach/2.html', $this->getDvachThread2Samples()],
+            'dvach/30.html'   => [$dir . '/Fixtures/dvach/30.html', $this->getDvachThread30Samples()],
+            'dvach/34.html'   => [$dir . '/Fixtures/dvach/34.html', $this->getDvachThread34Samples()],
+            'dvach/82.html'   => [$dir . '/Fixtures/dvach/82.html', $this->getDvachThread82Samples()],
         ];
 
         $data = [];
@@ -71,13 +72,13 @@ class CommonParserTest extends AbstractTestCase
         return $data;
     }
 
-    public function provideArhivachSamples(): array 
+    public function provideArhivachSamples(): array
     {
-        $dir = dirname(__DIR__);        
+        $dir = dirname(__DIR__);
 
         $threads = [
-            'arhivach/25.html' =>  [$dir . '/Fixtures/arhivach/25.html', $this->getDvachThread25Samples()],
-            'arhivach/90.html' =>  [$dir . '/Fixtures/arhivach/90.html', $this->getDvachThread90Samples()]
+            'arhivach/25.html' => [$dir . '/Fixtures/arhivach/25.html', $this->getDvachThread25Samples()],
+            'arhivach/90.html' => [$dir . '/Fixtures/arhivach/90.html', $this->getDvachThread90Samples()],
         ];
 
         $data = [];
@@ -98,48 +99,48 @@ class CommonParserTest extends AbstractTestCase
     {
         // type, postId, content, comment
         return [
-            ["text", 247752, "Наверняка тут есть те, кто хочет попробовать"],
-            ["text", 247752, "не устраиваем холивар по поводу нужен ли PHP или нет", "spoiler"],
-            ["text", 247752, "Сайт опять упал?", "bold"],
-            ["text", 247752, "http://rghost.net/41915862", "link"],
-            ["text", 247752, "В общем, хватит разговоров"],
+            ['text', 247752, 'Наверняка тут есть те, кто хочет попробовать'],
+            ['text', 247752, 'не устраиваем холивар по поводу нужен ли PHP или нет', 'spoiler'],
+            ['text', 247752, 'Сайт опять упал?', 'bold'],
+            ['text', 247752, 'http://rghost.net/41915862', 'link'],
+            ['text', 247752, 'В общем, хватит разговоров'],
 
             // Different markup
-            ["text", 247754, "function makeMeFeelGood", "code"],
-            ["text", 247821, "мимомехматоотличник", "italic"],
-            ["text", 247890, "Да ты издеваешься!", "quote"],
-            ["text", 258742, "В-четвёртых", "underline"],
-            ["text", 254899, "2", "sup"],
+            ['text', 247754, 'function makeMeFeelGood', 'code'],
+            ['text', 247821, 'мимомехматоотличник', 'italic'],
+            ['text', 247890, 'Да ты издеваешься!', 'quote'],
+            ['text', 258742, 'В-четвёртых', 'underline'],
+            ['text', 254899, '2', 'sup'],
 
             // Last post
-            ["text", 268548, "Тред почему-то тонет"],
+            ['text', 268548, 'Тред почему-то тонет'],
 
-            ["trip", 247752, "!xnn2uE3AU."],
-            ["trip", 247778, ""],
-            ["trip", 248954, "!WgiiL9n8io"],
+            ['trip', 247752, '!xnn2uE3AU.'],
+            ['trip', 247778, ''],
+            ['trip', 248954, '!WgiiL9n8io'],
 
-            ["author", 248954, "Stockholm-кун"],
-            ["author", 248949, "Аноним"],
-            ["author", 258281, "sage"],
+            ['author', 248954, 'Stockholm-кун'],
+            ['author', 248949, 'Аноним'],
+            ['author', 258281, 'sage'],
 
-            ["email", 250712, "sage"],
-            ["email", 258281, "sage"],
+            ['email', 250712, 'sage'],
+            ['email', 258281, 'sage'],
 
-            ["subject", 258281, "sage"],
+            ['subject', 258281, 'sage'],
 
             // Pictures
-            ["image", 247752, "/pr/src/1361972370522.png"],
-            ["thumb", 247752, "/pr/thumb/1361972370522s.gif"],
-            ["size", 247752, "500x500"],
+            ['image', 247752, '/pr/src/1361972370522.png'],
+            ['thumb', 247752, '/pr/thumb/1361972370522s.gif'],
+            ['size', 247752, '500x500'],
 
-            ["image", 267620, "/pr/src/1366510503127.jpg"],
-            ["thumb", 267620, "/pr/thumb/1366510503127s.gif"],
-            ["size", 267620, "682x1024"],
+            ['image', 267620, '/pr/src/1366510503127.jpg'],
+            ['thumb', 267620, '/pr/thumb/1366510503127s.gif'],
+            ['size', 267620, '682x1024'],
 
-            ["youtube-pic", 258711, "GpkC7fcr8jM"],
+            ['youtube-pic', 258711, 'GpkC7fcr8jM'],
 
-            ["date", 247752, "2013-02-27T16:39:30"],
-            ["date", 268548, "2013-04-23T06:14:03"]
+            ['date', 247752, '2013-02-27T16:39:30'],
+            ['date', 268548, '2013-04-23T06:14:03'],
         ];
     }
 
@@ -147,23 +148,23 @@ class CommonParserTest extends AbstractTestCase
     {
         // type, postId, content, comment
         return [
-            ["text", 360376, "А давайте в этом ИТТ треде будем изучать PHP"],
-            ["text", 360376, "Если я решу твой учебник, я смогу"],
-            ["text", 360378, "function bakeCookies(...)", "code"],
-            ["text", 360791, "ОП СПУСТЯ МЕСЯЦ Я СОЗРЕЛ"],
+            ['text', 360376, 'А давайте в этом ИТТ треде будем изучать PHP'],
+            ['text', 360376, 'Если я решу твой учебник, я смогу'],
+            ['text', 360378, 'function bakeCookies(...)', 'code'],
+            ['text', 360791, 'ОП СПУСТЯ МЕСЯЦ Я СОЗРЕЛ'],
 
-            ["trip", 360376, "!xnn2uE3AU."],
+            ['trip', 360376, '!xnn2uE3AU.'],
 
-            ["date", 360376, "2014-06-09T13:39:31"],
-            ["date", 360791, "2014-06-11T01:57:46"],
+            ['date', 360376, '2014-06-09T13:39:31'],
+            ['date', 360791, '2014-06-11T01:57:46'],
 
-            ["subject", 360376, "Клуб изучающих PHP #25"],
-            ["subject", 360378, "Пиши верно"],
-            ["subject", 360572, "регулярки"],
+            ['subject', 360376, 'Клуб изучающих PHP #25'],
+            ['subject', 360378, 'Пиши верно'],
+            ['subject', 360572, 'регулярки'],
 
-            ["author", 360381, "Аноним"],
+            ['author', 360381, 'Аноним'],
 
-            ["image", 360376, "1402306771864.png"]
+            ['image', 360376, '1402306771864.png'],
         ];
     }
 
@@ -172,36 +173,36 @@ class CommonParserTest extends AbstractTestCase
         // type, postId, content, comment
         return [
             // This thread has two different date formats
-            ["text", 377570, "Всем привет"],
-            ["text", 377570, "В общем, давайте начинать"],
+            ['text', 377570, 'Всем привет'],
+            ['text', 377570, 'В общем, давайте начинать'],
 
-            ["text", 378308, 'if ($humanSum>$robotSum) {', "code"],
-            ["text", 378643, "Joomla, Webasyst, MODX", "quote"],
-            ["text", 378643, "контент-менеджер", "spoiler"],
-            ["text", 381133, "Поздно ли учить PHP в 26?"],
+            ['text', 378308, 'if ($humanSum>$robotSum) {', 'code'],
+            ['text', 378643, 'Joomla, Webasyst, MODX', 'quote'],
+            ['text', 378643, 'контент-менеджер', 'spoiler'],
+            ['text', 381133, 'Поздно ли учить PHP в 26?'],
 
             // last post
-            ["text", 383389, "Спасибо. Я что-то не догадался посмотреть на сообщение от PHP"],
+            ['text', 383389, 'Спасибо. Я что-то не догадался посмотреть на сообщение от PHP'],
 
-            ["subject", 377570, "Клуб любителей изучать PHP #30"],
-            ["subject", 377571, "Пиши красиво"],
-            ["subject", 379692, "Помогач-вопросач!"],
+            ['subject', 377570, 'Клуб любителей изучать PHP #30'],
+            ['subject', 377571, 'Пиши красиво'],
+            ['subject', 379692, 'Помогач-вопросач!'],
 
-            ["trip", 377570, "!xnn2uE3AU."],
+            ['trip', 377570, '!xnn2uE3AU.'],
 
-            ["author", 378075, "Аноним"],
-            ["author", 382151, "`"],
+            ['author', 378075, 'Аноним'],
+            ['author', 382151, '`'],
 
-            ["date", 377570, "2014-08-13T03:57:04"],
-            ["date", 381952, "2014-08-27T17:26:28"],
+            ['date', 377570, '2014-08-13T03:57:04'],
+            ['date', 381952, '2014-08-27T17:26:28'],
 
-            ["image", 377570, "/pr/src/377570/1407887824895.png"],
-            ["thumb", 377570, "/pr/thumb/377570/1407887824895s.gif"],
-            ["size", 377570, "500x500"],
+            ['image', 377570, '/pr/src/377570/1407887824895.png'],
+            ['thumb', 377570, '/pr/thumb/377570/1407887824895s.gif'],
+            ['size', 377570, '500x500'],
 
-            ["image", 381751, "/pr/src/377570/14090672526641.png"],
-            ["thumb", 381751, "/pr/thumb/377570/14090672526641s.jpg"],
-            ["size", 381751, "675x36"]            
+            ['image', 381751, '/pr/src/377570/14090672526641.png'],
+            ['thumb', 381751, '/pr/thumb/377570/14090672526641s.jpg'],
+            ['size', 381751, '675x36'],
         ];
     }
 
@@ -209,36 +210,36 @@ class CommonParserTest extends AbstractTestCase
     {
         return [
             // pr-thread-34
-            ["text", 395787, "В этом ИТТ треде мы изучаем PHP"],
-            ["text", 395787, "В общем, давайте начинать уже"],
-            ["text", 396934, "миморубист", "italic"],
-            ["text", 396934, "<html>"],
-            ["text", 396936, ">>396926"],
-            ["text", 396942, "пытается заставить работать пхп у клиента", "quote"],
-            ["text", 396948, "не знаю даже, что в гугле забивать", "spoiler"],
+            ['text', 395787, 'В этом ИТТ треде мы изучаем PHP'],
+            ['text', 395787, 'В общем, давайте начинать уже'],
+            ['text', 396934, 'миморубист', 'italic'],
+            ['text', 396934, '<html>'],
+            ['text', 396936, '>>396926'],
+            ['text', 396942, 'пытается заставить работать пхп у клиента', 'quote'],
+            ['text', 396948, 'не знаю даже, что в гугле забивать', 'spoiler'],
 
             // last post
-            ["text", 400041, "Создавал таблицу через MySQL Workbench"],
+            ['text', 400041, 'Создавал таблицу через MySQL Workbench'],
 
-            ["subject", 395787, "рнр тред номер 34"],
-            ["subject", 395792, "Клуб изучающих PHP"],
+            ['subject', 395787, 'рнр тред номер 34'],
+            ['subject', 395792, 'Клуб изучающих PHP'],
 
-            ["author", 395792, "!ОП"],
-            ["author", 395801, "Аноним"],
-            ["author", 396704, "Воннаби"],
+            ['author', 395792, '!ОП'],
+            ['author', 395801, 'Аноним'],
+            ['author', 396704, 'Воннаби'],
 
-            ["trip", 396837, "!3MOm6dO3V2"],
-            ["trip", 396839, "!xnn2uE3AU."],
+            ['trip', 396837, '!3MOm6dO3V2'],
+            ['trip', 396839, '!xnn2uE3AU.'],
 
-            ["email", 396934, "sage"],
-            ["email", 397230, "stremitel007@rambler.ru"],
+            ['email', 396934, 'sage'],
+            ['email', 397230, 'stremitel007@rambler.ru'],
 
-            ["date", 395787, "2014-10-15T12:18:40"],
-            ["date", 400041, "2014-10-29T07:39:43"],
+            ['date', 395787, '2014-10-15T12:18:40'],
+            ['date', 400041, '2014-10-29T07:39:43'],
 
-            ["image", 396704, "14136508968842.jpg"],
-            ["thumb", 396704, "14136508968842s.jpg"],
-            ["size", 396704, "992x1200"]
+            ['image', 396704, '14136508968842.jpg'],
+            ['thumb', 396704, '14136508968842s.jpg'],
+            ['size', 396704, '992x1200'],
         ];
     }
 
@@ -246,62 +247,62 @@ class CommonParserTest extends AbstractTestCase
     {
         return [
             // pr-thread-82
-            ["text", 864640, "Добро пожаловать в наш уютный тред."],
-            ["text", 864640, "не надо тратить время на поиск заказов и переговоры с неадекватными заказчиками"],
-            ["text", 864640, "Высказывайтесь одним большим постом", "bold"],
-            ["text", 864763, "comment = none", "italic"],
-            ["text", 865009, "Изучаю с 1 октября", "spoiler"],
-            ["text", 866928, "Есть сервер на джаве и клиент на пыхе", "quote"],
+            ['text', 864640, 'Добро пожаловать в наш уютный тред.'],
+            ['text', 864640, 'не надо тратить время на поиск заказов и переговоры с неадекватными заказчиками'],
+            ['text', 864640, 'Высказывайтесь одним большим постом', 'bold'],
+            ['text', 864763, 'comment = none', 'italic'],
+            ['text', 865009, 'Изучаю с 1 октября', 'spoiler'],
+            ['text', 866928, 'Есть сервер на джаве и клиент на пыхе', 'quote'],
 
             // last post
-            ["text", 884791, "Если я кого-то пропустил" ],
+            ['text', 884791, 'Если я кого-то пропустил'],
 
-            ["date", 864640, "2016-10-27T15:58:45"],
-            ["date", 884791, "2016-11-30T09:58:33"],
+            ['date', 864640, '2016-10-27T15:58:45'],
+            ['date', 884791, '2016-11-30T09:58:33'],
 
-            ["subject", 864640, "Клуб изучающих PHP 82"],
-            ["subject", 884783, "https://bitbucket.org/learningacc/file-downloader/"],
+            ['subject', 864640, 'Клуб изучающих PHP 82'],
+            ['subject', 884783, 'https://bitbucket.org/learningacc/file-downloader/'],
 
-            ["author", 864640, "Аноним"],
-            ["author", 865009, "Satosi"],
+            ['author', 864640, 'Аноним'],
+            ['author', 865009, 'Satosi'],
 
-            ["email", 870894, "sage"],
+            ['email', 870894, 'sage'],
 
-            ["image-name", 864640, "cat-sad.jpg"],
-            ["image", 864640, "14775731253722.jpg"],
-            ["thumb", 864640, "14775731253722s.jpg"],
-            ["size", 864640, "1024x768"],
+            ['image-name', 864640, 'cat-sad.jpg'],
+            ['image', 864640, '14775731253722.jpg'],
+            ['thumb', 864640, '14775731253722s.jpg'],
+            ['size', 864640, '1024x768'],
 
-            ["image-name", 869219, "zce-php-engineer-logo-l.jpg"],
-            ["image", 869219, "14781898497020.jpg"],
-            ["thumb", 869219, "14781898497020s.jpg"],
-            ["size", 869219, "432x402"]
+            ['image-name', 869219, 'zce-php-engineer-logo-l.jpg'],
+            ['image', 869219, '14781898497020.jpg'],
+            ['thumb', 869219, '14781898497020s.jpg'],
+            ['size', 869219, '432x402'],
         ];
     }
 
     private function getDvachThread90Samples(): array
     {
         return [
-            ["text", 1000416, "Добро пожаловать в наш уютный"],
-            ["text", 1000416, ">>988868"],
-            ["text", 1000535, "посоветуйте редактор текстовый для убунту"],
-            ["text", 1000566, "А почему оно должно меняться?"],
-            ["text", 1018009, "насколько всё ужасно", "spoiler"],
+            ['text', 1000416, 'Добро пожаловать в наш уютный'],
+            ['text', 1000416, '>>988868'],
+            ['text', 1000535, 'посоветуйте редактор текстовый для убунту'],
+            ['text', 1000566, 'А почему оно должно меняться?'],
+            ['text', 1018009, 'насколько всё ужасно', 'spoiler'],
 
-            ["subject", 1000416, "Клуб изучающих PHP 90"],
-            ["subject", 1005550, "https://github.com/Merkalov/Students"],
+            ['subject', 1000416, 'Клуб изучающих PHP 90'],
+            ['subject', 1005550, 'https://github.com/Merkalov/Students'],
 
-            ["author", 1000416, "Аноним"],
+            ['author', 1000416, 'Аноним'],
 
-            ["date", 1000416, "2017-06-03T14:06:06"],
-            ["date", 1018049, "2017-07-07T15:18:58"],
+            ['date', 1000416, '2017-06-03T14:06:06'],
+            ['date', 1018049, '2017-07-07T15:18:58'],
 
-            ["email", 1019198, "sage"],
+            ['email', 1019198, 'sage'],
 
-            ["image", 1000416, "14964879662911.jpg"],
-            ["thumb", 1000416, "14964879662911s.jpg"],
-            ["image-name", 1000416, "cat-cafe-osaka.jpg"],
-            ["size", 1000416, "1024x683"]
+            ['image', 1000416, '14964879662911.jpg'],
+            ['thumb', 1000416, '14964879662911s.jpg'],
+            ['image-name', 1000416, 'cat-cafe-osaka.jpg'],
+            ['size', 1000416, '1024x683'],
         ];
     }
 
@@ -329,7 +330,7 @@ class CommonParserTest extends AbstractTestCase
         } elseif ($parserClass == MDvachThreadParser::class) {
             $parser = $this->getContainer()->get(MDvachThreadParser::class);
         } else {
-            throw new \InvalidArgumentException("Invalid thread parser: " . $parserClass);
+            throw new \InvalidArgumentException('Invalid thread parser: ' . $parserClass);
         }
 
         $html = file_get_contents($threadPath);
@@ -339,9 +340,9 @@ class CommonParserTest extends AbstractTestCase
     }
 
     private function findSampleInThread(
-        Thread $thread, 
-        string $type, 
-        int $postId, 
+        Thread $thread,
+        string $type,
+        int $postId,
         string $content,
         string $parser
     ) {
@@ -355,8 +356,8 @@ class CommonParserTest extends AbstractTestCase
                 $postText = DOMUtil::getTextFromCrawler($crawler);
 
                 $this->assertContainsIgnoringSpaces(
-                    $content, 
-                    $postText, 
+                    $content,
+                    $postText,
                     "Cannot find string '$content' in post $postId"
                 );
 
@@ -395,7 +396,7 @@ class CommonParserTest extends AbstractTestCase
                     $content,
                     strval($post->getTitle()),
                     "Cannot find title '$content' in post $postId"
-                );  
+                );
 
                 break;
 
@@ -427,8 +428,8 @@ class CommonParserTest extends AbstractTestCase
                 }
 
                 $this->assertContains(
-                    $content, 
-                    $paths, 
+                    $content,
+                    $paths,
                     "Cannot find image '$content' in post $postId"
                 );
 
@@ -450,7 +451,7 @@ class CommonParserTest extends AbstractTestCase
 
                 $this->assertContains(
                     $content,
-                    $paths, 
+                    $paths,
                     "Cannot find thumb path '$content' in post $postId"
                 );
 
@@ -464,7 +465,7 @@ class CommonParserTest extends AbstractTestCase
                 }
 
                 $this->assertContains(
-                    $content, 
+                    $content,
                     $sizes,
                     "Cannot find image of size '$content' in post $postId"
                 );
@@ -473,8 +474,8 @@ class CommonParserTest extends AbstractTestCase
 
             case 'image-name':
 
-                // TODO: Doesn't work yet 
-                break; 
+                // TODO: Doesn't work yet
+                break;
 
                 $names = [];
 
@@ -517,7 +518,7 @@ class CommonParserTest extends AbstractTestCase
 
         $this->assertContains($needle, $haystack, $message);
     }
-    
+
     private function assertEqualsIgnoringSpaces(string $expected, string $actual, string $message = '')
     {
         $expected = $this->normalizeSpaces($expected);
@@ -534,6 +535,7 @@ class CommonParserTest extends AbstractTestCase
     private function removeDirs(string $path): string
     {
         $parts = explode('/', $path);
+
         return array_pop($parts);
     }
 }

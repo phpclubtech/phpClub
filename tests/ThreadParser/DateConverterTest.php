@@ -58,5 +58,5 @@ class DateConverterTest extends TestCase
     public function testMDvachInvalidDate()
     {
         $dateTime = $this->dateConverter->parseMDvachDate('absolutely invalid date', 2013);
-    }    
+    }
 }

@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace phpClub\Command;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use phpClub\BoardClient\ArhivachClient;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Entity\Thread;
@@ -18,6 +12,11 @@ use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\ThreadParser\ThreadParseException;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportThreadsCommand extends Command
 {
@@ -111,7 +110,7 @@ class ImportThreadsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $isDryRun = !!$input->getOption('dry-run');
+        $isDryRun = (bool) $input->getOption('dry-run');
 
         $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
         $output->writeln('Parsing threads...');
@@ -167,7 +166,7 @@ class ImportThreadsCommand extends Command
         // Is an array of glob expressions
         $fileGlobs = $input->getOption('file');
         $threadsDir = $input->getOption('dir');
-        $skipBroken = !!$input->getOption('skip-broken');
+        $skipBroken = (bool) $input->getOption('skip-broken');
 
         if (!$threadsDir && !$fileGlobs) {
             throw new \Exception('You need to specify --dir, --source, or --file');
@@ -198,7 +197,7 @@ class ImportThreadsCommand extends Command
         $threadNumber = 0;
 
         foreach ($htmlPaths as $path) {
-            
+
             // $progress->setMessage(basename($path));
             $threadNumber++;
             $html = file_get_contents($path);
@@ -220,7 +219,7 @@ class ImportThreadsCommand extends Command
                 }
 
                 $output->writeln(sprintf(
-                    "%2d/%2d: %s - error: %s", 
+                    '%2d/%2d: %s - error: %s',
                     $threadNumber,
                     count($htmlPaths),
                     basename($path),
@@ -232,7 +231,7 @@ class ImportThreadsCommand extends Command
 
             $threads[] = $thread;
             $output->write(sprintf(
-                "%2d/%2d: %s [%d posts]\n", 
+                "%2d/%2d: %s [%d posts]\n",
                 $threadNumber,
                 count($htmlPaths),
                 basename($path),
@@ -247,11 +246,11 @@ class ImportThreadsCommand extends Command
     {
         // <title>#272705 - Программирование - М.Двач</title>
         // hacks hacks
-        return (bool)preg_match("/<title>[^<>]*М.Двач/u", $html);
+        return (bool) preg_match('/<title>[^<>]*М.Двач/u', $html);
     }
 
     /**
-     * Checks whether the file looks like archivach HTML page
+     * Checks whether the file looks like archivach HTML page.
      */
     private function looksLikeArchivachPage(string $html): bool
     {
@@ -265,8 +264,8 @@ class ImportThreadsCommand extends Command
             return true;
         }
 
-        // <meta name="keywords" content="архивач, архива.ч, архив тредов, 
-        // архивы 2ch.hk, копипаста, сохраненные треды двача, сохранить тред, 
+        // <meta name="keywords" content="архивач, архива.ч, архив тредов,
+        // архивы 2ch.hk, копипаста, сохраненные треды двача, сохранить тред,
         // имиджборд, archivach">
         if (preg_match('~<meta\b[^<>]+name="keywords"[^<>]+(архива\.ч)~', $html)) {
             return true;
