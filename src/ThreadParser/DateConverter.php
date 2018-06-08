@@ -22,7 +22,7 @@ class DateConverter
     }
 
     /**
-     * @param string        $date
+     * @param string $date
      *
      * @throws \Exception
      *
