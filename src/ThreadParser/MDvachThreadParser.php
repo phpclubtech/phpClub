@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use Symfony\Component\DomCrawler\Crawler;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
-use phpClub\ThreadParser\ThreadParseException;
 use phpClub\Util\DOMUtil;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Parses threads from m2-ch.ru website.
@@ -22,11 +21,11 @@ class MDvachThreadParser extends AbstractThreadParser
 
     protected function getAuthorXPath(): string
     {
-        // TODO: now it catches only tripcode and sage, what about normal name? 
+        // TODO: now it catches only tripcode and sage, what about normal name?
         return '//span[@class="sage"]';
     }
 
-    protected function getTripCodeXPath(): string 
+    protected function getTripCodeXPath(): string
     {
         return '//span[@class="postertrip"]';
     }
@@ -68,7 +67,7 @@ class MDvachThreadParser extends AbstractThreadParser
 
         // Author can be missing
         return $author !== '' ? $author : $trip;
-    }    
+    }
 
     protected function extractDate(Crawler $postNode): \DateTimeInterface
     {
@@ -76,20 +75,20 @@ class MDvachThreadParser extends AbstractThreadParser
         $dateNode = $postNode->filterXPath($dateXPath);
 
         if (!count($dateNode)) {
-            throw new ThreadParseException("Unable to find post date node");
+            throw new ThreadParseException('Unable to find post date node');
         }
 
-        // Date doesn't contain year so we have to guess it by post id 
+        // Date doesn't contain year so we have to guess it by post id
         $postId = $postNode->attr('id');
         if (!$postId) {
-            throw new ThreadParseException("Cannot read post id while parsing date");
+            throw new ThreadParseException('Cannot read post id while parsing date');
         }
 
         if ($postId >= 272705 && $postId <= 289749) {
             $year = 2013;
         } else {
             throw new ThreadParseException("m2-ch parser doesn't know the year for post id '$postId'");
-        }        
+        }
 
         $rawDate = $dateNode->text();
 
@@ -106,7 +105,7 @@ class MDvachThreadParser extends AbstractThreadParser
             </div>
         </a>
 
-        For video: 
+        For video:
 
         <a class="il" href="http://youtu.be/giC3-LnnV4c">
             <div class="thumb video yt" style="background-image: url('pr/thumb/yougiC3-LnnV4c.jpg');">
@@ -117,23 +116,23 @@ class MDvachThreadParser extends AbstractThreadParser
         */
         $originalUrl = $fileNode->attr('href');
         if (!$originalUrl) {
-            throw new ThreadParseException("Cannot find URL in file node");
+            throw new ThreadParseException('Cannot find URL in file node');
         }
 
         $thumbStyle = $fileNode->filter('div.thumb')->attr('style');
         if (!$thumbStyle) {
-            throw new ThreadParseException("Cannot find style attr of thumb node inside file node");
+            throw new ThreadParseException('Cannot find style attr of thumb node inside file node');
         }
 
         if (!preg_match("/background-image:\s*url\('([^']*)'\)/", $thumbStyle, $m2)) {
-            throw new ThreadParseException("Cannot find thumbnail URL");
+            throw new ThreadParseException('Cannot find thumbnail URL');
         }
 
-       $thumbPath = $m2[1];        
+        $thumbPath = $m2[1];
 
         if ($fileNode->filter('.video.yt')->count() > 0) {
             // Is an Youtube video - what to do?
-            $file = new File;
+            $file = new File();
             $file->setPath($originalUrl);
             $file->setThumbPath($thumbPath);
 
@@ -144,7 +143,7 @@ class MDvachThreadParser extends AbstractThreadParser
 
         $sizeText = $fileNode->filter('div.img_size')->text();
         if (!$sizeText) {
-            throw new ThreadParseException("Cannot find size node inside file node");
+            throw new ThreadParseException('Cannot find size node inside file node');
         }
 
         if (!preg_match("/(\d+)x(\d+)/", $sizeText, $m)) {
@@ -153,12 +152,12 @@ class MDvachThreadParser extends AbstractThreadParser
 
         $thumbPath = $m2[1];
 
-        $file = new File;
+        $file = new File();
         $file->setPath($path);
         $file->setThumbPath($thumbPath);
         $file->setWidth(intval($m[1]));
         $file->setHeight(intval($m[2]));
 
         return $file;
-    }    
+    }
 }

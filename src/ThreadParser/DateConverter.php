@@ -13,9 +13,9 @@ class DateConverter
     {
         $this->timeZone = $timeZone;
     }
-    
+
     /**
-     * @param string $date
+     * @param string        $date
      * @param \DateTimeZone $timeZone The timezone that date belongs to.
      *
      * @throws \Exception
@@ -50,7 +50,7 @@ class DateConverter
     }
 
     /**
-     * Parses datetime like '02 Май, 19:34' from m2-ch.ru
+     * Parses datetime like '02 Май, 19:34' from m2-ch.ru.
      */
     public function parseMDvachDate(string $rawDate, int $year): \DateTimeInterface
     {
@@ -82,7 +82,7 @@ class DateConverter
         // m2-ch always uses Moscow timezone
         $mskTimezone = new \DateTimeZone('Europe/Moscow');
         $dateTime = new \DateTimeImmutable("$year-$month-$day $hours:$minutes", $mskTimezone);
-        
+
         return $dateTime;
     }
 

@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 
 declare(strict_types=1);
 
@@ -11,15 +12,15 @@ class DOMUtil
     /**
      * Creates a DOM fragment from string. Doesn't accept HTML that contains
      * <body> or <html> tags.
-     * 
-     * @param string $html HTML string without html or body tag, 
+     *
+     * @param string $html HTML string without html or body tag,
      *                     e.g. 'Hello <em>world</em>'
      */
     public static function createFragment(string $html):\DOMDocumentFragment
     {
         $ignoreHtmlErrors = true;
 
-        $doc = new \DOMDocument;
+        $doc = new \DOMDocument();
 
         // A hack to force utf-8 charset
         $fullHtml = '<html><meta charset="utf-8"><body>' . $html . '</body></html>';
@@ -46,11 +47,11 @@ class DOMUtil
             }
         }
 
-        assert(!!$body);
+        assert((bool) $body);
 
         $fragment = $doc->createDocumentFragment();
         $child = $body->firstChild;
-        while ($child) { 
+        while ($child) {
             // Save next child reference as it changes after moving
             $next = $child->nextSibling;
             $fragment->appendChild($child);
@@ -63,8 +64,8 @@ class DOMUtil
     /**
      * Creates a DOM node from string. Doesn't accept HTML code with
      * <body> or <html> tags.
-     * 
-     * @param string $html HTML string without html or body tag, 
+     *
+     * @param string $html HTML string without html or body tag,
      *                     containg a single DOM node e.g. '<em>test</em>'
      */
     public static function createNode(string $html):\DOMNode
@@ -76,13 +77,13 @@ class DOMUtil
             throw new \InvalidArgumentException("HTML must contain a single node, second node ({$node->nodeName}) found");
         }
 
-        /* 
-            If we return $node now, there will be an error 
+        /*
+            If we return $node now, there will be an error
             "Couldn't fetch DOMElement. Node no longer exists"
             when you try to use it probably because
             $fragment is destroyed along with its child nodes
             when leaving function.
-        
+
             So we remove $node from the fragment.
         */
 
@@ -92,7 +93,7 @@ class DOMUtil
     }
 
     /**
-     * Returns HTML code representing the node
+     * Returns HTML code representing the node.
      */
     public static function getOuterHtml(\DOMNode $node): string
     {
@@ -100,8 +101,8 @@ class DOMUtil
     }
 
     /**
-     * Transforms a DOM tree by passing each node to $transformer callback. 
-     * The callback must return:
+     * Transforms a DOM tree by passing each node to $transformer callback.
+     * The callback must return:.
      *
      * - either the same node unchanged
      * - or modified node
@@ -109,9 +110,9 @@ class DOMUtil
      * - or null to indicate that the node must be removed
      *
      * Callback can modify passed nodes and doesn't need to clone
-     * them before modifying. Callback can add or remove children from node. 
+     * them before modifying. Callback can add or remove children from node.
      * Callback will get all of the nodes including text and comment nodes.
-     * 
+     *
      * Walks the DOM tree from bottom to top.
      *
      * Returns an \DOMNode[] that can be empty or have more than one node.
@@ -120,13 +121,13 @@ class DOMUtil
     {
         $copy = $root->cloneNode(true);
         $replacement = self::transformNodeRecursively($copy, $transformer);
+
         return $replacement;
     }
 
     private static function transformNodeRecursively(\DOMNode $node, callable $transformer): array
     {
         if ($node->hasChildNodes()) {
-
             $newChildren = [];
 
             while ($node->firstChild) {
@@ -172,6 +173,7 @@ class DOMUtil
     public static function hasClass(string $classList, string $class)
     {
         $classes = preg_split("/\s+/", trim($classList));
+
         return in_array($class, $classes, true);
     }
 
@@ -184,6 +186,4 @@ class DOMUtil
 
         return $crawler->text();
     }
-    
 }
-

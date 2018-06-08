@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
-use Tests\AbstractTestCase;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\ThreadParser\AbstractThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
+use Tests\AbstractTestCase;
 
 class DvachHtmlParserTest extends AbstractTestCase
 {

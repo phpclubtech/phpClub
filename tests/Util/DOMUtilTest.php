@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 namespace Tests\Util;
 
-use PHPUnit\Framework\TestCase;
 use phpClub\Util\DOMUtil;
+use PHPUnit\Framework\TestCase;
 
-class DOMUtilTest extends TestCase 
+class DOMUtilTest extends TestCase
 {
     public function testCanCreateElement()
     {
@@ -34,7 +34,7 @@ class DOMUtilTest extends TestCase
         $this->assertContains('Привет', $node->textContent);
         $this->assertContains('世界', $node->textContent);
     }
-    
+
     /* public function testParsesBodyTag()
     {
         $node = DOMUtil::createNode('<body>Hello</body>');
@@ -81,7 +81,6 @@ class DOMUtilTest extends TestCase
     {
         $source = DOMUtil::createNode('<div><a></a><b><s></s></b></div>');
         $result = DOMUtil::transformDomTree($source, function ($node) {
-
             if (mb_strtolower($node->nodeName) == 'b') {
                 return null;
             }
@@ -95,14 +94,14 @@ class DOMUtilTest extends TestCase
         $html = $this->removeSpaceBetweenTags($html);
         $this->assertEquals('<div><a></a></div>', $html);
     }
-    
+
     public function testTransformerCanModifyAttributes()
     {
         $source = DOMUtil::createNode('<div><a id="id1"><b></b></a></div>');
         $result = DOMUtil::transformDomTree($source, function ($node) {
-
             if (mb_strtolower($node->nodeName) == 'a') {
                 $node->setAttribute('id', 'id2');
+
                 return $node;
             }
 
@@ -115,14 +114,14 @@ class DOMUtilTest extends TestCase
         $html = $this->removeSpaceBetweenTags($html);
         $this->assertEquals('<div><a id="id2"><b></b></a></div>', $html);
     }
-    
+
     public function testTransformerCanReplaceNode()
     {
         $source = DOMUtil::createNode('<div><a></a><b></b></div>');
         $result = DOMUtil::transformDomTree($source, function ($node) {
-
             if (mb_strtolower($node->nodeName) == 'a') {
                 $newNode = $node->ownerDocument->createElement('p');
+
                 return $newNode;
             }
 
@@ -140,7 +139,6 @@ class DOMUtilTest extends TestCase
     {
         $source = DOMUtil::createNode('<div><a></a><b></b></div>');
         $result = DOMUtil::transformDomTree($source, function ($node) {
-
             if (mb_strtolower($node->nodeName) == 'a') {
                 $newNode1 = $node->ownerDocument->createElement('p');
                 $newNode2 = $node->ownerDocument->createElement('s');

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\ThreadParser;
 
-use Tests\AbstractTestCase;
 use phpClub\Entity\Post;
 use phpClub\ThreadParser\MDvachThreadParser;
+use Tests\AbstractTestCase;
 
 class MDvachHtmlParserTest extends AbstractTestCase
 {
@@ -72,4 +72,3 @@ class MDvachHtmlParserTest extends AbstractTestCase
         $this->assertGreaterThan(100, count($posts));
     }
 }
-

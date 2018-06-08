@@ -26,7 +26,7 @@ class DvachThreadParser extends AbstractThreadParser
     protected function getTripCodeXPath(): string
     {
         return '//span[starts-with(@class,"postertrip")]';
-    }    
+    }
 
     protected function getDateXPath(): string
     {
