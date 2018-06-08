@@ -20,6 +20,7 @@ use phpClub\BoardClient\ArhivachClient;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Command\ImportThreadsCommand;
 use phpClub\Command\RebuildChainsCommand;
+use phpClub\Controller\ApiController;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Controller\UsersController;
@@ -181,7 +182,20 @@ $di[RebuildChainsCommand::class] = function (Container $di) {
 };
 
 $di[Client::class] = function () {
-    return new Client();
+    $proxy = getenv('GUZZLE_PROXY');
+
+    if (!$proxy) {
+        throw new \Exception(sprintf('GUZZLE_PROXY env variable is empty or not defined'));
+    }
+
+    $client = new Client([
+        'timeout' => 10,
+        'curl'    => [
+//            CURLOPT_PROXY => 'user:password@ip:port',
+        ],
+    ]);
+
+    return $client;
 };
 
 $di[DvachClient::class] = function ($di) {
@@ -195,8 +209,9 @@ $di[UrlGenerator::class] = function (Container $di) {
 $di[PhpRenderer::class] = function (Container $di): PhpRenderer {
     return new PhpRenderer(__DIR__ . '/../templates', [
         // Shared variables
-        'urlGenerator' => $di->get(UrlGenerator::class),
-        'paginator'    => $di->get(PaginationRenderer::class),
+        'urlGenerator'   => $di->get(UrlGenerator::class),
+        'paginator'      => $di->get(PaginationRenderer::class),
+        'arhivachClient' => $di->get(ArhivachClient::class),
     ]);
 };
 
@@ -243,6 +258,10 @@ $di['SearchController'] = function (Container $di): SearchController {
 
 $di['UsersController'] = function (Container $di): UsersController {
     return new UsersController($di->get(Authorizer::class), $di->get(PhpRenderer::class));
+};
+
+$di['ApiController'] = function (Container $di): ApiController {
+    return new ApiController($di->get(PostRepository::class));
 };
 
 $di['notFoundHandler'] = function (Container $di) {

@@ -21,13 +21,9 @@
         "vlucas/phpdotenv": "^2.4"
     },
     "require-dev": {
+        "roave/security-advisories": "dev-master",
         "phpunit/phpunit": "^6.2",
         "mikey179/vfsStream": "^1.6",
         "symfony/var-dumper": "^3.3"
-    },
-    "scripts": {
-        "diff": "vendor/bin/doctrine-migrations migrations:diff",
-        "migrate": "vendor/bin/doctrine-migrations migrations:migrate",
-        "migrate-test": "APP_ENV=test vendor/bin/doctrine-migrations migrations:migrate"
     }
 }

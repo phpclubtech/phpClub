@@ -48,6 +48,11 @@ class File
      **/
     private $post;
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     public function getPost(): Post
     {
         return $this->post;

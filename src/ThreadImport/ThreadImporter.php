@@ -63,6 +63,7 @@ class ThreadImporter
      */
     public function import(array $threads): void
     {
+        $this->entityManager->beginTransaction();
         $this->cascadeRemoveThreads($threads);
 
         foreach ($threads as $thread) {
@@ -75,6 +76,7 @@ class ThreadImporter
         }
 
         $this->lastPostUpdater->updateLastPosts($threads);
+        $this->entityManager->commit();
         $this->cache->clear();
     }
 

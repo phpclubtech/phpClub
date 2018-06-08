@@ -3,5 +3,66 @@
         <div id="lightbox" style="display: none;">
             <i class="cross fas fa-times"></i>
         </div>
+        <div id="loading" style="display: none">
+            <img src="/media/images/load.gif">
+        </div>
+
+        <script id="post-template" type="text/template" src="/media/js/templates/post.js">
+            <div id="<%= post.id %>" class="post <% if (post.isFirstPost) { %> op-post <% } %> clearfix" data-id="<%= post.id %>">
+                <div class="post-header clearfix">
+                    <span class="title"><%= post.title %></span>
+                    <span class="author"><%= post.author %></span>
+                    <span class="datetime"><%= post.date.getFullYear() %>/<%= post.date.getMonth() %>/<%= post.date.getDay() %> <%= post.date.getHours() %>:<%= post.date.getMinutes() %>:<%= post.date.getSeconds() %>&nbsp;</span>
+                    <span class="number">
+                            <a href="/pr/res/<%= post.thread %>.html#<%= post.id %>" date-reflink-id="<%= post.id %>">№<%= post.id %></a>
+                    </span>
+
+                    <% if (!post.isOld && !post.isFirstPost) { %>                        
+                        <span class="chain">
+                            <a href="/pr/chain/<%= post.id %>/"><i class="fa fa-link" aria-hidden="true" title="Цепочка ответов"></i></a>
+                        </span>
+                    <% } %>
+
+                    <% if (post.isFirstPost) { %>
+                        <span class="archives">
+                            <a href="<?= $urlGenerator->toDvachArchiveThread() ?>"><img src="/media/images/2ch.ico" title="Искать в архиве 2ch.hk"></a>
+                            <a href="<?= $urlGenerator->toArhivachThread() ?>https://2ch.hk/pr/res/<%= post.thread %>.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
+                            <i class="fa fa-chain"></i>
+                        </span>
+                    <% } %>
+                </div>
+
+                <% if (post.files.length > 0) { %>
+                    <div class="files <% if (post.files.length > 1) { %> files-multiple <% } %>">
+                        <% for (var key in post.files) { %>
+                            <figure class="file">
+                                <figcaption class="file-attributes">
+                                    <a href="<%= post.files[key].path %>" target="_blank" title="<%= post.files[key].name %>"><%= post.files[key].name %></a>
+                                    <span class="filesize">(<%= post.files[key].size %>, <%= post.files[key].width %>x<%= post.files[key].height %>)</span>
+                                </figcaption>
+                                <a href="<%= post.files[key].path %>" class="file-link" target="_blank">
+                                    <img class="preview" src="<%= post.files[key].thumbPath %>" alt="<%= post.files[key].height %>x<%= post.files[key].width %>">
+                                </a>
+                            </figure>
+                        <% } %>
+                    </div>
+                <% } %>
+
+                <article class="text">
+                    <%- post.text %>
+                </article>
+                
+                <% if (post.replies.length > 0) { %>
+                    <div class="refmap">
+                        <em>Ответы: </em>
+
+                        <% for (var key in post.replies) { %>
+                            <!-- reflinks data must be changed after prossing them in the parser  -->
+                            <a class="post-reply-link" data-num="<%= post.replies[key].id %>" data-thread="<%= post.replies[key].thread %>" href="/pr/res/<%= post.replies[key].thread %>.html#<%= post.replies[key].id %>">&gt;&gt;<%= post.replies[key].id %></a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+        </script>
     </body>
 </html>

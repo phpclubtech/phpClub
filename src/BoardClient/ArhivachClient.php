@@ -82,13 +82,11 @@ class ArhivachClient
     }
 
     /**
-     * @param Thread $thread
-     *
      * @return string
      */
-    public function generateArchiveLink(Thread $thread): string
+    public function generateArchiveLink(): string
     {
-        return "http://arhivach.org/ajax/?act=locate_thread&url=https://2ch.hk/pr/res/{$thread->getId()}.html";
+        return 'http://arhivach.cf/ajax/?act=locate_thread&url=';
     }
 
     /**
