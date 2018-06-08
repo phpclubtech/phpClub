@@ -16,7 +16,7 @@ class DateConverterTest extends TestCase
 
     public function setUp()
     {
-        $this->dateConverter = new DateConverter();
+        $this->dateConverter = new DateConverter(new \DateTimeZone('UTC'));
     }
 
     public function testGetDateTime()

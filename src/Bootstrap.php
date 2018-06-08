@@ -122,19 +122,21 @@ $di['DvachMarkupConverter'] = function ($di) {
 };
 
 $di[ArhivachThreadParser::class] = function ($di) {
-    return new ArhivachThreadParser($di[DateConverter::class], $di['ArhivachMarkupConverter']);
+    $tz = new \DateTimeZone('Europe/Moscow');
+    $dateConverter = new DateConverter($tz);
+    return new ArhivachThreadParser($dateConverter, $di['ArhivachMarkupConverter']);
 };
 
 $di[DvachThreadParser::class] = function ($di) {
-    return new DvachThreadParser($di[DateConverter::class], $di['DvachMarkupConverter']);
+    $tz = new \DateTimeZone('Europe/Moscow');
+    $dateConverter = new DateConverter($tz);
+    return new DvachThreadParser($dateConverter, $di['DvachMarkupConverter']);
 };
 
 $di[MDvachThreadParser::class] = function ($di) {
-    return new MDvachThreadParser($di[DateConverter::class], $di['DvachMarkupConverter']);
-};
-
-$di[DateConverter::class] = function () {
-    return new DateConverter();
+    $tz = new \DateTimeZone('Europe/Moscow');
+    $dateConverter = new DateConverter($tz);
+    return new MDvachThreadParser($dateConverter, $di['DvachMarkupConverter']);
 };
 
 $di[ThreadRepository::class] = function (Container $di) {

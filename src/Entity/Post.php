@@ -15,7 +15,11 @@ class Post
     /** @Id @Column(type="integer") **/
     private $id;
 
-    /** @Column(type="text") **/
+    /** 
+     * Contains HTML code
+     * 
+     * @Column(type="text") 
+     */
     private $text;
 
     /** @Column(type="datetime_immutable") **/
@@ -131,6 +135,9 @@ class Post
         return $this->thread;
     }
 
+    /**
+     * Returns post body as HTML code
+     */
     public function getText()
     {
         return $this->text;

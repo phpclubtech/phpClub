@@ -79,12 +79,13 @@ abstract class AbstractThreadParser
                 $post = $this->extractSinglePost($postNode, $thread, $threadPath, $hasCloudflareEmails);
             } catch (ThreadParseException $e) {
                 // Add details if an exception is thrown
+                $html = DOMUtil::getOuterHtml($postNode->getNode(0));
                 
                 $details = sprintf(
-                    "%s: %s\nPost HTML: \n%s",
+                    "%s: %s\nPost HTML: \n%s...",
                     get_class($e),
                     $e->getMessage(),
-                    DOMUtil::getOuterHtml($postNode->getNode(0))
+                    mb_substr($html, 0, 2000)
                 );
 
                 throw new ThreadParseException($details, 0, $e);

@@ -6,8 +6,17 @@ namespace phpClub\ThreadParser;
 
 class DateConverter
 {
+    /** @var \DateTimeZone */
+    private $timeZone;
+
+    public function __construct(\DateTimeZone $timeZone)
+    {
+        $this->timeZone = $timeZone;
+    }
+    
     /**
      * @param string $date
+     * @param \DateTimeZone $timeZone The timezone that date belongs to.
      *
      * @throws \Exception
      *
@@ -17,12 +26,22 @@ class DateConverter
     {
         $normalized = $this->normalizeDate($date);
 
-        $dateTime = \DateTimeImmutable::createFromFormat('d M Y H:i:s', $normalized);
+        $dateTime = \DateTimeImmutable::createFromFormat(
+            'd M Y H:i:s',
+            $normalized,
+            $this->timeZone
+        );
+
         if ($dateTime !== false) {
             return $dateTime;
         }
 
-        $dateTime = \DateTimeImmutable::createFromFormat('d/m/y  H:i:s', $normalized);
+        $dateTime = \DateTimeImmutable::createFromFormat(
+            'd/m/y  H:i:s',
+            $normalized,
+            $this->timeZone
+        );
+
         if ($dateTime !== false) {
             return $dateTime;
         }
@@ -60,6 +79,7 @@ class DateConverter
 
         $month = $monthNames[$m[2]];
 
+        // m2-ch always uses Moscow timezone
         $mskTimezone = new \DateTimeZone('Europe/Moscow');
         $dateTime = new \DateTimeImmutable("$year-$month-$day $hours:$minutes", $mskTimezone);
         
