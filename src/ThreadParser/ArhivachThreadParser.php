@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
-use phpClub\Entity\File;
 use Symfony\Component\DomCrawler\Crawler;
+use phpClub\Entity\File;
+use phpClub\Util\DOMUtil;
 
 class ArhivachThreadParser extends AbstractThreadParser
 {
@@ -16,8 +17,13 @@ class ArhivachThreadParser extends AbstractThreadParser
 
     protected function getAuthorXPath(): string
     {
-        return '//span[@class="poster_name"] | //span[@class="poster_trip"]';
+        return '//span[@class="poster_name"]';
     }
+
+    protected function getTripCodeXPath(): string
+    {
+        return '//span[@class="poster_trip"]';
+    }    
 
     protected function getDateXPath(): string
     {
@@ -47,26 +53,24 @@ class ArhivachThreadParser extends AbstractThreadParser
     /**
      * @param Crawler $postNode
      *
-     * @throws \Exception
-     *
      * @return string
      */
     protected function extractAuthor(Crawler $postNode): string
     {
         $authorXPath = $this->getAuthorXPath();
         $authorNode = $postNode->filterXPath($authorXPath);
+        $author = trim(DOMUtil::getTextFromCrawler($authorNode));
 
-        if (!count($authorNode)) {
-            return '';
-        }
+        $tripXPath = $this->getTripCodeXPath();
+        $tripNode = $postNode->filterXPath($tripXPath);
+        $trip = trim(DOMUtil::getTextFromCrawler($tripNode));
 
-        return $authorNode->text();
+        // Author can be missing
+        return $author !== '' ? $author : $trip;        
     }
 
     /**
      * @param Crawler $fileNode
-     *
-     * @throws \Exception
      *
      * @return File
      */
@@ -76,7 +80,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $imgNode = $fileNode->filterXPath($fileXPath);
 
         if (!count($imgNode)) {
-            throw new \Exception("Unable to parse file, HTML: {$imgNode->html()}");
+            throw new ThreadParseException("Unable to parse image node, HTML: {$imgNode->html()}");
         }
 
         [, $filePath, $width, $height] = preg_split("/','|',|,|\)/", $imgNode->attr('onclick'), -1, PREG_SPLIT_NO_EMPTY);
@@ -96,7 +100,7 @@ class ArhivachThreadParser extends AbstractThreadParser
         $thumbNode = $imgNode->filterXPath($thumbXPath);
 
         if (!count($thumbNode)) {
-            throw new \Exception("Unable to parse thumb, HTML: {$thumbNode->html()}");
+            throw new ThreadParseException("Unable to parse thumb, HTML: {$thumbNode->html()}");
         }
 
         $clientNameNode = $fileNode->filterXPath('//a[@class="img_filename"]');

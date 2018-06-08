@@ -63,7 +63,7 @@ class File
         return (bool) $this->size;
     }
 
-    public function getSize(): int
+    public function getSize(): ?int
     {
         return $this->size;
     }

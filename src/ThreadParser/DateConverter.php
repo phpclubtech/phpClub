@@ -6,8 +6,17 @@ namespace phpClub\ThreadParser;
 
 class DateConverter
 {
+    /** @var \DateTimeZone */
+    private $timeZone;
+
+    public function __construct(\DateTimeZone $timeZone)
+    {
+        $this->timeZone = $timeZone;
+    }
+    
     /**
      * @param string $date
+     * @param \DateTimeZone $timeZone The timezone that date belongs to.
      *
      * @throws \Exception
      *
@@ -17,17 +26,64 @@ class DateConverter
     {
         $normalized = $this->normalizeDate($date);
 
-        $dateTime = \DateTimeImmutable::createFromFormat('d M Y H:i:s', $normalized);
+        $dateTime = \DateTimeImmutable::createFromFormat(
+            'd M Y H:i:s',
+            $normalized,
+            $this->timeZone
+        );
+
         if ($dateTime !== false) {
             return $dateTime;
         }
 
-        $dateTime = \DateTimeImmutable::createFromFormat('d/m/y  H:i:s', $normalized);
+        $dateTime = \DateTimeImmutable::createFromFormat(
+            'd/m/y  H:i:s',
+            $normalized,
+            $this->timeZone
+        );
+
         if ($dateTime !== false) {
             return $dateTime;
         }
 
-        throw new \Exception("Unable to parse date: {$date}");
+        throw new DateParseException("Unable to parse date: {$date}");
+    }
+
+    /**
+     * Parses datetime like '02 Май, 19:34' from m2-ch.ru
+     */
+    public function parseMDvachDate(string $rawDate, int $year): \DateTimeInterface
+    {
+        if (!preg_match("/(\d+)\s+(\w+),\s*(\d+):(\d+)/u", $rawDate, $m)) {
+            throw new DateParseException("Invalid date format: '$rawDate'");
+        }
+
+        $day = $m[1];
+        $hours = $m[3];
+        $minutes = $m[4];
+
+        $monthNames = [
+            'Янв' => 1,
+            'Фев' => 2,
+            'Мар' => 3,
+            'Апр' => 4,
+            'Май' => 5,
+            'Июн' => 6,
+            'Июл' => 7,
+            'Авг' => 8,
+            'Сен' => 9,
+            'Окт' => 10,
+            'Ноя' => 11,
+            'Дек' => 12,
+        ];
+
+        $month = $monthNames[$m[2]];
+
+        // m2-ch always uses Moscow timezone
+        $mskTimezone = new \DateTimeZone('Europe/Moscow');
+        $dateTime = new \DateTimeImmutable("$year-$month-$day $hours:$minutes", $mskTimezone);
+        
+        return $dateTime;
     }
 
     /**

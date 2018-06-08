@@ -15,7 +15,11 @@ class Post
     /** @Id @Column(type="integer") **/
     private $id;
 
-    /** @Column(type="text") **/
+    /** 
+     * Contains HTML code
+     * 
+     * @Column(type="text") 
+     */
     private $text;
 
     /** @Column(type="datetime_immutable") **/
@@ -55,7 +59,7 @@ class Post
      */
     private $replies;
 
-    public function __construct($id)
+    public function __construct(int $id)
     {
         $this->id = $id;
         $this->files = new ArrayCollection();
@@ -91,7 +95,7 @@ class Post
         return $this;
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -131,6 +135,9 @@ class Post
         return $this->thread;
     }
 
+    /**
+     * Returns post body as HTML code
+     */
     public function getText()
     {
         return $this->text;

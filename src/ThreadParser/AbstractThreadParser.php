@@ -4,23 +4,32 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
+use Symfony\Component\DomCrawler\Crawler;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
-use Symfony\Component\DomCrawler\Crawler;
+use phpClub\ThreadParser\MarkupConverter;
+use phpClub\ThreadParser\ThreadParseException;
+use phpClub\Util\DOMUtil;
 
 abstract class AbstractThreadParser
 {
     /**
      * @var DateConverter
      */
-    private $dateConverter;
+    protected $dateConverter;
+
+    /**
+     * @var MarkupConverter 
+     */
+    protected $markupConverter;
 
     /**
      * @param DateConverter $dateConverter
      */
-    public function __construct(DateConverter $dateConverter)
+    public function __construct(DateConverter $dateConverter, MarkupConverter $markupConverter)
     {
+        $this->markupConverter = $markupConverter;
         $this->dateConverter = $dateConverter;
     }
 
@@ -31,6 +40,8 @@ abstract class AbstractThreadParser
     abstract protected function getTitleXPath(): string;
 
     abstract protected function getAuthorXPath(): string;
+
+    abstract protected function getTripCodeXPath(): string;
 
     abstract protected function getDateXPath(): string;
 
@@ -44,52 +55,97 @@ abstract class AbstractThreadParser
      * @param string $threadHtml
      * @param string $threadPath
      *
-     * @throws \Exception
-     *
      * @return Thread
      */
     public function extractThread(string $threadHtml, string $threadPath = ''): Thread
     {
+        $hasCloudflareEmails = $this->hasCloudflareEmails($threadHtml);
         $threadCrawler = new Crawler($threadHtml);
 
         $postsXPath = $this->getPostsXPath();
-
-        $firstPostXPath = $threadCrawler->filterXPath($postsXPath . '[1]');
-        $thread = new Thread($this->extractId($firstPostXPath));
-
         $postNodes = $threadCrawler->filterXPath($postsXPath);
 
         if (!count($postNodes)) {
-            throw new \Exception('Posts not found');
+            throw new ThreadParseException('Post nodes not found');
         }
 
-        $extractPost = function (Crawler $postNode) use ($thread, $threadPath) {
-            $post = (new Post($this->extractId($postNode)))
-                ->setTitle($this->extractTitle($postNode))
-                ->setAuthor($this->extractAuthor($postNode))
-                ->setDate($this->extractDate($postNode))
-                ->setText($this->extractText($postNode))
-                ->setThread($thread);
+        $firstPost = $postNodes->first();
 
-            if (!$this->isThreadWithMissedFiles($thread)) {
-                $files = $this->extractFiles($postNode, $threadPath);
-                foreach ($files as $file) {
-                    $post->addFile($file);
-                }
+        $thread = new Thread($this->extractId($firstPost));
+
+        $extractPost = function (Crawler $postNode) use ($thread, $threadPath, $hasCloudflareEmails) {
+
+            try {
+                $post = $this->extractSinglePost($postNode, $thread, $threadPath, $hasCloudflareEmails);
+            } catch (ThreadParseException $e) {
+                // Add details if an exception is thrown
+                $html = DOMUtil::getOuterHtml($postNode->getNode(0));
+                
+                $details = sprintf(
+                    "%s: %s\nPost HTML: \n%s...",
+                    get_class($e),
+                    $e->getMessage(),
+                    mb_substr($html, 0, 2000)
+                );
+
+                throw new ThreadParseException($details, 0, $e);
             }
 
+            $post->setThread($thread);
             $thread->addPost($post);
         };
 
         $postNodes->each($extractPost);
 
+        $this->assertThatPostIdsAreUnique($thread);
+
         return $thread;
+    }
+
+    private function extractSinglePost(
+        Crawler $postNode, 
+        Thread $thread, 
+        string $threadPath, 
+        bool $hasCloudflareEmails): Post
+    {
+        if ($hasCloudflareEmails) {
+            $postNode = $this->restoreCloudflareEmails($postNode);
+        }
+
+        $post = (new Post($this->extractId($postNode)))
+            ->setTitle($this->extractTitle($postNode))
+            ->setAuthor($this->extractAuthor($postNode))
+            ->setDate($this->extractDate($postNode))
+            ->setText($this->extractText($postNode));            
+
+        if (!$this->isThreadWithMissedFiles($thread)) {
+            $files = $this->extractFiles($postNode, $threadPath);
+            foreach ($files as $file) {
+                $post->addFile($file);
+            }
+        }
+
+        return $post;
+    }
+
+    protected function assertThatPostIdsAreUnique(Thread $thread)
+    {
+        $ids = [];
+        $posts = $thread->getPosts();
+
+        foreach ($posts as $post) {
+            $id = $post->getId();
+
+            if (array_key_exists($id, $ids)) {
+                throw new ThreadParseException("In thread {$thread->getId()} there is more than one post with id {$id}");
+            }
+
+            $ids[$id] = true;
+        }
     }
 
     /**
      * @param Crawler $postNode
-     *
-     * @throws \Exception
      *
      * @return int
      */
@@ -99,7 +155,7 @@ abstract class AbstractThreadParser
         $idNode = $postNode->filterXPath($idXPath);
 
         if (!count($idNode)) {
-            throw new \Exception("Unable to parse post id, HTML: {$postNode->html()}");
+            throw new ThreadParseException("Unable to parse post id");
         }
 
         $postId = preg_replace('/[^\d]+/', '', $idNode->text());
@@ -127,8 +183,6 @@ abstract class AbstractThreadParser
     /**
      * @param Crawler $postNode
      *
-     * @throws \Exception
-     *
      * @return string
      */
     protected function extractAuthor(Crawler $postNode): string
@@ -137,26 +191,32 @@ abstract class AbstractThreadParser
         $authorNode = $postNode->filterXPath($authorXPath);
 
         if (!count($authorNode)) {
-            throw new \Exception("Unable to parse post author, HTML: {$postNode->html()}");
+            throw new ThreadParseException("Unable to parse post author");
         }
 
-        return $authorNode->text();
+        $author = trim($authorNode->text());
+
+        $tripXPath = $this->getTripCodeXPath();
+        $tripNode = $postNode->filterXPath($tripXPath);
+        $trip = trim(DOMUtil::getTextFromCrawler($tripNode));
+
+        // As currently we don't distinguish between names and trip codes,
+        // parse both and return first non-empty value
+        return $author !== '' ? $author : $trip;        
     }
 
     /**
      * @param Crawler $postNode
      *
-     * @throws \Exception
-     *
      * @return \DateTimeImmutable
      */
-    protected function extractDate(Crawler $postNode): \DateTimeImmutable
+    protected function extractDate(Crawler $postNode): \DateTimeInterface
     {
         $dateXPath = $this->getDateXPath();
         $dateNode = $postNode->filterXPath($dateXPath);
 
         if (!count($dateNode)) {
-            throw new \Exception("Unable to parse post date, HTML: {$postNode->html()}");
+            throw new ThreadParseException("Unable to parse post date");
         }
 
         return $this->dateConverter->toDateTime($dateNode->text());
@@ -165,20 +225,22 @@ abstract class AbstractThreadParser
     /**
      * @param Crawler $postNode
      *
-     * @throws \Exception
-     *
      * @return string
      */
     protected function extractText(Crawler $postNode): string
     {
         $textXPath = $this->getTextXPath();
-        $textNode = $postNode->filterXPath($textXPath);
+        $blockquoteNode = $postNode->filterXPath($textXPath);
 
-        if (!count($textNode)) {
-            throw new \Exception("Unable to parse post text, HTML: {$postNode->html()}");
+        if (!count($blockquoteNode)) {
+            throw new ThreadParseException("Unable to parse post text");
         }
 
-        return trim($textNode->html());
+        // $textNode is an iterable
+        $blockquoteDomNode = $blockquoteNode->getNode(0);
+        $this->markupConverter->transformChildren($blockquoteDomNode);
+
+        return trim($blockquoteNode->html());
     }
 
     /**
@@ -215,5 +277,109 @@ abstract class AbstractThreadParser
         $threadsWithMissedFiles = ['345388'];
 
         return in_array($thread->getId(), $threadsWithMissedFiles, $strict = true);
+    }
+
+    protected function hasCloudflareEmails(string $html)
+    {
+        return false !== strstr($html, '__cf_email__');
+    }
+
+    /**
+     * Removes cloudflare-encoded emails from post body
+     *
+     * Returns a new Crawler with a copy of DOM tree.
+     */
+    public static function restoreCloudflareEmails(Crawler $post): Crawler
+    {
+        //    Cloudflare replaces email with code (formatted): 
+        //    
+        //    <a class="__cf_email__" 
+        //        href="http://www.cloudflare.com/email-protection" 
+        //        data-cfemail="50243835373c253510243f223d31393c7e3f2237">[email&nbsp;protected]</a>
+        //        <script type="text/javascript">
+        //          /* <![CDATA[ */
+        //          (function(){try{
+        //              var s,a,i,j,r,c,l,b=document.getElementsByTagName("script");
+        //              l=b[b.length-1].previousSibling;
+        //              a=l.getAttribute('data-cfemail');
+        //              if(a){
+        //                  s='';
+        //                  r=parseInt(a.substr(0,2),16);
+        //                  for(j=2;a.length-j;j+=2){
+        //                      c=parseInt(a.substr(j,2),16)^r;
+        //                      s+=String.fromCharCode(c);
+        //                  }
+        //                  s=document.createTextNode(s);
+        //                  l.parentNode.replaceChild(s,l);
+        //              }
+        //          }catch(e){}})();
+        //          /* ]]> */
+        //        </script>
+        //        
+        //    We replace it with decoded email
+        
+        assert($post->count() == 1);
+        $postNode = $post->getNode(0);
+
+        $replacement = DOMUtil::transformDomTree($postNode, function (\DOMNode $node) {
+
+            $nodeName = strtolower($node->nodeName);
+
+            if ($nodeName == 'a') {
+                $class = $node->getAttribute('class');
+                if ($class != '__cf_email__') {
+                    return $node;
+                }
+
+                $encodedEmail = $node->getAttribute('data-cfemail');
+                if (!$encodedEmail) {
+                    return $node;
+                }
+
+                $email = self::decodeCfEmail($encodedEmail);
+
+                $textNode = $node->ownerDocument->createTextNode($email);
+                return $textNode;
+            }
+
+            if ($nodeName == 'script') {
+                if (false === strstr($node->textContent, 'c=parseInt(a.substr(j,2),16)^r')) {
+                    return $node;
+                }
+
+                // Remove script
+                return null;
+            }
+
+            return $node;     
+        });
+
+        $newCrawler = new Crawler;
+        $newCrawler->addNodes($replacement);
+
+        return $newCrawler;
+    }  
+
+    /**
+     * Decodes emails from data-cfemail attribute:
+     *
+     * 123456abcdef => some@example.com
+     */
+    public static function decodeCfEmail($cfeString)
+    {
+        if (!preg_match("/^([0-9a-fA-F]{2}){2,}$/", $cfeString)) {
+            throw new \Exception("Invalid data-cfemail string: '$cfeString'");
+        }
+
+        $result = '';
+        $key = hexdec(mb_substr($cfeString, 0, 2));
+        $length = mb_strlen($cfeString);
+
+        for ($i=2; $i < $length; $i+=2) { 
+            $byte = hexdec(mb_substr($cfeString, $i, 2)) ^ $key;
+            $result .= chr($byte);
+        }
+
+        return $result;
     }
 }

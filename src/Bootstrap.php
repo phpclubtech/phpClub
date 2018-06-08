@@ -9,6 +9,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Setup;
 use GuzzleHttp\Client;
+use Psr\SimpleCache\CacheInterface;
+use Slim\Container;
+use Slim\Http\Request;
+use Slim\Http\Response;
+use Slim\Views\PhpRenderer;
+use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 use phpClub\BoardClient\ArhivachClient;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Command\ImportThreadsCommand;
@@ -33,13 +40,8 @@ use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DateConverter;
 use phpClub\ThreadParser\DvachThreadParser;
-use Psr\SimpleCache\CacheInterface;
-use Slim\Container;
-use Slim\Http\Request;
-use Slim\Http\Response;
-use Slim\Views\PhpRenderer;
-use Symfony\Component\Cache\Simple\ArrayCache;
-use Symfony\Component\Cache\Simple\FilesystemCache;
+use phpClub\ThreadParser\MDvachThreadParser;
+use phpClub\ThreadParser\MarkupConverter;
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
@@ -112,16 +114,30 @@ $di[ArhivachClient::class] = function (Container $di) {
     );
 };
 
+$di['ArhivachMarkupConverter'] = function ($di) {
+    return new MarkupConverter(true);
+};
+
+$di['DvachMarkupConverter'] = function ($di) {
+    return new MarkupConverter(false);
+};
+
 $di[ArhivachThreadParser::class] = function ($di) {
-    return new ArhivachThreadParser($di[DateConverter::class]);
+    $tz = new \DateTimeZone('Europe/Moscow');
+    $dateConverter = new DateConverter($tz);
+    return new ArhivachThreadParser($dateConverter, $di['ArhivachMarkupConverter']);
 };
 
 $di[DvachThreadParser::class] = function ($di) {
-    return new DvachThreadParser($di[DateConverter::class]);
+    $tz = new \DateTimeZone('Europe/Moscow');
+    $dateConverter = new DateConverter($tz);
+    return new DvachThreadParser($dateConverter, $di['DvachMarkupConverter']);
 };
 
-$di[DateConverter::class] = function () {
-    return new DateConverter();
+$di[MDvachThreadParser::class] = function ($di) {
+    $tz = new \DateTimeZone('Europe/Moscow');
+    $dateConverter = new DateConverter($tz);
+    return new MDvachThreadParser($dateConverter, $di['DvachMarkupConverter']);
 };
 
 $di[ThreadRepository::class] = function (Container $di) {
@@ -155,7 +171,9 @@ $di[ImportThreadsCommand::class] = function (Container $di) {
         $di[ThreadImporter::class],
         $di[DvachClient::class],
         $di[ArhivachClient::class],
-        $di[DvachThreadParser::class]
+        $di[DvachThreadParser::class],
+        $di[MDvachThreadParser::class],
+        $di[ArhivachThreadParser::class]
     );
 };
 
