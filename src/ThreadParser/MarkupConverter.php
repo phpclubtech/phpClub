@@ -101,7 +101,8 @@ class MarkupConverter
         }
 
         if ($type === XML_ELEMENT_NODE) {
-            return $this->transformElementRecursively($body);
+            $keep = $this->transformElementRecursively($body);
+            return $keep ? $body : null;
         }
 
         throw new \InvalidArgumentException("Invalid DOM Node type; only text, element or document fragment node is allowed, given type='$type'");
