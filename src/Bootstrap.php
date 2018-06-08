@@ -42,7 +42,6 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\PhpRenderer;
 use Symfony\Component\Cache\Simple\ArrayCache;
-use Symfony\Component\Cache\Simple\FilesystemCache;
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 

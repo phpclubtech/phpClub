@@ -247,7 +247,7 @@ abstract class AbstractThreadParser
 
     /**
      * @param Crawler $postNode
-     * @param string $threadPath
+     * @param string  $threadPath
      *
      * @return File[]
      */
