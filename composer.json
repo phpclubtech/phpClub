@@ -6,6 +6,7 @@
         }
     },
     "require": {
+        "php": "^7.1",
         "doctrine/orm": "^2.6",
         "doctrine/migrations": "^1.5",
         "slim/slim": "^3.8",
