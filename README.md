@@ -34,3 +34,6 @@ php -S 127.0.0.1:9001 -t public dev-server.php
 1. Create test database, edit TEST_DB_NAME variable in `.env` file
 2. Run migrations for test database `make migrate-test`
 3. Run tests using `./vendor/bin/phpunit`. To run single method add `--filter` option.
+
+## Sphinx
+To run Sphinx use `indexer --config /path/to/project/config/sphinx.conf --all --rotate`

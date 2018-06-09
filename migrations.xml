@@ -10,6 +10,6 @@
 
     <table name="doctrine_migration_versions" />
 
-    <migrations-directory>/DoctrineMigrations</migrations-directory>
+    <migrations-directory>./migrations</migrations-directory>
 
 </doctrine-migrations>
