@@ -11,7 +11,7 @@ use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\MDvachThreadParser;
-use phpClub\ThreadParser\ThreadParseException;
+use phpClub\ThreadParser\Exception\ThreadParseException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;

@@ -70,6 +70,7 @@ class BoardController
         $threadsQuery = $this->threadRepository->getThreadsWithLastPostsQuery();
 
         $threads = (new Pagerfanta(new DoctrineORMAdapter($threadsQuery)))
+            ->setMaxPerPage(10)
             ->setCurrentPage($page);
 
         $viewArgs = [

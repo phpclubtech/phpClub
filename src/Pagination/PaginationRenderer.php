@@ -31,7 +31,7 @@ class PaginationRenderer
 
         return (new DefaultView())->render($pagerfanta, $generateRoute, [
             'container_template' => '<nav class="pagerfanta">%pages%</nav>',
-            'previous_message'   => 'Предыдущая',
+            'prev_message'       => 'Предыдущая',
             'next_message'       => 'Следующая',
         ]);
     }
