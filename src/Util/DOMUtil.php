@@ -150,10 +150,14 @@ class DOMUtil
         if ($replacement === null) {
             // Transformer wants to remove the node
             return [];
-        } elseif ($replacement === $node) {
+        }
+
+        if ($replacement === $node) {
             // Leave the same node
             return [$replacement];
-        } elseif ($replacement instanceof \DOMDocumentFragment) {
+        }
+
+        if ($replacement instanceof \DOMDocumentFragment) {
             // Use these as replacement
             $nodes = [];
             while ($replacement->firstChild) {
@@ -163,11 +167,13 @@ class DOMUtil
             }
 
             return $nodes;
-        } elseif ($replacement instanceof \DOMNode) {
-            return [$replacement];
-        } else {
-            throw new \Exception("Transformer must return either null, or \DOMNode, or \DOMDocumentFragment");
         }
+
+        if ($replacement instanceof \DOMNode) {
+            return [$replacement];
+        }
+
+        throw new \Exception("Transformer must return either null, or \DOMNode, or \DOMDocumentFragment");
     }
 
     public static function hasClass(string $classList, string $class)
