@@ -84,11 +84,11 @@ class MDvachThreadParser extends AbstractThreadParser
             throw new ThreadParseException('Cannot read post id while parsing date');
         }
 
-        if ($postId >= 272705 && $postId <= 289749) {
-            $year = 2013;
-        } else {
+        if (!($postId >= 272705 && $postId <= 289749)) {
             throw new ThreadParseException("m2-ch parser doesn't know the year for post id '$postId'");
         }
+
+        $year = 2013;
 
         $rawDate = $dateNode->text();
 

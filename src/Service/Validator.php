@@ -119,12 +119,8 @@ class Validator
 
     public static function validateToken($token)
     {
-        if (isset($_COOKIE['token'])) {
-            if ($token != '' and $_COOKIE['token'] != '' and $token === $_COOKIE['token']) {
-                return true;
-            }
-        }
+        $isValidToken = isset($_COOKIE['token']) && $token != '' && $_COOKIE['token'] != '' && $token === $_COOKIE['token'];
 
-        return false;
+        return $isValidToken;
     }
 }
