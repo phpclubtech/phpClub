@@ -53,12 +53,12 @@ class UrlGenerator
         return '';
     }
 
-    public function toDvachIcon()
+    public function toDvachIcon(): string
     {
         return '/media/images/2ch.ico';
     }
 
-    public function toArhivachIcon()
+    public function toArhivachIcon(): string
     {
         return '/media/images/arhivach.ico';
     }

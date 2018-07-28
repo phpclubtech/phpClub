@@ -31,12 +31,6 @@ class ArhivachClient
      */
     private $password;
 
-    /**
-     * @param Client               $guzzle
-     * @param ArhivachThreadParser $threadParser
-     * @param string               $email
-     * @param string               $password
-     */
     public function __construct(
         Client $guzzle,
         ArhivachThreadParser $threadParser,
@@ -89,11 +83,6 @@ class ArhivachClient
         return 'http://arhivach.cf/ajax/?act=locate_thread&url=';
     }
 
-    /**
-     * @param Thread $thread
-     *
-     * @return void
-     */
     public function archive(Thread $thread): void
     {
         // login using email + password, save cookie

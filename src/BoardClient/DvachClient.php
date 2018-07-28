@@ -63,7 +63,7 @@ class DvachClient
      */
     private function extractThread(array $phpThread): Thread
     {
-        $threadId = intval($phpThread['num']);
+        $threadId = (int) $phpThread['num'];
 
         $responseBody = $this->guzzle->get("https://2ch.hk/pr/res/{$threadId}.json")->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
@@ -120,17 +120,5 @@ class DvachClient
             ->setHeight($fileArray['height'])
             ->setWidth($fileArray['width'])
             ->setClientName($fileArray['fullname'] ?? $fileArray['name']);
-    }
-
-    /**
-     * @param Thread $thread
-     *
-     * @return string
-     */
-    public function searchInArchive(Thread $thread): string
-    {
-        $archiveBaseUrl = 'https://2ch.hk/pr/arch/0.html';
-
-        // TODO: implement search
     }
 }
