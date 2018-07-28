@@ -46,20 +46,4 @@ class UrlGenerator
     {
         return $this->arhivachClient->generateArchiveLink();
     }
-
-    public function toDvachArchiveThread(): string
-    {
-        // TODO: implement
-        return '';
-    }
-
-    public function toDvachIcon(): string
-    {
-        return '/media/images/2ch.ico';
-    }
-
-    public function toArhivachIcon(): string
-    {
-        return '/media/images/arhivach.ico';
-    }
 }
