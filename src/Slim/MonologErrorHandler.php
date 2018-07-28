@@ -34,7 +34,7 @@ class MonologErrorHandler
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, \Exception $exception): ResponseInterface
     {
-        $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+        $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
 
         return ($this->defaultErrorHandler)($request, $response, $exception);
     }
