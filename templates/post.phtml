@@ -4,10 +4,11 @@
 /** @var \phpClub\Entity\File $file */
 /** @var \phpClub\Entity\Post $post */
 /** @var \phpClub\Service\UrlGenerator $urlGenerator */
+/** @var \Slim\Views\PhpRenderer $this */
 use phpClub\Entity\File;
 ?>
 
-<div id="<?= $post->getId() ?>" class="post <?= ($post->isFirstPost()) ? 'op-post' : '' ?> clearfix" data-id="<?= $post->getId() ?>">
+<div id="<?= $post->getId() ?>" class="post <?= $post->isFirstPost() ? 'op-post' : '' ?> clearfix" data-id="<?= $post->getId() ?>">
     <div class="post-header clearfix">
         <span class="title"><?= $post->getTitle() ?></span>
         <span class="author"><?= $post->getAuthor() ?></span>
@@ -24,13 +25,13 @@ use phpClub\Entity\File;
 
         <?php if ($post->isFirstPost() && isset($thread)) : ?>
             <span class="archives">
-                <a href="<?= $urlGenerator->toDvachArchiveThread() ?>"><img src="/media/images/2ch.ico" title="Искать в архиве 2ch.hk"></a>
+                <?= $this->fetch('_dvachArchiveForm.php', ['searchString' => $post->getTitle()]) ?>
                 <a href="<?= $urlGenerator->toArhivachThread() ?>https://2ch.hk/pr/res/<?= $post->getThread()->getId() ?>.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
                 <i class="fa fa-chain"></i>
             </span>
         <?php endif; ?>
 
-        <?php if (isset($threads) and $post->isFirstPost()): ?>
+        <?php if (isset($threads) && $post->isFirstPost()): ?>
             <span class="show">
                 [<a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>]
             </span>
@@ -69,7 +70,7 @@ use phpClub\Entity\File;
         </div>
     <?php endif; ?>
 
-    <?php if (isset($threads) and $post->isFirstPost()) : ?>
+    <?php if (isset($threads) && $post->isFirstPost()) : ?>
         <span class="open">Нажмите <a href="<?= $urlGenerator->toThread($thread) ?>">Просмотреть</a>, чтобы открыть.</span>
     <?php endif; ?>
 </div>

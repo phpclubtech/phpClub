@@ -22,7 +22,11 @@ class Post
      */
     private $text;
 
-    /** @Column(type="datetime_immutable") **/
+    /**
+     * @var \DateTimeImmutable
+     *
+     * @Column(type="datetime_immutable")
+     */
     private $date;
 
     /** @Column(type="string", nullable=true) **/

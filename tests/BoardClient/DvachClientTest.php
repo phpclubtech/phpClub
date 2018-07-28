@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class DvachClientTest extends TestCase
 {
-    public function testThreads92and93()
+    public function testThreads92and93(): void
     {
         $dvachClient = $this->createDvachApiClient(
             new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog.json')),
@@ -46,11 +46,9 @@ class DvachClientTest extends TestCase
         $this->assertCount(1, $thirdPost->getFiles());
         $this->assertEquals('https://2ch.hk/pr/src/1049651/15035109769900.jpg', $thirdPost->getFiles()->first()->getPath());
         $this->assertEquals('https://2ch.hk/pr/thumb/1049651/15035109769900s.jpg', $thirdPost->getFiles()->first()->getThumbPath());
-
-        // TODO: add more tests
     }
 
-    public function testThreadsNotFound()
+    public function testThreadsNotFound(): void
     {
         $dvachApiClient = $this->createDvachApiClient(
             new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog_without_php_threads.json'))
