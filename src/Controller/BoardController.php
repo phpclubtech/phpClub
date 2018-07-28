@@ -65,6 +65,7 @@ class BoardController
 
     public function indexAction(Request $request, Response $response): ResponseInterface
     {
+        throw new \LogicException('Test exception');
         $page = $request->getParam('page', 1);
 
         $threadsQuery = $this->threadRepository->getThreadsWithLastPostsQuery();

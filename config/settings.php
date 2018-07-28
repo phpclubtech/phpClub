@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Logger;
 use phpClub\FileStorage\LocalFileStorage;
 
 return [
@@ -27,5 +28,10 @@ return [
         'sphinx' => [
             'dsn' => getenv('SPHINX_DSN'),
         ],
+    ],
+    'logger' => [
+        'name' => 'phpClub',
+        'path' => __DIR__ . '/../var/log/app.log',
+        'level' => getenv('APP_ENV') !== 'prod' ? Logger::DEBUG : Logger::ERROR,
     ],
 ];

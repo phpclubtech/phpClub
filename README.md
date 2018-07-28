@@ -7,6 +7,7 @@ Demonstration: http://phpclub.tech/
 3. `cp .env.example .env`, config db connection
 4. Run migrations `make migrate`
 5. `cp config/sphinx.conf.example config/sphinx.conf`
+6. Set correct permissions for `var/log` and `var/cache`
 
 ## Thread import syntax
 Run `./bin/console import-threads` with following arguments:
