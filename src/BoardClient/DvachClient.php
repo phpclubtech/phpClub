@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace phpClub\BoardClient;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use function GuzzleHttp\Psr7\str;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
-use Symfony\Component\DomCrawler\Crawler;
 
 class DvachClient
 {
