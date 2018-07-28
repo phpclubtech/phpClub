@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace phpClub\Slim;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Handlers\Error as DefaultErrorHandler;
 
 /**
- * PSR-3 decorator for default Slim error handler
+ * PSR-3 decorator for default Slim error handler.
  *
  * @see https://akrabat.com/logging-errors-in-slim-3/
  */

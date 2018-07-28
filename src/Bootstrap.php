@@ -220,6 +220,7 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
     $rotatingFileHandler->setFormatter($formatter);
     $logger->pushHandler($rotatingFileHandler);
     $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
+
     return $logger;
 };
 

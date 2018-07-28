@@ -30,8 +30,8 @@ return [
         ],
     ],
     'logger' => [
-        'name' => 'phpClub',
-        'path' => __DIR__ . '/../var/log/app.log',
+        'name'  => 'phpClub',
+        'path'  => __DIR__ . '/../var/log/app.log',
         'level' => getenv('APP_ENV') !== 'prod' ? Logger::DEBUG : Logger::ERROR,
     ],
 ];
