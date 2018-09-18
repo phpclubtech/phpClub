@@ -219,7 +219,9 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
     $rotatingFileHandler = new RotatingFileHandler($di['logger']['path'], 20, $di['logger']['level']);
     $rotatingFileHandler->setFormatter($formatter);
     $logger->pushHandler($rotatingFileHandler);
-    if (getenv('APP_ENV') === 'prod') $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
+    if (getenv('APP_ENV') === 'prod') {
+        $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
+    }
 
     return $logger;
 };
