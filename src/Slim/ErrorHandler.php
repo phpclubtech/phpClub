@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace phpClub\Slim;
 
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Handlers\Error as DefaultErrorHandler;
-use phpClub\Slim\NotFoundHandler;
-use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 
 /**
  * PSR-3 decorator for default Slim error handler.
