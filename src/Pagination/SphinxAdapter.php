@@ -2,10 +2,10 @@
 
 namespace phpClub\Pagination;
 
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
+use Foolz\SphinxQL\SphinxQL;
 use Pagerfanta\Adapter\AdapterInterface;
 use phpClub\Repository\PostRepository;
-use Foolz\SphinxQL\SphinxQL;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxAdapter implements AdapterInterface
 {

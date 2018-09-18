@@ -8,6 +8,7 @@ use Doctrine\Common\Proxy\AbstractProxyFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Setup;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use GuzzleHttp\Client;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
@@ -48,9 +49,6 @@ use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Slim\Views\PhpRenderer;
 use Symfony\Component\Cache\Simple\ArrayCache;
-use Foolz\SphinxQL\SphinxQL;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
-
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
