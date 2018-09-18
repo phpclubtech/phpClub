@@ -4,13 +4,15 @@ namespace phpClub\Pagination;
 
 use Pagerfanta\Adapter\AdapterInterface;
 use phpClub\Repository\PostRepository;
+use Foolz\SphinxQL\SphinxQL;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SphinxAdapter implements AdapterInterface
 {
     /**
-     * @var \PDO
+     * @var Connection
      */
-    protected $pdo;
+    protected $connection;
 
     /**
      * @var string
@@ -22,9 +24,9 @@ class SphinxAdapter implements AdapterInterface
      */
     protected $postRepository;
 
-    public function __construct(\PDO $pdo, PostRepository $postRepository, string $query)
+    public function __construct(Connection $connection, PostRepository $postRepository, string $query)
     {
-        $this->pdo = $pdo;
+        $this->connection = $connection;
         $this->postRepository = $postRepository;
         $this->query = $query;
     }
@@ -34,15 +36,15 @@ class SphinxAdapter implements AdapterInterface
      */
     public function getNbResults()
     {
-        $pdo = $this->pdo;
-
         $query = $this->query;
 
-        $q = $pdo->prepare('SELECT COUNT(*) FROM index_posts WHERE MATCH (:search)');
-        $q->bindValue(':search', $query);
-        $q->execute();
+        $q = (new SphinxQL($this->connection))->select('COUNT(*)')
+            ->from('index_posts')
+            ->match('*', $query);
 
-        $count = $q->fetchColumn();
+        $result = $q->execute()->fetchAssoc();
+
+        $count = $result['count(*)'];
 
         return $count;
     }
@@ -54,13 +56,16 @@ class SphinxAdapter implements AdapterInterface
     {
         $query = $this->query;
 
-        $q = $this->pdo->prepare('SELECT * FROM index_posts WHERE MATCH (:search) AND is_first_post != 1 ORDER BY date DESC LIMIT :offset, :length OPTION max_matches=100000');
-        $q->bindValue(':search', $query);
-        $q->bindValue(':length', $length, \PDO::PARAM_INT);
-        $q->bindValue(':offset', $offset, \PDO::PARAM_INT);
-        $q->execute();
+        $q = (new SphinxQL($this->connection))->select('*')
+            ->from('index_posts')
+            ->match('*', $query)
+            ->where('is_first_post', 'NOT IN', [1])
+            ->orderBy('date', 'DESC')
+            ->offset($offset)
+            ->limit($length)
+            ->option('max_matches', 10000);
 
-        $ids = array_column($q->fetchAll(), 'id');
+        $ids = array_column($q->execute()->fetchAllAssoc(), 'id');
 
         $posts = $this->postRepository->findBy(['id' => $ids], ['date' => 'DESC']);
 

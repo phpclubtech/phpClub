@@ -48,6 +48,9 @@ use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Slim\Views\PhpRenderer;
 use Symfony\Component\Cache\Simple\ArrayCache;
+use Foolz\SphinxQL\SphinxQL;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
+
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
@@ -205,10 +208,10 @@ $di[CacheInterface::class] = function (): CacheInterface {
 };
 
 $di['SphinxConnection'] = function (Container $di) {
-    $pdo = new \PDO($di['connections']['sphinx']['dsn']);
-    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    $connection = new Connection();
+    $connection->setParams(parse_url($di['connections']['sphinx']['dsn']));
 
-    return $pdo;
+    return $connection;
 };
 
 $di[LoggerInterface::class] = function (Container $di): LoggerInterface {

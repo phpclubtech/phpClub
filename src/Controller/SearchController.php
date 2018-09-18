@@ -12,6 +12,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\PhpRenderer;
 use Slim\Views\PhpRenderer as View;
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SearchController
 {
@@ -36,7 +37,7 @@ class SearchController
     private $paginationRenderer;
 
     /**
-     * @var \PDO
+     * @var Connection
      */
     private $sphinxConnection;
 
@@ -45,7 +46,7 @@ class SearchController
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
         View $view,
-        \PDO $sphinxConnection
+        Connection $sphinxConnection
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;

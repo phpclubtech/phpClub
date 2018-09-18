@@ -20,7 +20,8 @@
         "evenement/evenement": "^3.0",
         "pagerfanta/pagerfanta": "^1.0",
         "vlucas/phpdotenv": "^2.4",
-        "monolog/monolog": "^1.23"
+        "monolog/monolog": "^1.23",
+        "foolz/sphinxql-query-builder": "^2.0"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
