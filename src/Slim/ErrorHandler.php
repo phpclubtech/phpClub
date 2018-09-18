@@ -44,7 +44,7 @@ class ErrorHandler
         if ($exception instanceof OutOfRangeCurrentPageException) {
             return ($this->notFoundHandler)($request, $response);
         }
-        
+
         $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
 
         return ($this->defaultErrorHandler)($request, $response, $exception);
