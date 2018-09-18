@@ -2,6 +2,7 @@
 
 namespace phpClub\Controller;
 
+use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use Pagerfanta\Pagerfanta;
 use phpClub\Pagination\PaginationRenderer;
 use phpClub\Pagination\SphinxAdapter;
@@ -12,7 +13,6 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\PhpRenderer;
 use Slim\Views\PhpRenderer as View;
-use Foolz\SphinxQL\Drivers\Pdo\Connection;
 
 class SearchController
 {
