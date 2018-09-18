@@ -8,13 +8,15 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Handlers\Error as DefaultErrorHandler;
+use phpClub\Slim\NotFoundHandler;
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 
 /**
  * PSR-3 decorator for default Slim error handler.
  *
  * @see https://akrabat.com/logging-errors-in-slim-3/
  */
-class MonologErrorHandler
+class ErrorHandler
 {
     /**
      * @var LoggerInterface
@@ -26,16 +28,26 @@ class MonologErrorHandler
      */
     private $defaultErrorHandler;
 
-    public function __construct(LoggerInterface $logger, DefaultErrorHandler $defaultErrorHandler)
+    /**
+     * @var NotFoundHandler
+     */
+    private $notFoundHandler;
+
+    public function __construct(LoggerInterface $logger, DefaultErrorHandler $defaultErrorHandler, NotFoundHandler $notFoundHandler)
     {
         $this->logger = $logger;
         $this->defaultErrorHandler = $defaultErrorHandler;
+        $this->notFoundHandler = $notFoundHandler;
     }
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, \Exception $exception): ResponseInterface
     {
-        $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
+        if ($exception instanceof OutOfRangeCurrentPageException) {
+            return ($this->notFoundHandler)($request, $response);
+        } else {
+            $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
 
-        return ($this->defaultErrorHandler)($request, $response, $exception);
+            return ($this->defaultErrorHandler)($request, $response, $exception);
+        }
     }
 }

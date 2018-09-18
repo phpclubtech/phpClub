@@ -32,7 +32,7 @@ use phpClub\Repository\PostRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\UrlGenerator;
-use phpClub\Slim\MonologErrorHandler;
+use phpClub\Slim\ErrorHandler;
 use phpClub\Slim\NotFoundHandler;
 use phpClub\ThreadImport\ChainManager;
 use phpClub\ThreadImport\LastPostUpdater;
@@ -219,7 +219,7 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
     $rotatingFileHandler = new RotatingFileHandler($di['logger']['path'], 20, $di['logger']['level']);
     $rotatingFileHandler->setFormatter($formatter);
     $logger->pushHandler($rotatingFileHandler);
-    $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
+    if (getenv('APP_ENV') === 'prod') $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
 
     return $logger;
 };
@@ -228,8 +228,8 @@ $di['notFoundHandler'] = function (Container $di): NotFoundHandler {
     return new NotFoundHandler($di->get(PhpRenderer::class));
 };
 
-$di['errorHandler'] = function (Container $di): MonologErrorHandler {
-    return new MonologErrorHandler($di[LoggerInterface::class], $di[\Slim\Handlers\Error::class]);
+$di['errorHandler'] = function (Container $di): ErrorHandler {
+    return new ErrorHandler($di[LoggerInterface::class], $di[\Slim\Handlers\Error::class], $di['notFoundHandler']);
 };
 
 $di[\Slim\Handlers\Error::class] = function (Container $di) {
