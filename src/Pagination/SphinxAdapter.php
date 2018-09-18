@@ -40,7 +40,9 @@ class SphinxAdapter implements AdapterInterface
 
         $q = (new SphinxQL($this->connection))->select('COUNT(*)')
             ->from('index_posts')
-            ->match('*', $query);
+            ->match('*', $query)
+            ->where('is_first_post', 'NOT IN', [1])
+            ->option('max_matches', 10000);
 
         $result = $q->execute()->fetchAssoc();
 
