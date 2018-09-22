@@ -44,6 +44,7 @@ header {
 .search-form {
     float: right;
     width: 333px;
+    margin-right: 20px;
 }
 
 .search-form input[name="q"] {
@@ -180,6 +181,16 @@ header {
     margin: 12px 36px;
 }
 
+.github-corner svg {
+    fill: #151513;
+    color: #fff;
+    position: absolute;
+    top: 0;
+    border: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+}
 
 /* Place for markdown */
 .o { text-decoration: overline; }
@@ -383,5 +394,10 @@ sup {vertical-align: super; font-size: smaller;}
 
     .files-multiple + .text {
         margin: 1em;
+    }
+
+    .github-corner svg {
+        width: 80px;
+        height: 80px;
     }
 }
