@@ -71,15 +71,15 @@ class SearchController
         $posts = (new Pagerfanta(new SphinxAdapter($this->sphinxConnection, $this->postRepository, $query)))
             ->setCurrentPage($page);
 
-        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs['Все треды'] = '/';
         $breadcrumbs["Поиск по запросу \"{$query}\""] = $this->urlGenerator->toSearch($query);
 
         $viewArgs = [
-            'query'      => $query,
-            'posts'      => $posts,
-            'logged'     => $this->authorizer->isLoggedIn(),
+            'query'       => $query,
+            'posts'       => $posts,
+            'logged'      => $this->authorizer->isLoggedIn(),
             'breadcrumbs' => $breadcrumbs,
-            'pagination' => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
+            'pagination'  => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
         return $this->view->render($response, '/searchResults.phtml', $viewArgs);

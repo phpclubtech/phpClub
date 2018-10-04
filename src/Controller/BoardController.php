@@ -81,13 +81,13 @@ class BoardController
             ->setMaxPerPage(10)
             ->setCurrentPage($page);
 
-        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs['Все треды'] = '/';
 
         $viewArgs = [
-            'threads'    => $threads,
-            'logged'     => $this->authorizer->isLoggedIn(),
+            'threads'     => $threads,
+            'logged'      => $this->authorizer->isLoggedIn(),
             'breadcrumbs' => $breadcrumbs,
-            'pagination' => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
+            'pagination'  => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
         if ($this->authorizer->isLoggedIn()) {
@@ -109,15 +109,13 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-
-        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs['Все треды'] = '/';
         $breadcrumbs[$OP->getTitle()] = $this->urlGenerator->toPostAnchor($OP);
 
-
         $viewArgs = [
-            'thread' => $thread,
-            'logged' => $this->authorizer->isLoggedIn(),
-            'breadcrumbs' => $breadcrumbs
+            'thread'      => $thread,
+            'logged'      => $this->authorizer->isLoggedIn(),
+            'breadcrumbs' => $breadcrumbs,
         ];
 
         if ($this->authorizer->isLoggedIn()) {
@@ -138,28 +136,28 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        $post = $chain->filter(function($entry) use ($postId) {
+        $post = $chain->filter(function ($entry) use ($postId) {
             return $entry->getId() == $postId;
         })->first();
 
         $OP = $post->getThread()->getPosts()->first();
 
-        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs['Все треды'] = '/';
         $breadcrumbs[$OP->getTitle()] = $this->urlGenerator->toPostAnchor($OP);
         $breadcrumbs["Ответы на пост №{$postId}"] = $this->urlGenerator->toChain($post);
 
         return $this->view->render($response, '/chain.phtml', [
-            'posts'  => $chain,
-            'postId' => $postId,
-            'logged' => $this->authorizer->isLoggedIn(),
-            'breadcrumbs' => $breadcrumbs
+            'posts'       => $chain,
+            'postId'      => $postId,
+            'logged'      => $this->authorizer->isLoggedIn(),
+            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 
     public function aboutAction(Request $request, Response $response): ResponseInterface
     {
         $viewArgs = [
-            'logged'     => $this->authorizer->isLoggedIn()
+            'logged'     => $this->authorizer->isLoggedIn(),
         ];
 
         return $this->view->render($response, '/about.phtml', $viewArgs);
