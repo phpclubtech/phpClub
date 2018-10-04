@@ -57,6 +57,29 @@ header {
     font-size: 100%;
 }
 
+.breadcrumbs {
+    margin: 4px 8px;
+}
+
+.breadcrumbs ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+
+.breadcrumbs li {
+    display: inline;
+}
+
+.breadcrumbs a {
+    text-decoration: none;
+}
+
+.breadcrumbs li:not(:first-child):before {
+  padding: 0 .5rem 0;
+  content: "\203A";
+}
+
 .result-search-form input[name="q"] {
     box-sizing: border-box;
     margin-top: 7px;
@@ -70,7 +93,6 @@ header {
 .pagerfanta {
     display: block;
     text-align: center;
-    margin-top: 4px;
     padding: 10px;
 }
 

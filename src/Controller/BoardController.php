@@ -8,6 +8,7 @@ use phpClub\Pagination\PaginationRenderer;
 use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
+use phpClub\Service\UrlGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
@@ -47,13 +48,19 @@ class BoardController
      */
     private $paginationRenderer;
 
+    /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
     public function __construct(
         Authorizer $authorizer,
         PhpRenderer $view,
         CacheInterface $cache,
         ThreadRepository $threadRepository,
         ChainRepository $chainRepository,
-        PaginationRenderer $paginationRenderer
+        PaginationRenderer $paginationRenderer,
+        UrlGenerator $urlGenerator
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
@@ -61,6 +68,7 @@ class BoardController
         $this->threadRepository = $threadRepository;
         $this->chainRepository = $chainRepository;
         $this->paginationRenderer = $paginationRenderer;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function indexAction(Request $request, Response $response): ResponseInterface
@@ -73,9 +81,12 @@ class BoardController
             ->setMaxPerPage(10)
             ->setCurrentPage($page);
 
+        $breadcrumbs["Все треды"] = "/";
+
         $viewArgs = [
             'threads'    => $threads,
             'logged'     => $this->authorizer->isLoggedIn(),
+            'breadcrumbs' => $breadcrumbs,
             'pagination' => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
@@ -92,13 +103,21 @@ class BoardController
     {
         $thread = $this->threadRepository->find($args['thread']);
 
+        $OP = $thread->getPosts()->first();
+
         if (!$thread) {
             throw new NotFoundException($request, $response);
         }
 
+
+        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs[$OP->getTitle()] = $this->urlGenerator->toPostAnchor($OP);
+
+
         $viewArgs = [
             'thread' => $thread,
             'logged' => $this->authorizer->isLoggedIn(),
+            'breadcrumbs' => $breadcrumbs
         ];
 
         if ($this->authorizer->isLoggedIn()) {
@@ -119,10 +138,21 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
+        $post = $chain->filter(function($entry) use ($postId) {
+            return $entry->getId() == $postId;
+        })->first();
+
+        $OP = $post->getThread()->getPosts()->first();
+
+        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs[$OP->getTitle()] = $this->urlGenerator->toPostAnchor($OP);
+        $breadcrumbs["Ответы на пост №{$postId}"] = $this->urlGenerator->toChain($post);
+
         return $this->view->render($response, '/chain.phtml', [
             'posts'  => $chain,
             'postId' => $postId,
             'logged' => $this->authorizer->isLoggedIn(),
+            'breadcrumbs' => $breadcrumbs
         ]);
     }
 

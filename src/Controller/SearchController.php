@@ -8,6 +8,7 @@ use phpClub\Pagination\PaginationRenderer;
 use phpClub\Pagination\SphinxAdapter;
 use phpClub\Repository\PostRepository;
 use phpClub\Service\Authorizer;
+use phpClub\Service\UrlGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -41,18 +42,25 @@ class SearchController
      */
     private $sphinxConnection;
 
+    /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
     public function __construct(
         Authorizer $authorizer,
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
         View $view,
-        Connection $sphinxConnection
+        Connection $sphinxConnection,
+        UrlGenerator $urlGenerator
     ) {
         $this->view = $view;
         $this->authorizer = $authorizer;
         $this->postRepository = $postRepository;
         $this->paginationRenderer = $paginationRenderer;
         $this->sphinxConnection = $sphinxConnection;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function searchAction(Request $request, Response $response): ResponseInterface
@@ -63,10 +71,14 @@ class SearchController
         $posts = (new Pagerfanta(new SphinxAdapter($this->sphinxConnection, $this->postRepository, $query)))
             ->setCurrentPage($page);
 
+        $breadcrumbs["Все треды"] = "/";
+        $breadcrumbs["Поиск по запросу \"{$query}\""] = $this->urlGenerator->toSearch($query);
+
         $viewArgs = [
             'query'      => $query,
             'posts'      => $posts,
             'logged'     => $this->authorizer->isLoggedIn(),
+            'breadcrumbs' => $breadcrumbs,
             'pagination' => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 

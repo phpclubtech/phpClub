@@ -1,3 +1,13 @@
+        <?php if (isset($breadcrumbs)) : ?>
+            <div class="breadcrumbs">
+                <ul>
+                    <?php foreach ($breadcrumbs as $title => $url): ?>
+                        <li><a class="breadcrumb" href="<?= $url ?>"><?= $title ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
         <div class="up-nav-arrow nav-arrows" id="up-nav-arrow"></div>
         <div class="down-nav-arrow nav-arrows" id="down-nav-arrow"></div>
         <div id="lightbox" style="display: none;">

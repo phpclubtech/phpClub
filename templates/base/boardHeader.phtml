@@ -1,6 +1,7 @@
 <header>
     <a class="logo" href="/">phpClub</a>
 
+
     <?php if ($logged) : ?>
         <ul class="authorization-menu">
             <li><b><?= $logged->getName() ?></b></li>
@@ -20,3 +21,12 @@
         </label>
     </form>
 </header>
+<?php if (isset($breadcrumbs)) : ?>
+    <div class="breadcrumbs">
+        <ul>
+            <?php foreach ($breadcrumbs as $title => $url): ?>
+                <li><a class="breadcrumb" href="<?= $url ?>"><?= $title ?></a></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>

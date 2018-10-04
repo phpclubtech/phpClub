@@ -42,6 +42,11 @@ class UrlGenerator
         return $this->router->pathFor('chain', ['post' => $post->getId()]);
     }
 
+    public function toSearch(string $query)
+    {
+        return $this->router->pathFor('search') . "?q={$query}";
+    }
+
     public function toArhivachThread(): string
     {
         return $this->arhivachClient->generateArchiveLink();

@@ -247,7 +247,8 @@ $di['BoardController'] = function (Container $di): BoardController {
         $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
         $di->get(ChainRepository::class),
-        $di->get(PaginationRenderer::class)
+        $di->get(PaginationRenderer::class),
+        $di->get(UrlGenerator::class)
     );
 };
 
@@ -257,7 +258,8 @@ $di['SearchController'] = function (Container $di): SearchController {
         $di->get(PostRepository::class),
         $di->get(PaginationRenderer::class),
         $di->get(PhpRenderer::class),
-        $di->get('SphinxConnection')
+        $di->get('SphinxConnection'),
+        $di->get(UrlGenerator::class)
     );
 };
 
