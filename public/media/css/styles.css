@@ -96,6 +96,11 @@ av ul li.active {
     font-size: 100%;
 }
 
+.clarification {
+    float: right;
+    margin: 8px;
+}
+
 .breadcrumbs {
     margin: 4px 8px;
 }
