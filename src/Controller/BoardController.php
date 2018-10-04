@@ -156,6 +156,15 @@ class BoardController
         ]);
     }
 
+    public function aboutAction(Request $request, Response $response): ResponseInterface
+    {
+        $viewArgs = [
+            'logged'     => $this->authorizer->isLoggedIn()
+        ];
+
+        return $this->view->render($response, '/about.phtml', $viewArgs);
+    }
+
     /**
      * Get html template cache by key or set html cache to cache by key.
      *

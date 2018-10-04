@@ -1,0 +1,24 @@
+<?php
+/** @var \phpClub\Entity\Thread[]|\Pagerfanta\Pagerfanta $threads */
+/** @var string $pagination */
+$title = 'Архив тредов клуба изучающих PHP';
+require __DIR__ . '/base/header.phtml';
+require __DIR__ . '/base/boardHeader.phtml';
+?>
+
+<div class="about">
+    <h2>Что это за сайт?</h2>
+    Это архив тем ("тредов") расположенных на анонимной имиджборде <a target="_blank" href="https://2ch.hk">2ch.hk</a>, в разделе программирования <a target="_blank" href="https://2ch.hk/pr/">/pr/</a>, посвещённых изучению PHP и веб-технологий.<br>
+
+    <br>
+
+    <h2>Что может этот сайт?</h2>
+    На сайте есть поиск, который поддерживает <i>google-like</i> синтаксис запросов, с помощью которого легко найти какое-то обсуждение... А также, можно получить всю цепочку ответов на определённый пост, чтобы получить только определённое обсуждение.<br>
+
+    <br>
+
+    <h2>Что Я могу сделать для этого сайта?</h2>
+    Вы можете посетить наш репозиторий на <a target="_blank" href="https://github.com/richBlueElephant/phpClub">GitHub</a>, ознакомится с issues и сделать PR (Pull Request), или можете сами создать issue, если обнаружили какой-то баг или ошибку.  
+</div>
+
+<?php require __DIR__ . '/base/footer.phtml' ?>

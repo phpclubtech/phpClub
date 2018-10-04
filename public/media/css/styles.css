@@ -23,13 +23,15 @@ hr {
 
 header {
     border-bottom: .25rem solid;
-    padding: 6px 30px;
+    padding: 0 30px;
     border-color: #4F5B93;
     background: #8892BF;
     box-shadow: 0 0.25em 0.25em rgba(0,0,0,.1);
 }
 
 .logo {
+    float: left;
+    padding: 7px;
     font-size: 30px;
     font-weight: bold;
     font-style: italic;
@@ -39,6 +41,43 @@ header {
 
 .logo:hover {
     color: #22242f;
+}
+
+.navigation {
+    float: left
+}
+
+.navigation ul {
+    float: left;
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+
+.navigation ul li {
+    float: left;
+}
+
+.navigation ul li a {
+    display: block;
+    color: #E2E4EF;
+    border: 0;
+    padding: 16px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+}
+
+.navigation ul li a:hover,
+.navigation ul li a:focus,
+av ul li.active {
+    background-color: transparent;
+    color: #fff;
+}
+
+.navigation ul li.active {
+    color: #fff;
+    background-color: #4F5B93;
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
 }
 
 .search-form {
@@ -271,6 +310,15 @@ sup {vertical-align: super; font-size: smaller;}
 
 .form-error {
     color: red;
+}
+
+.about {
+    padding: 12px;
+}
+
+.about h2 {
+    margin: 0;
+    font-size: inherit;
 }
 
 .four-hundred-four {

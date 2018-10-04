@@ -7,6 +7,7 @@ $app->get('/', 'BoardController:indexAction')->setName('index');
 $app->get('/pr/res/{thread:[0-9]+}.html', 'BoardController:threadAction')->setName('thread');
 $app->get('/pr/chain/{post:[0-9]+}/', 'BoardController:chainAction')->setName('chain');
 $app->get('/search/', 'SearchController:searchAction')->setName('search');
+$app->get('/about/', 'BoardController:aboutAction')->setName('about');
 
 $app->map(['GET', 'POST'], '/login/', 'UsersController:authAction');
 $app->map(['GET', 'POST'], '/registration/', 'UsersController:registrationAction');
