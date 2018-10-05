@@ -8,11 +8,12 @@ class Breadcrumbs
 
     public function addCrumb(string $title, string $url): self
     {
-        if (!$this->isHas($title))
-        {
+        if (!$this->isHas($title)) {
             $this->breadcrumbs[$title] = $url;
+
             return $this;
         }
+
         throw new \InvalidArgumentException('Crumb already added');
     }
 
@@ -25,4 +26,5 @@ class Breadcrumbs
     {
         return array_key_exists($title, $this->breadcrumbs);
     }
+
 }

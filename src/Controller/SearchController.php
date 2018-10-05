@@ -73,7 +73,7 @@ class SearchController
             ->setCurrentPage($page);
 
         $breadcrumbs = new Breadcrumbs();
-        $breadcrumbs->addCrumb('Все треды','/');
+        $breadcrumbs->addCrumb('Все треды', '/');
         $breadcrumbs->addCrumb("Поиск по запросу \"{$query}\"", $this->urlGenerator->toSearch($query));
 
         $viewArgs = [
