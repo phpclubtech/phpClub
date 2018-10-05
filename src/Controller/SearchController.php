@@ -65,7 +65,7 @@ class SearchController
 
     public function searchAction(Request $request, Response $response): ResponseInterface
     {
-        $query = $request->getParam('q');
+        $query = \htmlspecialchars($request->getParam('q'), ENT_QUOTES, 'UTF-8');
         $page = $request->getParam('page', 1);
 
         $posts = (new Pagerfanta(new SphinxAdapter($this->sphinxConnection, $this->postRepository, $query)))
