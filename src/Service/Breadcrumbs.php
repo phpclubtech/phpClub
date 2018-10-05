@@ -26,5 +26,4 @@ class Breadcrumbs
     {
         return array_key_exists($title, $this->breadcrumbs);
     }
-
 }
