@@ -9,6 +9,7 @@ use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Authorizer;
 use phpClub\Service\UrlGenerator;
+use phpClub\Service\Breadcrumbs;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
@@ -81,12 +82,13 @@ class BoardController
             ->setMaxPerPage(10)
             ->setCurrentPage($page);
 
-        $breadcrumbs['Все треды'] = '/';
+        $breadcrumbs = new Breadcrumbs();
+        $breadcrumbs->addCrumb('Все треды', '/');
 
         $viewArgs = [
             'threads'     => $threads,
             'logged'      => $this->authorizer->isLoggedIn(),
-            'breadcrumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
             'pagination'  => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
@@ -108,14 +110,14 @@ class BoardController
         if (!$thread) {
             throw new NotFoundException($request, $response);
         }
-
-        $breadcrumbs['Все треды'] = '/';
-        $breadcrumbs[$OP->getTitle()] = $this->urlGenerator->toPostAnchor($OP);
+        $breadcrumbs = new Breadcrumbs();
+        $breadcrumbs->addCrumb('Все треды', '/');
+        $breadcrumbs->addCrumb($OP->getTitle(), $this->urlGenerator->toPostAnchor($OP));
 
         $viewArgs = [
             'thread'      => $thread,
             'logged'      => $this->authorizer->isLoggedIn(),
-            'breadcrumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ];
 
         if ($this->authorizer->isLoggedIn()) {
@@ -142,15 +144,16 @@ class BoardController
 
         $OP = $post->getThread()->getPosts()->first();
 
-        $breadcrumbs['Все треды'] = '/';
-        $breadcrumbs[$OP->getTitle()] = $this->urlGenerator->toPostAnchor($OP);
-        $breadcrumbs["Ответы на пост №{$postId}"] = $this->urlGenerator->toChain($post);
+        $breadcrumbs = new Breadcrumbs();
+        $breadcrumbs->addCrumb('Все треды', '/');
+        $breadcrumbs->addCrumb($OP->getTitle(), $this->urlGenerator->toPostAnchor($OP));
+        $breadcrumbs->addCrumb("Ответы на пост №{$postId}", $this->urlGenerator->toChain($post));
 
         return $this->view->render($response, '/chain.phtml', [
             'posts'       => $chain,
             'postId'      => $postId,
             'logged'      => $this->authorizer->isLoggedIn(),
-            'breadcrumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ]);
     }
 
