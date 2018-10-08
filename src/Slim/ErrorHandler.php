@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace phpClub\Slim;
 
+use Pagerfanta\Exception\LessThan1CurrentPageException;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,7 +42,7 @@ class ErrorHandler
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, \Exception $exception): ResponseInterface
     {
-        if ($exception instanceof OutOfRangeCurrentPageException) {
+        if ($exception instanceof OutOfRangeCurrentPageException || $exception instanceof LessThan1CurrentPageException) {
             return ($this->notFoundHandler)($request, $response);
         }
 
