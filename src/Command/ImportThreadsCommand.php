@@ -277,25 +277,25 @@ class ImportThreadsCommand extends Command
     private function getDefaultArhivachThreads(): array
     {
         return [
-            25    => 'http://arhivach.cf/thread/25318/',
-            79    => 'http://arhivach.cf/thread/191923/',
-            '79b' => 'http://arhivach.cf/thread/193343/', // Нелегетимный 79-й тред
-            80    => 'http://arhivach.cf/thread/197740/',
-            81    => 'http://arhivach.cf/thread/204328/',
-            82    => 'http://arhivach.cf/thread/213097/',
-            83    => 'http://arhivach.cf/thread/216627/',
-            84    => 'http://arhivach.cf/thread/224683/',
-            85    => 'http://arhivach.cf/thread/233392/',
-            86    => 'http://arhivach.cf/thread/245785/',
-            87    => 'http://arhivach.cf/thread/249265/',
-            88    => 'http://arhivach.cf/thread/254710/',
-            89    => 'http://arhivach.cf/thread/261841/',
-            90    => 'http://arhivach.cf/thread/266631/',
-            91    => 'http://arhivach.cf/thread/282397/',
-            92    => 'http://arhivach.cf/thread/282400/',
-            93    => 'http://arhivach.cf/thread/302513/',
-            94    => 'http://arhivach.cf/thread/302511/',
-            95    => 'http://arhivach.cf/thread/312253/',
+            25    => 'http://arhivach.tk/thread/25318/',
+            79    => 'http://arhivach.tk/thread/191923/',
+            '79b' => 'http://arhivach.tk/thread/193343/', // Нелегетимный 79-й тред
+            80    => 'http://arhivach.tk/thread/197740/',
+            81    => 'http://arhivach.tk/thread/204328/',
+            82    => 'http://arhivach.tk/thread/213097/',
+            83    => 'http://arhivach.tk/thread/216627/',
+            84    => 'http://arhivach.tk/thread/224683/',
+            85    => 'http://arhivach.tk/thread/233392/',
+            86    => 'http://arhivach.tk/thread/245785/',
+            87    => 'http://arhivach.tk/thread/249265/',
+            88    => 'http://arhivach.tk/thread/254710/',
+            89    => 'http://arhivach.tk/thread/261841/',
+            90    => 'http://arhivach.tk/thread/266631/',
+            91    => 'http://arhivach.tk/thread/282397/',
+            92    => 'http://arhivach.tk/thread/282400/',
+            93    => 'http://arhivach.tk/thread/302513/',
+            94    => 'http://arhivach.tk/thread/302511/',
+            95    => 'http://arhivach.tk/thread/312253/',
         ];
     }
 }
