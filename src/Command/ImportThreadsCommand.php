@@ -277,25 +277,25 @@ class ImportThreadsCommand extends Command
     private function getDefaultArhivachThreads(): array
     {
         return [
-            25    => 'http://arhivach.tk/thread/25318/',
-            79    => 'http://arhivach.tk/thread/191923/',
-            '79b' => 'http://arhivach.tk/thread/193343/', // Нелегетимный 79-й тред
-            80    => 'http://arhivach.tk/thread/197740/',
-            81    => 'http://arhivach.tk/thread/204328/',
-            82    => 'http://arhivach.tk/thread/213097/',
-            83    => 'http://arhivach.tk/thread/216627/',
-            84    => 'http://arhivach.tk/thread/224683/',
-            85    => 'http://arhivach.tk/thread/233392/',
-            86    => 'http://arhivach.tk/thread/245785/',
-            87    => 'http://arhivach.tk/thread/249265/',
-            88    => 'http://arhivach.tk/thread/254710/',
-            89    => 'http://arhivach.tk/thread/261841/',
-            90    => 'http://arhivach.tk/thread/266631/',
-            91    => 'http://arhivach.tk/thread/282397/',
-            92    => 'http://arhivach.tk/thread/282400/',
-            93    => 'http://arhivach.tk/thread/302513/',
-            94    => 'http://arhivach.tk/thread/302511/',
-            95    => 'http://arhivach.tk/thread/312253/',
+            25    => getenv('ARHIVACH_DOMAIN') . '/thread/25318/',
+            79    => getenv('ARHIVACH_DOMAIN') . '/thread/191923/',
+            '79b' => getenv('ARHIVACH_DOMAIN') . '/thread/193343/', // Нелегетимный 79-й тред
+            80    => getenv('ARHIVACH_DOMAIN') . '/thread/197740/',
+            81    => getenv('ARHIVACH_DOMAIN') . '/thread/204328/',
+            82    => getenv('ARHIVACH_DOMAIN') . '/thread/213097/',
+            83    => getenv('ARHIVACH_DOMAIN') . '/thread/216627/',
+            84    => getenv('ARHIVACH_DOMAIN') . '/thread/224683/',
+            85    => getenv('ARHIVACH_DOMAIN') . '/thread/233392/',
+            86    => getenv('ARHIVACH_DOMAIN') . '/thread/245785/',
+            87    => getenv('ARHIVACH_DOMAIN') . '/thread/249265/',
+            88    => getenv('ARHIVACH_DOMAIN') . '/thread/254710/',
+            89    => getenv('ARHIVACH_DOMAIN') . '/thread/261841/',
+            90    => getenv('ARHIVACH_DOMAIN') . '/thread/266631/',
+            91    => getenv('ARHIVACH_DOMAIN') . '/thread/282397/',
+            92    => getenv('ARHIVACH_DOMAIN') . '/thread/282400/',
+            93    => getenv('ARHIVACH_DOMAIN') . '/thread/302513/',
+            94    => getenv('ARHIVACH_DOMAIN') . '/thread/302511/',
+            95    => getenv('ARHIVACH_DOMAIN') . '/thread/312253/',
         ];
     }
 }

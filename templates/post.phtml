@@ -25,8 +25,8 @@ use phpClub\Entity\File;
 
         <?php if ($post->isFirstPost() && isset($thread)) : ?>
             <span class="archives">
-                <?= $this->fetch('_dvachArchiveForm.php', ['searchString' => $post->getTitle()]) ?>
                 <a href="<?= $urlGenerator->toArhivachThread() ?>https://2ch.hk/pr/res/<?= $post->getThread()->getId() ?>.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
+                <?= $this->fetch('_dvachArchiveForm.php', ['searchString' => $post->getTitle()]) ?>
                 <i class="fa fa-chain"></i>
             </span>
         <?php endif; ?>
