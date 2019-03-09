@@ -126,14 +126,9 @@ class ImportThreadsCommand extends Command
             $progress->setMessage('Thread saving progress');
             $progress->start();
 
-            $this->threadImporter->on(
-                ThreadImporter::EVENT_THREAD_SAVED,
-                function () use (&$progress) {
-                    $progress->advance();
-                }
-            );
-
-            $this->threadImporter->import($threads);
+            $this->threadImporter->import($threads, function () use (&$progress) {
+                $progress->advance();
+            });
 
             $progress->finish();
             $output->writeln('');

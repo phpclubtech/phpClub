@@ -6,7 +6,6 @@ namespace phpClub\ThreadImport;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
-use Evenement\EventEmitterTrait;
 use phpClub\Entity\File;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
@@ -15,10 +14,6 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 class ThreadImporter
 {
-    use EventEmitterTrait;
-
-    const EVENT_THREAD_SAVED = 'event.thread.saved';
-
     /**
      * @var FileStorageInterface
      */
@@ -60,8 +55,9 @@ class ThreadImporter
 
     /**
      * @param Thread[] $threads
+     * @param callable $onThreadImported
      */
-    public function import(array $threads): void
+    public function import(array $threads, callable $onThreadImported): void
     {
         $this->entityManager->beginTransaction();
         $this->cascadeRemoveThreads($threads);
@@ -70,7 +66,7 @@ class ThreadImporter
             $this->saveFilesFromThread($thread);
             $this->entityManager->persist($thread);
             $this->chainManager->insertChain($thread);
-            $this->emit(self::EVENT_THREAD_SAVED, [$thread]);
+            $onThreadImported($thread);
             $this->entityManager->flush();
             $this->entityManager->clear();
         }
