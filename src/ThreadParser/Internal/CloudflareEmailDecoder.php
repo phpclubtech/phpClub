@@ -5,6 +5,9 @@ namespace phpClub\ThreadParser\Internal;
 use phpClub\Util\DOMUtil;
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * @author codedokode
+ */
 class CloudflareEmailDecoder
 {
     /**
