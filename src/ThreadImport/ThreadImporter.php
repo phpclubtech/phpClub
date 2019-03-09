@@ -54,7 +54,7 @@ class ThreadImporter
     }
 
     /**
-     * @param Thread[] $threads
+     * @param Thread[]      $threads
      * @param callable|null $onThreadImported
      */
     public function import(array $threads, callable $onThreadImported = null): void
