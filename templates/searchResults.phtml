@@ -1,6 +1,6 @@
 <?php
 /** @var \phpClub\Entity\Post[]|\Pagerfanta\Pagerfanta $posts */
-/** @var \phpClub\Service\Paginator $paginator */
+/** @var string $pagination */
 ?>
 <?php $title = 'Результаты поиска' ?>
 <?php include(__DIR__ . '/base/header.phtml') ?>
@@ -16,7 +16,7 @@
 
 <div class="results">
     <?php foreach ($posts as $post) :?>
-        <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
+        <?= $this->fetch('/post.phtml', ['post' => $post, 'index' => null]); ?>
     <?php endforeach; ?>
 </div>
 

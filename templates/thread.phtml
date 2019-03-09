@@ -6,8 +6,8 @@ require __DIR__ . '/base/boardHeader.phtml';
 ?>
 
 <div class="thread" data-id="<?= $thread->getId() ?>">
-    <?php foreach ($thread->getPosts() as $post) :?>
-        <?= $this->fetch('/post.phtml', ['post' => $post, 'thread' => $thread]) ?>
+    <?php foreach ($thread->getPosts() as $i => $post): ?>
+        <?= $this->fetch('/post.phtml', ['post' => $post, 'thread' => $thread, 'index' => $i + 1]) ?>
     <?php endforeach; ?>
 </div>
 <hr>

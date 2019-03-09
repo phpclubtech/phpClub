@@ -5,6 +5,7 @@
 /** @var \phpClub\Entity\Post $post */
 /** @var \phpClub\Service\UrlGenerator $urlGenerator */
 /** @var \Slim\Views\PhpRenderer $this */
+/** @var number|null $index */
 use phpClub\Entity\File;
 ?>
 
@@ -14,8 +15,11 @@ use phpClub\Entity\File;
         <span class="author"><?= $post->getAuthor() ?></span>
         <span class="datetime"><?= $post->getDate()->format('Y/m/d H:i:s') ?>&nbsp;</span>
         <span class="number">
-                <a href="<?= $urlGenerator->toPostAnchor($post) ?>" date-reflink-id="<?= $post->getId() ?>">№<?= $post->getId() ?></a>
+            <a href="<?= $urlGenerator->toPostAnchor($post) ?>" date-reflink-id="<?= $post->getId() ?>">№<?= $post->getId() ?></a>
         </span>
+        <?php if ($index): ?>
+            <span class="post-number"><?= $index ?></span>
+        <?php endif ?>
 
         <?php if (!$post->isOld() && !$post->isFirstPost()): ?>                        
             <span class="chain">

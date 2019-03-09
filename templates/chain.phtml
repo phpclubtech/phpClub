@@ -5,8 +5,8 @@
 <section class="posts">
     <form id="posts-form">
         <div class="thread">
-            <?php foreach ($posts as $post): ?>
-                <?= $this->fetch('/post.phtml', ['post' => $post]); ?>
+            <?php foreach ($posts as $i => $post): ?>
+                <?= $this->fetch('/post.phtml', ['post' => $post, 'index' => $i + 1]); ?>
             <?php endforeach; ?>
         </div>
         <hr>

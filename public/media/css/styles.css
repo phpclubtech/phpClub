@@ -198,6 +198,11 @@ av ul li.active {
     width: 16px;
 }
 
+.post-header .post-number {
+    color: #789922;
+    margin: 0 6px;
+}
+
 .files {
 
 }
