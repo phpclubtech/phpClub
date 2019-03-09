@@ -55,9 +55,9 @@ class ThreadImporter
 
     /**
      * @param Thread[] $threads
-     * @param callable $onThreadImported
+     * @param callable|null $onThreadImported
      */
-    public function import(array $threads, callable $onThreadImported): void
+    public function import(array $threads, callable $onThreadImported = null): void
     {
         $this->entityManager->beginTransaction();
         $this->cascadeRemoveThreads($threads);
@@ -66,7 +66,9 @@ class ThreadImporter
             $this->saveFilesFromThread($thread);
             $this->entityManager->persist($thread);
             $this->chainManager->insertChain($thread);
-            $onThreadImported($thread);
+            if ($onThreadImported) {
+                $onThreadImported($thread);
+            }
             $this->entityManager->flush();
             $this->entityManager->clear();
         }
