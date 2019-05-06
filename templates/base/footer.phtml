@@ -35,7 +35,8 @@
 
                     <% if (post.isFirstPost) { %>
                         <span class="archives">
-                            <a href="<?= $urlGenerator->toArhivachThread() ?>https://2ch.hk/pr/res/<%= post.thread %>.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
+                            <a href="<?= /** @var \phpClub\Service\UrlGenerator $urlGenerator */
+                            $urlGenerator->toArhivachThread() ?>https://2ch.hk/pr/res/<%= post.thread %>.html"><img src="/media/images/arhivach.ico" title="Искать в архиваче"></a>
                             <i class="fa fa-chain"></i>
                         </span>
                     <% } %>

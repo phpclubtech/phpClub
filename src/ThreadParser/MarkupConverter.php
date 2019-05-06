@@ -117,7 +117,7 @@ class MarkupConverter
      *
      * Can modify or remove children.
      *
-     * @param $nodeList iterable List of \DOMNodes
+     * @param \DOMNode $node iterable List of \DOMNodes
      */
     public function transformChildren(\DOMNode $node): void
     {

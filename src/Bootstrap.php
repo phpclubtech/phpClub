@@ -22,16 +22,13 @@ use phpClub\Command\RebuildChainsCommand;
 use phpClub\Controller\ApiController;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
-use phpClub\Controller\UsersController;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
-use phpClub\Entity\User;
 use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Pagination\PaginationRenderer;
 use phpClub\Repository\ChainRepository;
 use phpClub\Repository\PostRepository;
 use phpClub\Repository\ThreadRepository;
-use phpClub\Service\Authorizer;
 use phpClub\Service\UrlGenerator;
 use phpClub\Slim\ErrorHandler;
 use phpClub\Slim\NotFoundHandler;
@@ -196,10 +193,6 @@ $di[PaginationRenderer::class] = function (Container $di): PaginationRenderer {
     return new PaginationRenderer($di->get('router'));
 };
 
-$di[Authorizer::class] = function (Container $di): Authorizer {
-    return new Authorizer($di->get(EntityManager::class)->getRepository(User::class));
-};
-
 $di[CacheInterface::class] = function (): CacheInterface {
     // TODO: fix pagination for file cache
     return new ArrayCache();
@@ -240,9 +233,8 @@ $di[\Slim\Handlers\Error::class] = function (Container $di) {
 };
 
 /* Application controllers section */
-$di['BoardController'] = function (Container $di): BoardController {
+$di[BoardController::class] = function (Container $di): BoardController {
     return new BoardController(
-        $di->get(Authorizer::class),
         $di->get(PhpRenderer::class),
         $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
@@ -252,9 +244,8 @@ $di['BoardController'] = function (Container $di): BoardController {
     );
 };
 
-$di['SearchController'] = function (Container $di): SearchController {
+$di[SearchController::class] = function (Container $di): SearchController {
     return new SearchController(
-        $di->get(Authorizer::class),
         $di->get(PostRepository::class),
         $di->get(PaginationRenderer::class),
         $di->get(PhpRenderer::class),
@@ -263,11 +254,7 @@ $di['SearchController'] = function (Container $di): SearchController {
     );
 };
 
-$di['UsersController'] = function (Container $di): UsersController {
-    return new UsersController($di->get(Authorizer::class), $di->get(PhpRenderer::class));
-};
-
-$di['ApiController'] = function (Container $di): ApiController {
+$di[ApiController::class] = function (Container $di): ApiController {
     return new ApiController($di->get(PostRepository::class));
 };
 

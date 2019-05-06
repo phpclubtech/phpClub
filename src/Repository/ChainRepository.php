@@ -3,6 +3,7 @@
 namespace phpClub\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use phpClub\Entity\Post;
 use phpClub\Entity\RefLink;
 
 class ChainRepository extends BaseEntityRepository
@@ -10,7 +11,7 @@ class ChainRepository extends BaseEntityRepository
     /**
      * @param int $postId
      *
-     * @return ArrayCollection
+     * @return ArrayCollection|Post[]
      */
     public function getChain(int $postId): ArrayCollection
     {

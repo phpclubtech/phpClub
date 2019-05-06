@@ -12,14 +12,7 @@ use phpClub\Repository\PostRepository;
 
 class ChainManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
     private $entityManager;
-
-    /**
-     * @var PostRepository
-     */
     private $postRepository;
 
     public function __construct(EntityManagerInterface $entityManager, PostRepository $postRepository)
@@ -63,7 +56,7 @@ class ChainManager
         $references = $this->parseReferences($reference);
 
         foreach ($references as $reference) {
-            /** @var Post $reference */
+            /** @var Post|null $reference */
             $reference = $this->postRepository->find($reference);
             if ($reference && !$reference->isFirstPost()) {
                 $reflink = new RefLink($forPost, $reference, $depth + 1);

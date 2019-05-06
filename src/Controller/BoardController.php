@@ -4,10 +4,11 @@ namespace phpClub\Controller;
 
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
+use phpClub\Entity\Post;
+use phpClub\Entity\Thread;
 use phpClub\Pagination\PaginationRenderer;
 use phpClub\Repository\ChainRepository;
 use phpClub\Repository\ThreadRepository;
-use phpClub\Service\Authorizer;
 use phpClub\Service\Breadcrumbs;
 use phpClub\Service\UrlGenerator;
 use Psr\Http\Message\ResponseInterface;
@@ -19,43 +20,14 @@ use Slim\Views\PhpRenderer;
 
 class BoardController
 {
-    /**
-     * @var Authorizer
-     */
-    private $authorizer;
-
-    /**
-     * @var PhpRenderer
-     */
     private $view;
-
-    /**
-     * @var CacheInterface
-     */
     private $cache;
-
-    /**
-     * @var ThreadRepository
-     */
     private $threadRepository;
-
-    /**
-     * @var ChainRepository
-     */
     private $chainRepository;
-
-    /**
-     * @var PaginationRenderer
-     */
     private $paginationRenderer;
-
-    /**
-     * @var UrlGenerator
-     */
     private $urlGenerator;
 
     public function __construct(
-        Authorizer $authorizer,
         PhpRenderer $view,
         CacheInterface $cache,
         ThreadRepository $threadRepository,
@@ -64,7 +36,6 @@ class BoardController
         UrlGenerator $urlGenerator
     ) {
         $this->view = $view;
-        $this->authorizer = $authorizer;
         $this->cache = $cache;
         $this->threadRepository = $threadRepository;
         $this->chainRepository = $chainRepository;
@@ -87,14 +58,9 @@ class BoardController
 
         $viewArgs = [
             'threads'     => $threads,
-            'logged'      => $this->authorizer->isLoggedIn(),
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
             'pagination'  => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
-
-        if ($this->authorizer->isLoggedIn()) {
-            return $this->view->render($response, '/board.html', $viewArgs);
-        }
 
         $template = $this->getOrSetCache('/board.phtml', $viewArgs, 'board_index' . $page);
 
@@ -103,26 +69,21 @@ class BoardController
 
     public function threadAction(Request $request, Response $response, array $args): ResponseInterface
     {
+        /** @var Thread|null $thread */
         $thread = $this->threadRepository->find($args['thread']);
-
-        $OP = $thread->getPosts()->first();
-
         if (!$thread) {
             throw new NotFoundException($request, $response);
         }
+        /** @var Post $OP */
+        $OP = $thread->getPosts()->first();
         $breadcrumbs = new Breadcrumbs();
         $breadcrumbs->addCrumb('Все треды', '/');
         $breadcrumbs->addCrumb($OP->getTitle(), $this->urlGenerator->toPostAnchor($OP));
 
         $viewArgs = [
             'thread'      => $thread,
-            'logged'      => $this->authorizer->isLoggedIn(),
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ];
-
-        if ($this->authorizer->isLoggedIn()) {
-            return $this->view->render($response, '/thread.html', $viewArgs);
-        }
 
         $template = $this->getOrSetCache('/thread.phtml', $viewArgs, 'thread_' . $args['thread']);
 
@@ -133,15 +94,15 @@ class BoardController
     {
         $postId = (int) $args['post'];
         $chain = $this->chainRepository->getChain($postId);
-
         if ($chain->isEmpty()) {
             throw new NotFoundException($request, $response);
         }
 
-        $post = $chain->filter(function ($entry) use ($postId) {
+        $post = $chain->filter(function (Post $entry) use ($postId) {
             return $entry->getId() == $postId;
         })->first();
 
+        /** @var Post $OP */
         $OP = $post->getThread()->getPosts()->first();
 
         $breadcrumbs = new Breadcrumbs();
@@ -152,18 +113,13 @@ class BoardController
         return $this->view->render($response, '/chain.phtml', [
             'posts'       => $chain,
             'postId'      => $postId,
-            'logged'      => $this->authorizer->isLoggedIn(),
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ]);
     }
 
     public function aboutAction(Request $request, Response $response): ResponseInterface
     {
-        $viewArgs = [
-            'logged'     => $this->authorizer->isLoggedIn(),
-        ];
-
-        return $this->view->render($response, '/about.phtml', $viewArgs);
+        return $this->view->render($response, '/about.phtml');
     }
 
     /**

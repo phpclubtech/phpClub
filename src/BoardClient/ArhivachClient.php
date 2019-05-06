@@ -11,24 +11,9 @@ use phpClub\ThreadParser\ArhivachThreadParser;
 
 class ArhivachClient
 {
-    /**
-     * @var Client
-     */
     private $guzzle;
-
-    /**
-     * @var ArhivachThreadParser
-     */
     private $threadParser;
-
-    /**
-     * @var string
-     */
     private $email;
-
-    /**
-     * @var string
-     */
     private $password;
 
     public function __construct(
@@ -48,7 +33,7 @@ class ArhivachClient
      *
      * @return Thread[]
      */
-    public function getPhpThreads(array $threadUrls = null): array
+    public function getPhpThreads(array $threadUrls = []): array
     {
         return array_map(function ($threadUrl) {
             $threadHtml = (string) $this->guzzle->get($threadUrl)->getBody();
@@ -64,15 +49,16 @@ class ArhivachClient
      */
     public function isThreadArchived(Thread $thread): bool
     {
-        $url = $this->generateArchiveLink($thread);
-
-        try {
-            $this->guzzle->get($url);
-        } catch (ClientException $e) {
-            return false;
-        }
-
-        return true;
+        return false;
+//        $url = $this->generateArchiveLink($thread);
+//
+//        try {
+//            $this->guzzle->get($url);
+//        } catch (ClientException $e) {
+//            return false;
+//        }
+//
+//        return true;
     }
 
     /**

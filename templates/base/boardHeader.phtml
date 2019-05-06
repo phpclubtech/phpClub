@@ -8,19 +8,6 @@
         </ul>
     </nav>
 
-    <?php if ($logged) : ?>
-        <ul class="authorization-menu">
-            <li><b><?= $logged->getName() ?></b></li>
-            <li><a href="/config/">Настройки</a></li>
-            <li>
-                <form method="post" name="logout" action="/logout/">
-                    <input type="hidden" name="token" value="<?= $_COOKIE['token'] ?>">
-                    <input type="submit" value="Выход">
-                </form>
-            </li>
-        </ul>
-    <?php endif; ?>
-
     <form method="get" name="search" class="search-form" action="/search">
         <label>
             <input type="text" name="q" placeholder="Поиск" value="<?= (isset($query)) ? htmlspecialchars($query, ENT_QUOTES) : '' ?>">

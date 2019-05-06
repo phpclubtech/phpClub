@@ -58,7 +58,7 @@ class DateConverter
     /**
      * Parses datetime like '02 Май, 19:34' from m2-ch.ru.
      */
-    public function parseMDvachDate(string $rawDate, int $year): \DateTimeInterface
+    public function parseMDvachDate(string $rawDate, int $year): \DateTimeImmutable
     {
         if (!preg_match("/(\d+)\s+(\w+),\s*(\d+):(\d+)/u", $rawDate, $matches)) {
             throw new DateParseException("Invalid date format: '$rawDate'");

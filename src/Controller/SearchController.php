@@ -7,49 +7,22 @@ use Pagerfanta\Pagerfanta;
 use phpClub\Pagination\PaginationRenderer;
 use phpClub\Pagination\SphinxAdapter;
 use phpClub\Repository\PostRepository;
-use phpClub\Service\Authorizer;
 use phpClub\Service\Breadcrumbs;
 use phpClub\Service\UrlGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Views\PhpRenderer;
 use Slim\Views\PhpRenderer as View;
 
 class SearchController
 {
-    /**
-     * @var PhpRenderer
-     */
-    protected $view;
-
-    /**
-     * @var Authorizer
-     */
-    protected $authorizer;
-
-    /**
-     * @var PostRepository
-     */
+    private $view;
     private $postRepository;
-
-    /**
-     * @var PaginationRenderer
-     */
     private $paginationRenderer;
-
-    /**
-     * @var Connection
-     */
     private $sphinxConnection;
-
-    /**
-     * @var UrlGenerator
-     */
     private $urlGenerator;
 
     public function __construct(
-        Authorizer $authorizer,
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
         View $view,
@@ -57,7 +30,6 @@ class SearchController
         UrlGenerator $urlGenerator
     ) {
         $this->view = $view;
-        $this->authorizer = $authorizer;
         $this->postRepository = $postRepository;
         $this->paginationRenderer = $paginationRenderer;
         $this->sphinxConnection = $sphinxConnection;
@@ -79,7 +51,6 @@ class SearchController
         $viewArgs = [
             'query'       => $query,
             'posts'       => $posts,
-            'logged'      => $this->authorizer->isLoggedIn(),
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
             'pagination'  => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
         ];
