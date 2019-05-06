@@ -11,26 +11,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Handlers\Error as DefaultErrorHandler;
 
-/**
- * PSR-3 decorator for default Slim error handler.
- *
- * @see https://akrabat.com/logging-errors-in-slim-3/
- */
 class ErrorHandler
 {
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
-
-    /**
-     * @var DefaultErrorHandler
-     */
     private $defaultErrorHandler;
-
-    /**
-     * @var NotFoundHandler
-     */
     private $notFoundHandler;
 
     public function __construct(LoggerInterface $logger, DefaultErrorHandler $defaultErrorHandler, NotFoundHandler $notFoundHandler)
