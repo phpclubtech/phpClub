@@ -1,7 +1,6 @@
 <?php
 
 /** @var \Slim\App $app */
-
 use phpClub\Controller\ApiController;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
