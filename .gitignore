@@ -9,6 +9,7 @@
 /public/pr/thumb/**
 /public/json/**
 /public/*
+!/public/robots.txt
 !/public/index.php
 !/public/media
 .env
