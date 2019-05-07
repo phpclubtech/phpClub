@@ -3,6 +3,7 @@
 namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @Entity(repositoryClass="phpClub\Repository\ThreadRepository")
@@ -13,12 +14,14 @@ class Thread
     private $id;
 
     /**
+     * @var Post[]|Collection
+     *
      * @OneToMany(targetEntity="Post", mappedBy="thread", cascade={"all"})
      **/
     private $posts;
 
     /**
-     * @var Post[]
+     * @var Post[]|Collection
      * @ManyToMany(targetEntity="Post")
      * @JoinTable(name="last_post",
      *      joinColumns={@JoinColumn(name="thread_id", referencedColumnName="id", onDelete="CASCADE")},
@@ -27,19 +30,11 @@ class Thread
      */
     private $lastPosts;
 
-    /**
-     * @param $id
-     */
     public function __construct(int $id)
     {
         $this->id = $id;
         $this->posts = new ArrayCollection();
         $this->lastPosts = new ArrayCollection();
-    }
-
-    public function setPosts(array $posts = []): self
-    {
-        $this->posts = $posts;
     }
 
     public function addPost(Post $post)
@@ -53,7 +48,7 @@ class Thread
     }
 
     /**
-     * @return Post[]|ArrayCollection
+     * @return Post[]|Collection
      */
     public function getPosts()
     {
@@ -61,7 +56,7 @@ class Thread
     }
 
     /**
-     * @return Post[]|ArrayCollection
+     * @return Post[]|Collection
      */
     public function getLastPosts()
     {

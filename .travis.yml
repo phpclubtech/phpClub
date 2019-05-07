@@ -13,6 +13,7 @@ before_script:
   - APP_ENV=test vendor/bin/doctrine-migrations migrations:migrate --no-interaction
 
 script:
+  - composer sa
   - vendor/bin/phpunit --testdox
 
 after_success:

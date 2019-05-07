@@ -20,12 +20,17 @@
         "pagerfanta/pagerfanta": "^1.0",
         "vlucas/phpdotenv": "^2.4",
         "monolog/monolog": "^1.23",
-        "foolz/sphinxql-query-builder": "^2.0"
+        "foolz/sphinxql-query-builder": "^2.0",
+        "ext-dom": "*",
+        "phpstan/phpstan": "^0.11.5"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",
         "phpunit/phpunit": "^6.2",
         "mikey179/vfsStream": "^1.6",
         "symfony/var-dumper": "^3.3"
+    },
+    "scripts": {
+        "sa": "vendor/bin/phpstan analyze src"
     }
 }

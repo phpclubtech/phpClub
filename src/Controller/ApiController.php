@@ -9,9 +9,6 @@ use Slim\Http\Response;
 
 class ApiController
 {
-    /**
-     * @var PostRepository
-     */
     private $postRepository;
 
     public function __construct(PostRepository $postRepository)

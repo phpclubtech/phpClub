@@ -9,9 +9,6 @@ use phpClub\Entity\Thread;
 
 class LastPostUpdater
 {
-    /**
-     * @var Connection
-     */
     private $connection;
 
     public function __construct(Connection $connection)
@@ -21,7 +18,7 @@ class LastPostUpdater
 
     public function updateLastPosts(array $threads): void
     {
-        assert(count($threads));
+        assert((bool) count($threads));
 
         $threadIds = array_map(function (Thread $thread) {
             return $thread->getId();

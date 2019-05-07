@@ -1,4 +1,12 @@
-<?php $title = 'Ответы на пост #' . $postId ?>
+<?php
+/**
+ * @var int $postId
+ * @var Post[] $posts
+ */
+
+use phpClub\Entity\Post;
+
+$title = 'Ответы на пост #' . $postId ?>
 <?php include(__DIR__ . '/base/header.phtml') ?>
 <?php include(__DIR__ . '/base/boardHeader.phtml') ?>
 

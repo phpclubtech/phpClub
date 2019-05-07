@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 
 /**
@@ -165,7 +166,7 @@ class Post
     }
 
     /**
-     * @return File[]|ArrayCollection
+     * @return File[]|Collection
      */
     public function getFiles()
     {
@@ -173,7 +174,7 @@ class Post
     }
 
     /**
-     * @return RefLink[]|ArrayCollection
+     * @return RefLink[]|Collection
      */
     public function getReplies()
     {

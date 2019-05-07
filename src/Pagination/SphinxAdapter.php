@@ -9,20 +9,9 @@ use phpClub\Repository\PostRepository;
 
 class SphinxAdapter implements AdapterInterface
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var string
-     */
-    protected $query;
-
-    /**
-     * @var PostRepository
-     */
-    protected $postRepository;
+    private $connection;
+    private $query;
+    private $postRepository;
 
     public function __construct(Connection $connection, PostRepository $postRepository, string $query)
     {
@@ -39,7 +28,7 @@ class SphinxAdapter implements AdapterInterface
         $query = $this->query;
 
         $q = (new SphinxQL($this->connection))->select('COUNT(*)')
-            ->from('index_posts')
+            ->from(['index_posts'])
             ->match('*', $query)
             ->where('is_first_post', 'NOT IN', [1])
             ->option('max_matches', 10000);
@@ -59,7 +48,7 @@ class SphinxAdapter implements AdapterInterface
         $query = $this->query;
 
         $q = (new SphinxQL($this->connection))->select('*')
-            ->from('index_posts')
+            ->from(['index_posts'])
             ->match('*', $query)
             ->where('is_first_post', 'NOT IN', [1])
             ->orderBy('date', 'DESC')

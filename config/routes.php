@@ -1,19 +1,14 @@
 <?php
 
 /** @var \Slim\App $app */
+use phpClub\Controller\ApiController;
+use phpClub\Controller\BoardController;
+use phpClub\Controller\SearchController;
 
-/* Register application routes */
-$app->get('/', 'BoardController:indexAction')->setName('index');
-$app->get('/pr/res/{thread:[0-9]+}.html', 'BoardController:threadAction')->setName('thread');
-$app->get('/pr/chain/{post:[0-9]+}/', 'BoardController:chainAction')->setName('chain');
-$app->get('/search/', 'SearchController:searchAction')->setName('search');
-$app->get('/about/', 'BoardController:aboutAction')->setName('about');
+$app->get('/', BoardController::class . ':indexAction')->setName('index');
+$app->get('/pr/res/{thread:[0-9]+}.html', BoardController::class . ':threadAction')->setName('thread');
+$app->get('/pr/chain/{post:[0-9]+}/', BoardController::class . ':chainAction')->setName('chain');
+$app->get('/about/', BoardController::class . ':aboutAction')->setName('about');
+$app->get('/search/', SearchController::class . ':searchAction')->setName('search');
 
-$app->map(['GET', 'POST'], '/login/', 'UsersController:authAction');
-$app->map(['GET', 'POST'], '/registration/', 'UsersController:registrationAction');
-$app->map(['GET', 'POST'], '/config/', 'UsersController:configureAction');
-
-$app->post('/logout/', 'UsersController:logOutAction');
-
-/* API */
-$app->get('/api/board/get/message/{id:[0-9]+}/', 'ApiController:getPost');
+$app->get('/api/board/get/message/{id:[0-9]+}/', ApiController::class . ':getPost');

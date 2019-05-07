@@ -75,7 +75,8 @@ class CloudflareEmailDecoder
         assert($post->count() == 1);
         $postNode = $post->getNode(0);
 
-        $replacement = DOMUtil::transformDomTree($postNode, function (\DOMNode $node) {
+        $replacement = DOMUtil::transformDomTree($postNode, function ($node) {
+            /** @var \DOMElement $node */
             $nodeName = strtolower($node->nodeName);
 
             if ($nodeName === 'a') {

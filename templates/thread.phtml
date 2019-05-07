@@ -13,25 +13,7 @@ require __DIR__ . '/base/boardHeader.phtml';
 <hr>
 
 <footer>
-    <!-- It suppose be in OP head -->
-    <?php if ($logged) : ?>
-        <span class="archive-link-form">
-                <form method="post" name="archive-link" action="/addarchivelink/">
-                    <input type="hidden" name="thread" value="<?= $thread->getId() ?>" required>
-                    Добавить архив: <input type="text" name="archive-link">
-                    <input type="submit" name="submit" value="Ок">
-                </form>
 
-                <div>
-                    Удалить ссылки:
-                    <ul>
-                        <?php foreach ($thread->getArchiveLinks() as $archiveLink) : ?>
-                        <li><a href="/removearchivelink/<?= $archiveLink->getId() ?>"><?= $archiveLink->getLink() ?></a>
-                            <?php endforeach; ?>
-                    </ul>
-                </div>
-            </span>
-    <?php endif; ?>
 </footer>
 
 <?php include(__DIR__ . '/base/footer.phtml') ?>
