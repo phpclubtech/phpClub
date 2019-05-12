@@ -62,9 +62,7 @@ class BoardController
             'pagination'  => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
-        $template = $this->getOrSetCache('/board.phtml', $viewArgs, 'board_index' . $page);
-
-        return $this->renderHtml($response, $template);
+        return $this->view->render($response, '/board.phtml', $viewArgs);
     }
 
     public function threadAction(Request $request, Response $response, array $args): ResponseInterface
@@ -85,9 +83,7 @@ class BoardController
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ];
 
-        $template = $this->getOrSetCache('/thread.phtml', $viewArgs, 'thread_' . $args['thread']);
-
-        return $this->renderHtml($response, $template);
+        return $this->view->render($response, '/thread.phtml', $viewArgs);
     }
 
     public function chainAction(Request $request, Response $response, array $args): ResponseInterface
@@ -120,44 +116,5 @@ class BoardController
     public function aboutAction(Request $request, Response $response): ResponseInterface
     {
         return $this->view->render($response, '/about.phtml');
-    }
-
-    /**
-     * Get html template cache by key or set html cache to cache by key.
-     *
-     * @param string $template  path to template
-     * @param array  $data      array of attr inside template
-     * @param string $nameCache name key cache
-     *
-     * @throws \Exception
-     * @throws \Throwable
-     *
-     * @return mixed string of html template with set attr
-     */
-    public function getOrSetCache($template, array $data, string $nameCache)
-    {
-        $cache = $this->cache->get($nameCache);
-
-        if (!$cache) {
-            $cache = $this->view->fetch($template, $data);
-            $this->cache->set($nameCache, $cache);
-        }
-
-        return $cache;
-    }
-
-    /**
-     * Render template by html string.
-     *
-     * @param Response $response
-     * @param string   $html
-     *
-     * @return Response
-     */
-    public function renderHtml(Response $response, string $html): Response
-    {
-        $response->getBody()->write($html);
-
-        return $response;
     }
 }
