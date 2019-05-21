@@ -121,8 +121,9 @@ av ul li.active {
 }
 
 .breadcrumbs li:not(:first-child):before {
-  padding: 0 .5rem 0;
-  content: "/";
+  padding: 0 0.2rem 0 .5rem;
+  content: '〉';
+  font-size: 0.9em;
 }
 
 .result-search-form input[name="q"] {
