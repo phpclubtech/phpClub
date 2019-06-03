@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace phpClub\Slim;
 
-use Pagerfanta\Exception\LessThan1CurrentPageException;
-use Pagerfanta\Exception\OutOfRangeCurrentPageException;
+use Pagerfanta\Exception\NotValidCurrentPageException;
+use Pagerfanta\Exception\NotValidMaxPerPageException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -26,7 +26,7 @@ class ErrorHandler
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, \Exception $exception): ResponseInterface
     {
-        if ($exception instanceof OutOfRangeCurrentPageException || $exception instanceof LessThan1CurrentPageException) {
+        if ($exception instanceof NotValidCurrentPageException || $exception instanceof NotValidMaxPerPageException) {
             return ($this->notFoundHandler)($request, $response);
         }
 
