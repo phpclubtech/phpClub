@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * A router script for PHP builtin web server. Calls index.php for
  * handling all requests except for static files.
