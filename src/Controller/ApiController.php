@@ -68,6 +68,8 @@ class ApiController
             ];
         }
 
-        return $response->withJson($json, 200, JSON_PRETTY_PRINT);
+        return $response
+            ->withHeader('Expires', gmdate('D, d M Y H:i:s T', strtotime('+15 minutes')))
+            ->withJson($json, 200);
     }
 }
