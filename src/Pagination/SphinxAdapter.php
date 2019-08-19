@@ -9,6 +9,7 @@ use phpClub\Repository\PostRepository;
 
 class SphinxAdapter implements AdapterInterface
 {
+    private const MAX_SEARCH_COUNT = 10000;
     private $connection;
     private $query;
     private $postRepository;
@@ -31,11 +32,11 @@ class SphinxAdapter implements AdapterInterface
             ->from(['index_posts'])
             ->match('*', $query)
             ->where('is_first_post', 'NOT IN', [1])
-            ->option('max_matches', 10000);
+            ->option('max_matches', self::MAX_SEARCH_COUNT);
 
         $result = $q->execute()->fetchAssoc();
 
-        $count = $result['count(*)'];
+        $count = min($result['count(*)'], self::MAX_SEARCH_COUNT);
 
         return $count;
     }
@@ -54,7 +55,7 @@ class SphinxAdapter implements AdapterInterface
             ->orderBy('date', 'DESC')
             ->offset($offset)
             ->limit($length)
-            ->option('max_matches', 10000);
+            ->option('max_matches', self::MAX_SEARCH_COUNT);
 
         $ids = array_column($q->execute()->fetchAllAssoc(), 'id');
 
