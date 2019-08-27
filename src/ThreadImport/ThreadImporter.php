@@ -9,48 +9,25 @@ use Doctrine\ORM\EntityManagerInterface;
 use phpClub\Entity\File;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
-use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 class ThreadImporter
 {
-    /**
-     * @var FileStorageInterface
-     */
     private $fileStorage;
-
-    /**
-     * @var EntityManagerInterface
-     */
     private $entityManager;
-
-    /**
-     * @var LastPostUpdater
-     */
     private $lastPostUpdater;
-
-    /**
-     * @var ChainManager
-     */
     private $chainManager;
-
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
 
     public function __construct(
         FileStorageInterface $fileStorage,
         EntityManagerInterface $entityManager,
         LastPostUpdater $lastPostUpdater,
-        ChainManager $chainManager,
-        CacheInterface $cache
+        ChainManager $chainManager
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;
         $this->lastPostUpdater = $lastPostUpdater;
         $this->chainManager = $chainManager;
-        $this->cache = $cache;
     }
 
     /**
@@ -75,7 +52,6 @@ class ThreadImporter
 
         $this->lastPostUpdater->updateLastPosts($threads);
         $this->entityManager->commit();
-        $this->cache->clear();
     }
 
     /**

@@ -12,7 +12,6 @@ use phpClub\Repository\ThreadRepository;
 use phpClub\Service\Breadcrumbs;
 use phpClub\Service\UrlGenerator;
 use Psr\Http\Message\ResponseInterface;
-use Psr\SimpleCache\CacheInterface;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -21,7 +20,6 @@ use Slim\Views\PhpRenderer;
 class BoardController
 {
     private $view;
-    private $cache;
     private $threadRepository;
     private $chainRepository;
     private $paginationRenderer;
@@ -29,14 +27,12 @@ class BoardController
 
     public function __construct(
         PhpRenderer $view,
-        CacheInterface $cache,
         ThreadRepository $threadRepository,
         ChainRepository $chainRepository,
         PaginationRenderer $paginationRenderer,
         UrlGenerator $urlGenerator
     ) {
         $this->view = $view;
-        $this->cache = $cache;
         $this->threadRepository = $threadRepository;
         $this->chainRepository = $chainRepository;
         $this->paginationRenderer = $paginationRenderer;
