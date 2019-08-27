@@ -59,10 +59,10 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
     $isDevMode = false;
     $config = Environment::isTest() ? $di['connections']['mysql_test'] : $di['connections']['mysql'];
     $cache = Environment::isProd() ? new PhpFileCache(sys_get_temp_dir()) : new ArrayCache();
-    $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, null, $cache);
-    $namingStrategy = new UnderscoreNamingStrategy();
-    $metaConfig->setNamingStrategy($namingStrategy);
-    $metaConfig->setProxyDir(sys_get_temp_dir());
+    $proxyDir = sys_get_temp_dir();
+    $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, $proxyDir, $cache);
+    $metaConfig->setNamingStrategy(new UnderscoreNamingStrategy());
+    $metaConfig->setProxyDir($proxyDir);
     $metaConfig->setAutoGenerateProxyClasses(!Environment::isProd());
 
     return EntityManager::create($config, $metaConfig);

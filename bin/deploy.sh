@@ -8,6 +8,8 @@ if [ "$BRANCH" == "master" ]; then
       && vendor/bin/doctrine-migrations migrations:migrate --no-interaction \
       && vendor/bin/doctrine orm:clear-cache:query \
       && vendor/bin/doctrine orm:clear-cache:metadata \
+      && vendor/bin/doctrine orm:validate-schema \
+      && vendor/bin/doctrine orm:ensure-production-settings \
       && vendor/bin/doctrine orm:generate-proxies \
       && composer install"
 fi

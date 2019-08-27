@@ -15,8 +15,6 @@ before_script:
 script:
   - composer sa
   - vendor/bin/phpunit --testdox
-  - vendor/bin/doctrine orm:validate-schema
-  - vendor/bin/doctrine orm:ensure-production-settings
 
 after_success:
   - openssl aes-256-cbc -K $encrypted_5c05c901a3e7_key -iv $encrypted_5c05c901a3e7_iv
