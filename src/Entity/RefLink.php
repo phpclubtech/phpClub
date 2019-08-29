@@ -10,7 +10,7 @@ class RefLink
     /** @Id @Column(type="integer") @GeneratedValue **/
     private $id;
 
-    /** @ManyToOne(targetEntity="Post") */
+    /** @ManyToOne(targetEntity="Post", inversedBy="replies") */
     private $post;
 
     /** @ManyToOne(targetEntity="Post") */

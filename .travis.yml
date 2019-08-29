@@ -14,6 +14,7 @@ before_script:
 
 script:
   - composer sa
+  - APP_ENV=test vendor/bin/doctrine orm:validate-schema
   - vendor/bin/phpunit --testdox
 
 after_success:

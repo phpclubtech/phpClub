@@ -2,10 +2,11 @@
 
 use Monolog\Logger;
 use phpClub\FileStorage\LocalFileStorage;
+use phpClub\Util\Environment;
 
 return [
     'settings' => [
-        'displayErrorDetails' => getenv('APP_ENV') !== 'prod',
+        'displayErrorDetails' => !Environment::isProd(),
         'fileStorage'         => LocalFileStorage::class,
     ],
     'connections' => [
@@ -32,6 +33,6 @@ return [
     'logger' => [
         'name'  => 'phpClub',
         'path'  => __DIR__ . '/../var/log/app.log',
-        'level' => getenv('APP_ENV') !== 'prod' ? Logger::DEBUG : Logger::ERROR,
+        'level' => Environment::isProd() ? Logger::ERROR : Logger::DEBUG,
     ],
 ];

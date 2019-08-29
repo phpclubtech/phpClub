@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Doctrine\Common\Proxy\AbstractProxyFactory;
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\PhpFileCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\Tools\Setup;
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use GuzzleHttp\Client;
@@ -41,11 +43,10 @@ use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\Internal\CloudflareEmailDecoder;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\ThreadParser\MDvachThreadParser;
+use phpClub\Util\Environment;
 use Psr\Log\LoggerInterface;
-use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Slim\Views\PhpRenderer;
-use Symfony\Component\Cache\Simple\ArrayCache;
 
 (new Dotenv\Dotenv(__DIR__ . '/../'))->load();
 
@@ -56,19 +57,15 @@ $di = new Container($slimConfig);
 $di[EntityManager::class] = function (Container $di): EntityManager {
     $paths = [__DIR__ . '/Entity/'];
     $isDevMode = false;
+    $config = Environment::isTest() ? $di['connections']['mysql_test'] : $di['connections']['mysql'];
+    $cache = Environment::isProd() ? new PhpFileCache(sys_get_temp_dir()) : new ArrayCache();
+    $proxyDir = sys_get_temp_dir();
+    $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, $proxyDir, $cache);
+    $metaConfig->setNamingStrategy(new UnderscoreNamingStrategy());
+    $metaConfig->setProxyDir($proxyDir);
+    $metaConfig->setAutoGenerateProxyClasses(!Environment::isProd());
 
-    $config = getenv('APP_ENV') === 'test' ? $di['connections']['mysql_test'] : $di['connections']['mysql'];
-
-    $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
-
-    $namingStrategy = new \Doctrine\ORM\Mapping\UnderscoreNamingStrategy();
-    $metaConfig->setNamingStrategy($namingStrategy);
-
-    $metaConfig->setAutoGenerateProxyClasses(AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
-
-    $entityManager = EntityManager::create($config, $metaConfig);
-
-    return $entityManager;
+    return EntityManager::create($config, $metaConfig);
 };
 
 $di[EntityManagerInterface::class] = function (Container $di) {
@@ -86,9 +83,7 @@ $di[LastPostUpdater::class] = function (Container $di) {
 $di[ArhivachClient::class] = function (Container $di) {
     return new ArhivachClient(
         $di[Client::class],
-        $di[ArhivachThreadParser::class],
-        getenv('ARHIVACH_EMAIL'),
-        getenv('ARHIVACH_PASSWORD')
+        $di[ArhivachThreadParser::class]
     );
 };
 
@@ -146,8 +141,7 @@ $di[ThreadImporter::class] = function (Container $di) {
         $di[$di['settings']['fileStorage']],
         $di[EntityManager::class],
         $di[LastPostUpdater::class],
-        $di[ChainManager::class],
-        $di[CacheInterface::class]
+        $di[ChainManager::class]
     );
 };
 
@@ -193,11 +187,6 @@ $di[PaginationRenderer::class] = function (Container $di): PaginationRenderer {
     return new PaginationRenderer($di->get('router'));
 };
 
-$di[CacheInterface::class] = function (): CacheInterface {
-    // TODO: fix pagination for file cache
-    return new ArrayCache();
-};
-
 $di['SphinxConnection'] = function (Container $di) {
     $connection = new Connection();
     $connection->setParams(parse_url($di['connections']['sphinx']['dsn']));
@@ -213,7 +202,7 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
     $rotatingFileHandler = new RotatingFileHandler($di['logger']['path'], 20, $di['logger']['level']);
     $rotatingFileHandler->setFormatter($formatter);
     $logger->pushHandler($rotatingFileHandler);
-    if (getenv('APP_ENV') === 'prod') {
+    if (Environment::isProd()) {
         $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
     }
 
@@ -236,7 +225,6 @@ $di[\Slim\Handlers\Error::class] = function (Container $di) {
 $di[BoardController::class] = function (Container $di): BoardController {
     return new BoardController(
         $di->get(PhpRenderer::class),
-        $di->get(CacheInterface::class),
         $di->get(ThreadRepository::class),
         $di->get(ChainRepository::class),
         $di->get(PaginationRenderer::class),

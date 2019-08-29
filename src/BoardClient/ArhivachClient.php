@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace phpClub\BoardClient;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
 use phpClub\Entity\Thread;
 use phpClub\ThreadParser\ArhivachThreadParser;
 
@@ -13,19 +12,13 @@ class ArhivachClient
 {
     private $guzzle;
     private $threadParser;
-    private $email;
-    private $password;
 
     public function __construct(
         Client $guzzle,
-        ArhivachThreadParser $threadParser,
-        string $email,
-        string $password
+        ArhivachThreadParser $threadParser
     ) {
         $this->guzzle = $guzzle;
         $this->threadParser = $threadParser;
-        $this->email = $email;
-        $this->password = $password;
     }
 
     /**
@@ -42,37 +35,8 @@ class ArhivachClient
         }, $threadUrls);
     }
 
-    /**
-     * @param Thread $thread
-     *
-     * @return bool
-     */
-    public function isThreadArchived(Thread $thread): bool
-    {
-        return false;
-//        $url = $this->generateArchiveLink($thread);
-//
-//        try {
-//            $this->guzzle->get($url);
-//        } catch (ClientException $e) {
-//            return false;
-//        }
-//
-//        return true;
-    }
-
-    /**
-     * @return string
-     */
     public function generateArchiveLink(): string
     {
         return getenv('ARHIVACH_DOMAIN') . '/ajax/?act=locate_thread&url=';
-    }
-
-    public function archive(Thread $thread): void
-    {
-        // login using email + password, save cookie
-        // send POST request to arhivach/add
-        // check response is ok
     }
 }

@@ -13,7 +13,6 @@ use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\DvachThreadParser;
 use PHPUnit\Framework\TestCase;
-use Psr\SimpleCache\CacheInterface;
 use Slim\Container;
 use Tests\FileStorage\FileStorageMock;
 
@@ -65,8 +64,7 @@ abstract class AbstractTestCase extends TestCase
             new FileStorageMock(),
             $this->getContainer()->get(EntityManager::class),
             $this->createMock(LastPostUpdater::class),
-            $this->createMock(ChainManager::class),
-            $this->createMock(CacheInterface::class)
+            $this->createMock(ChainManager::class)
         );
 
         $importer->import([$thread]);
