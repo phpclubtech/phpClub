@@ -172,7 +172,7 @@ PostPreview.prototype.handle = function() {
         } else {
             that.api.getPost(id).then(
                 function(data) {
-                    data['data']['date'] = new Date(data['data']['date']['date']);
+                    data['data']['dateFormatted'] = data['data']['dateFormatted'];
 
                     var template = $('#post-template').html();
                     var html = ejs.render(template, {post: data['data']});

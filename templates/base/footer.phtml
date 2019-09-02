@@ -22,7 +22,7 @@
                 <div class="post-header clearfix">
                     <span class="title"><%= post.title %></span>
                     <span class="author"><%= post.author %></span>
-                    <span class="datetime"><%= post.date.getFullYear() %>/<%= post.date.getMonth() %>/<%= post.date.getDay() %> <%= post.date.getHours() %>:<%= post.date.getMinutes() %>:<%= post.date.getSeconds() %>&nbsp;</span>
+                    <span class="datetime"><%= post.dateFormatted %>&nbsp;</span>
                     <span class="number">
                             <a href="/pr/res/<%= post.thread %>.html#<%= post.id %>" date-reflink-id="<%= post.id %>">№<%= post.id %></a>
                     </span>
