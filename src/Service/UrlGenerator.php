@@ -37,7 +37,7 @@ class UrlGenerator
 
     public function toSearch(string $query): string
     {
-        return $this->router->pathFor('search') . "?q={$query}";
+        return $this->router->pathFor('search') . "?q=" . urlencode($query);
     }
 
     public function toArhivachThread(): string
