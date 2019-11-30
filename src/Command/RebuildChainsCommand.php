@@ -12,15 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class RebuildChainsCommand extends Command
 {
-    /**
-     * @var ChainManager
-     */
-    private $chainManager;
-
-    /**
-     * @var ThreadRepository
-     */
-    private $threadRepository;
+    private ChainManager $chainManager;
+    private ThreadRepository $threadRepository;
 
     public function __construct(ChainManager $chainManager, ThreadRepository $threadRepository)
     {

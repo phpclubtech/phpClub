@@ -14,27 +14,12 @@ use Tests\AbstractTestCase;
 
 class ChainManagerTest extends AbstractTestCase
 {
-    /**
-     * @var ChainManager
-     */
-    private $chainManager;
+    private ChainManager $chainManager;
+    private EntityManager $entityManager;
+    private ThreadRepository $threadRepository;
+    private ChainRepository $chainRepository;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var ThreadRepository
-     */
-    private $threadRepository;
-
-    /**
-     * @var ChainRepository
-     */
-    private $chainRepository;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->entityManager = $this->getContainer()->get(EntityManager::class);
         $this->chainManager = $this->getContainer()->get(ChainManager::class);
@@ -89,7 +74,7 @@ class ChainManagerTest extends AbstractTestCase
         ];
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->entityManager->getConnection()->rollBack();
     }

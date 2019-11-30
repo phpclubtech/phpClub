@@ -10,16 +10,19 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20190901203019 extends AbstractMigration
+final class Version20191128231821 extends AbstractMigration
 {
-    public function up(Schema $schema): void
+    public function getDescription() : string
+    {
+        return '';
+    }
+
+    public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8764B89032C');
-        $this->addSql('ALTER TABLE ref_link CHANGE post_id post_id INT NOT NULL');
-        $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8764B89032C FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE');
+        $this->addSql('DROP TABLE user');
     }
 
     public function down(Schema $schema) : void
@@ -27,8 +30,6 @@ final class Version20190901203019 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE ref_link DROP FOREIGN KEY FK_21DFD8764B89032C');
-        $this->addSql('ALTER TABLE ref_link CHANGE post_id post_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE ref_link ADD CONSTRAINT FK_21DFD8764B89032C FOREIGN KEY (post_id) REFERENCES post (id)');
+        $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) CHARACTER SET utf8 NOT NULL COLLATE `utf8_unicode_ci`, email VARCHAR(255) CHARACTER SET utf8 NOT NULL COLLATE `utf8_unicode_ci`, hash VARCHAR(255) CHARACTER SET utf8 NOT NULL COLLATE `utf8_unicode_ci`, salt VARCHAR(255) CHARACTER SET utf8 NOT NULL COLLATE `utf8_unicode_ci`, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
     }
 }

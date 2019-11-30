@@ -8,37 +8,35 @@ use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\Internal\CloudflareEmailDecoder;
+use phpClub\Util\FsUtil;
 use Tests\AbstractTestCase;
 
 class DvachHtmlParserTest extends AbstractTestCase
 {
-    /**
-     * @var DvachThreadParser
-     */
-    private $threadParser;
+    private DvachThreadParser $threadParser;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->threadParser = $this->getContainer()->get(DvachThreadParser::class);
     }
 
     public function testGetPost()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/dvach/posts/post-thread-17.html'));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents(__DIR__ . '/../Fixtures/dvach/posts/post-thread-17.html'));
         $post = $thread->getPosts()[0];
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('20/01/14 17:23:22', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('319724', $post->getId());
-        $this->assertContains('делать, если расширение', $post->getText());
+        $this->assertStringContainsString('делать, если расширение', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
 
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/dvach/posts/post-thread-71.html'));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents(__DIR__ . '/../Fixtures/dvach/posts/post-thread-71.html'));
         $post = $thread->getPosts()[0];
         $this->assertEquals('пхп', $post->getAuthor());
         $this->assertEquals('24/02/16 17:11:57', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('665216', $post->getId());
-        $this->assertContains('что в пхп ини то же самое</span><br>А ты тот файл который нужно редактируешь? Настройки', $post->getText());
+        $this->assertStringContainsString('что в пхп ини то же самое</span><br>А ты тот файл который нужно редактируешь? Настройки', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
     }
@@ -48,7 +46,7 @@ class DvachHtmlParserTest extends AbstractTestCase
      */
     public function testExtractThread(string $pathToThreadHtml)
     {
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToThreadHtml));
         $posts = $thread->getPosts();
 
         if (!preg_match("~15-fixed\.html$~", $pathToThreadHtml)) {
@@ -99,11 +97,11 @@ class DvachHtmlParserTest extends AbstractTestCase
     {
         $threadDir = __DIR__ . '/../Fixtures/dvach';
 
-        $thread = $this->threadParser->extractThread(file_get_contents($threadDir . '/80.html'), $threadDir);
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($threadDir . '/80.html'), $threadDir);
 
         $file = $thread->getPosts()[0]->getFiles()[0];
 
-        $this->assertContains($threadDir, $file->getPath());
+        $this->assertStringContainsString($threadDir, $file->getPath());
     }
 
     /**
@@ -111,7 +109,7 @@ class DvachHtmlParserTest extends AbstractTestCase
      */
     public function testOpPostTitleIsCorrect(string $pathToThreadHtml, string $opPostTitle)
     {
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToThreadHtml));
         $this->assertEquals($opPostTitle, $thread->getPosts()->first()->getTitle());
     }
 
@@ -140,7 +138,7 @@ class DvachHtmlParserTest extends AbstractTestCase
     public function testFilesThread80()
     {
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/80.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
 
         /** @var File[] $files */
@@ -171,18 +169,18 @@ class DvachHtmlParserTest extends AbstractTestCase
     public function testThreadFromGoogleCache()
     {
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/15-fixed.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertGreaterThan(300, $posts->count());
         $this->assertEquals('!xnn2uE3AU.', $posts[0]->getAuthor());
-        $this->assertContains('пробелы между строчками и всё заработало', $posts[7]->getText());
-        $this->assertContains('будет идти потоковое видео?', $posts->last()->getText());
+        $this->assertStringContainsString('пробелы между строчками и всё заработало', $posts[7]->getText());
+        $this->assertStringContainsString('будет идти потоковое видео?', $posts->last()->getText());
     }
 
     public function testWebmParsing()
     {
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/66.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
 
         $postWithWebm = $thread->getPosts()
             ->filter(function (Post $post) {
@@ -190,7 +188,7 @@ class DvachHtmlParserTest extends AbstractTestCase
             })
             ->first();
 
-        $this->assertContains('.webm', $postWithWebm->getFiles()->first()->getPath());
+        $this->assertStringContainsString('.webm', $postWithWebm->getFiles()->first()->getPath());
         $this->assertNotEmpty($postWithWebm->getFiles()->first()->getThumbPath());
     }
 
@@ -198,7 +196,7 @@ class DvachHtmlParserTest extends AbstractTestCase
     {
         // All this checks are required!
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/1-fixed.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(0, $posts[1]->getFiles());
@@ -206,20 +204,20 @@ class DvachHtmlParserTest extends AbstractTestCase
         $this->assertCount(1, $posts[3]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/3.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/6.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(1, $posts[1]->getFiles());
         $this->assertCount(0, $posts->last()->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/10.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(1, $posts[1]->getFiles());
@@ -227,45 +225,45 @@ class DvachHtmlParserTest extends AbstractTestCase
         $this->assertCount(0, $posts[3]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/77.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(4, $posts[0]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/60.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(4, $posts[0]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/50.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(4, $posts[0]->getFiles());
         $this->assertCount(3, $posts[1]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/40.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(4, $posts[0]->getFiles());
         $this->assertCount(2, $posts[1]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/32.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(3, $posts[0]->getFiles());
         $this->assertCount(3, $posts[1]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/29.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(1, $posts[1]->getFiles());
         $this->assertCount(0, $posts[2]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/27.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(1, $posts[1]->getFiles());
@@ -273,7 +271,7 @@ class DvachHtmlParserTest extends AbstractTestCase
         $this->assertCount(1, $posts[3]->getFiles());
 
         $pathToHtml = __DIR__ . '/../Fixtures/dvach/20.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         $this->assertCount(1, $posts[0]->getFiles());
         $this->assertCount(1, $posts[1]->getFiles());

@@ -69,7 +69,7 @@ class MDvachThreadParser extends AbstractThreadParser
         return $author !== '' ? $author : $trip;
     }
 
-    protected function extractDate(Crawler $postNode): \DateTimeInterface
+    protected function extractDate(Crawler $postNode): \DateTimeImmutable
     {
         $dateXPath = $this->getDateXPath();
         $dateNode = $postNode->filterXPath($dateXPath);
@@ -84,11 +84,11 @@ class MDvachThreadParser extends AbstractThreadParser
             throw new ThreadParseException('Cannot read post id while parsing date');
         }
 
-        if (!($postId >= 272705 && $postId <= 289749)) {
+        if (!($postId >= 272_705 && $postId <= 289_749)) {
             throw new ThreadParseException("m2-ch parser doesn't know the year for post id '$postId'");
         }
 
-        $year = 2013;
+        $year = 2_013;
 
         $rawDate = $dateNode->text();
 

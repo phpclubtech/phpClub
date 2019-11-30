@@ -10,7 +10,7 @@ use Slim\Views\PhpRenderer;
 
 class NotFoundHandler
 {
-    private $phpRenderer;
+    private PhpRenderer $phpRenderer;
 
     public function __construct(PhpRenderer $phpRenderer)
     {

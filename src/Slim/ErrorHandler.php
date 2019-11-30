@@ -13,9 +13,9 @@ use Slim\Handlers\Error as DefaultErrorHandler;
 
 class ErrorHandler
 {
-    private $logger;
-    private $defaultErrorHandler;
-    private $notFoundHandler;
+    private LoggerInterface $logger;
+    private DefaultErrorHandler $defaultErrorHandler;
+    private NotFoundHandler $notFoundHandler;
 
     public function __construct(LoggerInterface $logger, DefaultErrorHandler $defaultErrorHandler, NotFoundHandler $notFoundHandler)
     {

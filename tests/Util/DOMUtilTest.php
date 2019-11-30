@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Util;
 
 use phpClub\Util\DOMUtil;
@@ -11,42 +13,44 @@ class DOMUtilTest extends TestCase
     {
         $node = DOMUtil::createNode('<em>Hello</em>');
         $this->assertEquals('em', mb_strtolower($node->nodeName));
-        $this->assertContains('Hello', $node->textContent);
+        $this->assertStringContainsString('Hello', $node->textContent);
     }
 
     public function testCanCreateTextNode()
     {
         $node = DOMUtil::createNode('Hello world');
         $this->assertInstanceOf(\DOMText::class, $node);
-        $this->assertContains('Hello world', $node->wholeText);
+        /* @var \DOMText $node */
+        $this->assertStringContainsString('Hello world', $node->wholeText);
     }
 
     public function testCanCreateComment()
     {
         $node = DOMUtil::createNode('<!-- example -->');
         $this->assertInstanceOf(\DOMComment::class, $node);
-        $this->assertContains('example', $node->data);
+        /* @var \DOMComment $node */
+        $this->assertStringContainsString('example', $node->data);
     }
 
     public function testParsesUtf8Correctly()
     {
         $node = DOMUtil::createNode('<em>Привет 世界</em>');
-        $this->assertContains('Привет', $node->textContent);
-        $this->assertContains('世界', $node->textContent);
+        $this->assertStringContainsString('Привет', $node->textContent);
+        $this->assertStringContainsString('世界', $node->textContent);
     }
 
     /* public function testParsesBodyTag()
     {
         $node = DOMUtil::createNode('<body>Hello</body>');
         $this->assertEquals('body', mb_strtolower($node->nodeName));
-        $this->assertContains('Hello', $node->textContent);
+        $this->assertStringContainsString('Hello', $node->textContent);
     }
 
     public function testParsesHtmlTag()
     {
         $node = DOMUtil::createNode('<html><body>Hello</body></html>');
         $this->assertEquals('html', mb_strtolower($node->nodeName));
-        $this->assertContains('Hello', $node->textContent);
+        $this->assertStringContainsString('Hello', $node->textContent);
     }
     */
 

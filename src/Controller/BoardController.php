@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Controller;
 
 use Pagerfanta\Adapter\DoctrineORMAdapter;
@@ -19,11 +21,11 @@ use Slim\Views\PhpRenderer;
 
 class BoardController
 {
-    private $view;
-    private $threadRepository;
-    private $chainRepository;
-    private $paginationRenderer;
-    private $urlGenerator;
+    private PhpRenderer $view;
+    private ThreadRepository $threadRepository;
+    private ChainRepository $chainRepository;
+    private PaginationRenderer $paginationRenderer;
+    private UrlGenerator $urlGenerator;
 
     public function __construct(
         PhpRenderer $view,
@@ -53,9 +55,9 @@ class BoardController
         $breadcrumbs->addCrumb('Все треды', '/');
 
         $viewArgs = [
-            'threads'     => $threads,
+            'threads' => $threads,
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
-            'pagination'  => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
+            'pagination' => $this->paginationRenderer->render($threads, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
         return $this->view->render($response, '/board.phtml', $viewArgs);
@@ -75,7 +77,7 @@ class BoardController
         $breadcrumbs->addCrumb($OP->getTitle(), $this->urlGenerator->toPostAnchor($OP));
 
         $viewArgs = [
-            'thread'      => $thread,
+            'thread' => $thread,
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ];
 
@@ -90,9 +92,7 @@ class BoardController
             throw new NotFoundException($request, $response);
         }
 
-        $post = $chain->filter(function (Post $entry) use ($postId) {
-            return $entry->getId() == $postId;
-        })->first();
+        $post = $chain->filter(fn (Post $entry) => $entry->getId() == $postId)->first();
 
         /** @var Post $OP */
         $OP = $post->getThread()->getPosts()->first();
@@ -103,8 +103,8 @@ class BoardController
         $breadcrumbs->addCrumb("Ответы на пост №{$postId}", $this->urlGenerator->toChain($post));
 
         return $this->view->render($response, '/chain.phtml', [
-            'posts'       => $chain,
-            'postId'      => $postId,
+            'posts' => $chain,
+            'postId' => $postId,
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
         ]);
     }

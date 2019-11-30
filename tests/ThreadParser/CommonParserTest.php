@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ThreadParser;
+namespace Tests\ThreadParser;
 
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
@@ -10,6 +10,7 @@ use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\Util\DOMUtil;
+use phpClub\Util\FsUtil;
 use Symfony\Component\DomCrawler\Crawler;
 use Tests\AbstractTestCase;
 
@@ -51,10 +52,10 @@ class CommonParserTest extends AbstractTestCase
         $dir = dirname(__DIR__);
 
         $threads = [
-            'dvach/2.html'    => [$dir . '/Fixtures/dvach/2.html', $this->getDvachThread2Samples()],
-            'dvach/30.html'   => [$dir . '/Fixtures/dvach/30.html', $this->getDvachThread30Samples()],
-            'dvach/34.html'   => [$dir . '/Fixtures/dvach/34.html', $this->getDvachThread34Samples()],
-            'dvach/82.html'   => [$dir . '/Fixtures/dvach/82.html', $this->getDvachThread82Samples()],
+            'dvach/2.html'  => [$dir . '/Fixtures/dvach/2.html', $this->getDvachThread2Samples()],
+            'dvach/30.html' => [$dir . '/Fixtures/dvach/30.html', $this->getDvachThread30Samples()],
+            'dvach/34.html' => [$dir . '/Fixtures/dvach/34.html', $this->getDvachThread34Samples()],
+            'dvach/82.html' => [$dir . '/Fixtures/dvach/82.html', $this->getDvachThread82Samples()],
         ];
 
         $data = [];
@@ -332,7 +333,7 @@ class CommonParserTest extends AbstractTestCase
             throw new \InvalidArgumentException('Invalid thread parser: ' . $parserClass);
         }
 
-        $html = file_get_contents($threadPath);
+        $html = FsUtil::getContents($threadPath);
         $thread = $parser->extractThread($html, $threadPath);
 
         return $thread;
@@ -354,7 +355,7 @@ class CommonParserTest extends AbstractTestCase
                 $crawler = new Crawler($post->getText());
                 $postText = DOMUtil::getTextFromCrawler($crawler);
 
-                $this->assertContainsIgnoringSpaces(
+                $this->assertStringContainsStringIgnoringSpaces(
                     $content,
                     $postText,
                     "Cannot find string '$content' in post $postId"
@@ -391,7 +392,7 @@ class CommonParserTest extends AbstractTestCase
                 break;
 
             case 'subject':
-                $this->assertContainsIgnoringSpaces(
+                $this->assertStringContainsStringIgnoringSpaces(
                     $content,
                     strval($post->getTitle()),
                     "Cannot find title '$content' in post $postId"
@@ -510,12 +511,12 @@ class CommonParserTest extends AbstractTestCase
         throw new \Exception("Cannot find post $postId in thread");
     }
 
-    private function assertContainsIgnoringSpaces(string $needle, string $haystack, string $message = '')
+    private function assertStringContainsStringIgnoringSpaces(string $needle, string $haystack, string $message = '')
     {
         $needle = $this->normalizeSpaces($needle);
         $haystack = $this->normalizeSpaces($haystack);
 
-        $this->assertContains($needle, $haystack, $message);
+        $this->assertStringContainsString($needle, $haystack, $message);
     }
 
     private function assertEqualsIgnoringSpaces(string $expected, string $actual, string $message = '')

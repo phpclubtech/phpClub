@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\Tools\Setup;
+use Dotenv\Dotenv;
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use GuzzleHttp\Client;
 use Monolog\Formatter\LineFormatter;
@@ -25,6 +26,7 @@ use phpClub\Controller\ApiController;
 use phpClub\Controller\BoardController;
 use phpClub\Controller\SearchController;
 use phpClub\Entity\Post;
+use phpClub\Entity\RefLink;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\LocalFileStorage;
 use phpClub\Pagination\PaginationRenderer;
@@ -46,9 +48,11 @@ use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\Util\Environment;
 use Psr\Log\LoggerInterface;
 use Slim\Container;
+use Slim\Handlers\Error;
 use Slim\Views\PhpRenderer;
+use Symfony\Component\Filesystem\Filesystem;
 
-(new Dotenv\Dotenv(__DIR__ . '/../'))->load();
+(new Dotenv(__DIR__ . '/../'))->load();
 
 $slimConfig = require __DIR__ . '/../config/settings.php';
 
@@ -68,32 +72,20 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
     return EntityManager::create($config, $metaConfig);
 };
 
-$di[EntityManagerInterface::class] = function (Container $di) {
-    return $di[EntityManager::class];
-};
+$di[EntityManagerInterface::class] = fn (Container $di) => $di[EntityManager::class];
 
-$di[ChainManager::class] = function (Container $di) {
-    return new ChainManager($di[EntityManager::class], $di[PostRepository::class]);
-};
+$di[ChainManager::class] = fn (Container $di) => new ChainManager($di[EntityManager::class], $di[PostRepository::class]);
 
-$di[LastPostUpdater::class] = function (Container $di) {
-    return new LastPostUpdater($di[EntityManager::class]->getConnection());
-};
+$di[LastPostUpdater::class] = fn (Container $di) => new LastPostUpdater($di[EntityManager::class]->getConnection());
 
-$di[ArhivachClient::class] = function (Container $di) {
-    return new ArhivachClient(
-        $di[Client::class],
-        $di[ArhivachThreadParser::class]
-    );
-};
+$di[ArhivachClient::class] = fn (Container $di) => new ArhivachClient(
+    $di[Client::class],
+    $di[ArhivachThreadParser::class]
+);
 
-$di['ArhivachMarkupConverter'] = function () {
-    return new MarkupConverter(true);
-};
+$di['ArhivachMarkupConverter'] = fn () => new MarkupConverter(true);
 
-$di['DvachMarkupConverter'] = function () {
-    return new MarkupConverter(false);
-};
+$di['DvachMarkupConverter'] = fn () => new MarkupConverter(false);
 
 $di[ArhivachThreadParser::class] = function ($di) {
     $tz = new \DateTimeZone('Europe/Moscow');
@@ -116,80 +108,58 @@ $di[MDvachThreadParser::class] = function ($di) {
     return new MDvachThreadParser($dateConverter, $di['DvachMarkupConverter'], $di[CloudflareEmailDecoder::class]);
 };
 
-$di[CloudflareEmailDecoder::class] = function () {
-    return new CloudflareEmailDecoder();
-};
+$di[CloudflareEmailDecoder::class] = fn () => new CloudflareEmailDecoder();
 
-$di[ThreadRepository::class] = function (Container $di) {
-    return $di->get(EntityManager::class)->getRepository(Thread::class);
-};
+$di[ThreadRepository::class] = fn (Container $di) => $di->get(EntityManager::class)->getRepository(Thread::class);
 
-$di[PostRepository::class] = function (Container $di) {
-    return $di->get(EntityManager::class)->getRepository(Post::class);
-};
+$di[PostRepository::class] = fn (Container $di) => $di->get(EntityManager::class)->getRepository(Post::class);
 
-$di[ChainRepository::class] = function (Container $di) {
-    return $di->get(EntityManager::class)->getRepository(\phpClub\Entity\RefLink::class);
-};
+$di[ChainRepository::class] = fn (Container $di) => $di->get(EntityManager::class)->getRepository(RefLink::class);
 
-$di[LocalFileStorage::class] = function () {
-    return new LocalFileStorage(new Symfony\Component\Filesystem\Filesystem(), __DIR__ . '/../public');
-};
+$di[LocalFileStorage::class] = fn () => new LocalFileStorage(new Filesystem(), __DIR__ . '/../public');
 
-$di[ThreadImporter::class] = function (Container $di) {
-    return new ThreadImporter(
-        $di[$di['settings']['fileStorage']],
-        $di[EntityManager::class],
-        $di[LastPostUpdater::class],
-        $di[ChainManager::class]
-    );
-};
+$di[ThreadImporter::class] = fn (Container $di) => new ThreadImporter(
+    $di[$di['settings']['fileStorage']],
+    $di[EntityManager::class],
+    $di[LastPostUpdater::class],
+    $di[ChainManager::class]
+);
 
-$di[ImportThreadsCommand::class] = function (Container $di) {
-    return new ImportThreadsCommand(
-        $di[ThreadImporter::class],
-        $di[DvachClient::class],
-        $di[ArhivachClient::class],
-        $di[DvachThreadParser::class],
-        $di[MDvachThreadParser::class],
-        $di[ArhivachThreadParser::class]
-    );
-};
+$di[ImportThreadsCommand::class] = fn (Container $di) => new ImportThreadsCommand(
+    $di[ThreadImporter::class],
+    $di[DvachClient::class],
+    $di[ArhivachClient::class],
+    $di[DvachThreadParser::class],
+    $di[MDvachThreadParser::class],
+    $di[ArhivachThreadParser::class]
+);
 
-$di[RebuildChainsCommand::class] = function (Container $di) {
-    return new RebuildChainsCommand($di[ChainManager::class], $di[ThreadRepository::class]);
-};
+$di[RebuildChainsCommand::class] = fn (Container $di) => new RebuildChainsCommand($di[ChainManager::class], $di[ThreadRepository::class]);
 
-$di[Client::class] = function () {
-    return new Client([
-        'timeout' => 30,
-    ]);
-};
+$di[Client::class] = fn () => new Client([
+    'timeout' => 30,
+]);
 
-$di[DvachClient::class] = function ($di) {
-    return new DvachClient($di[Client::class]);
-};
+$di[DvachClient::class] = fn ($di) => new DvachClient($di[Client::class]);
 
-$di[UrlGenerator::class] = function (Container $di) {
-    return new UrlGenerator($di->get('router'), $di[ArhivachClient::class]);
-};
+$di[UrlGenerator::class] = fn (Container $di) => new UrlGenerator($di->get('router'), $di[ArhivachClient::class]);
 
-$di[PhpRenderer::class] = function (Container $di): PhpRenderer {
-    return new PhpRenderer(__DIR__ . '/../templates', [
-        // Shared variables
-        'urlGenerator'   => $di->get(UrlGenerator::class),
-        'paginator'      => $di->get(PaginationRenderer::class),
-        'arhivachClient' => $di->get(ArhivachClient::class),
-    ]);
-};
+$di[PhpRenderer::class] = fn (Container $di): PhpRenderer => new PhpRenderer(__DIR__ . '/../templates', [
+    // Shared variables
+    'urlGenerator' => $di->get(UrlGenerator::class),
+    'paginator' => $di->get(PaginationRenderer::class),
+    'arhivachClient' => $di->get(ArhivachClient::class),
+]);
 
-$di[PaginationRenderer::class] = function (Container $di): PaginationRenderer {
-    return new PaginationRenderer($di->get('router'));
-};
+$di[PaginationRenderer::class] = fn (Container $di): PaginationRenderer => new PaginationRenderer($di->get('router'));
 
 $di['SphinxConnection'] = function (Container $di) {
     $connection = new Connection();
-    $connection->setParams(parse_url($di['connections']['sphinx']['dsn']));
+    $config = parse_url($di['connections']['sphinx']['dsn']);
+    if (!$config) {
+        throw new Exception('Invalid Sphinx configuration');
+    }
+    $connection->setParams($config);
 
     return $connection;
 };
@@ -203,48 +173,40 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
     $rotatingFileHandler->setFormatter($formatter);
     $logger->pushHandler($rotatingFileHandler);
     if (Environment::isProd()) {
-        $logger->pushHandler(new SlackWebhookHandler(getenv('SLACK_WEBHOOK_URL')));
+        $url = getenv('SLACK_WEBHOOK_URL');
+        if (!$url) {
+            throw new Exception('Invalid SLACK_WEBHOOK_URL');
+        }
+        $logger->pushHandler(new SlackWebhookHandler($url));
     }
 
     return $logger;
 };
 
-$di['notFoundHandler'] = function (Container $di): NotFoundHandler {
-    return new NotFoundHandler($di->get(PhpRenderer::class));
-};
+$di['notFoundHandler'] = fn (Container $di): NotFoundHandler => new NotFoundHandler($di->get(PhpRenderer::class));
 
-$di['errorHandler'] = function (Container $di): ErrorHandler {
-    return new ErrorHandler($di[LoggerInterface::class], $di[\Slim\Handlers\Error::class], $di['notFoundHandler']);
-};
+$di['errorHandler'] = fn (Container $di): ErrorHandler => new ErrorHandler($di[LoggerInterface::class], $di[Error::class], $di['notFoundHandler']);
 
-$di[\Slim\Handlers\Error::class] = function (Container $di) {
-    return new \Slim\Handlers\Error($di->get('settings')['displayErrorDetails']);
-};
+$di[Error::class] = fn (Container $di) => new Error($di->get('settings')['displayErrorDetails']);
 
 /* Application controllers section */
-$di[BoardController::class] = function (Container $di): BoardController {
-    return new BoardController(
-        $di->get(PhpRenderer::class),
-        $di->get(ThreadRepository::class),
-        $di->get(ChainRepository::class),
-        $di->get(PaginationRenderer::class),
-        $di->get(UrlGenerator::class)
-    );
-};
+$di[BoardController::class] = fn (Container $di): BoardController => new BoardController(
+    $di->get(PhpRenderer::class),
+    $di->get(ThreadRepository::class),
+    $di->get(ChainRepository::class),
+    $di->get(PaginationRenderer::class),
+    $di->get(UrlGenerator::class)
+);
 
-$di[SearchController::class] = function (Container $di): SearchController {
-    return new SearchController(
-        $di->get(PostRepository::class),
-        $di->get(PaginationRenderer::class),
-        $di->get(PhpRenderer::class),
-        $di->get('SphinxConnection'),
-        $di->get(UrlGenerator::class)
-    );
-};
+$di[SearchController::class] = fn (Container $di): SearchController => new SearchController(
+    $di->get(PostRepository::class),
+    $di->get(PaginationRenderer::class),
+    $di->get(PhpRenderer::class),
+    $di->get('SphinxConnection'),
+    $di->get(UrlGenerator::class)
+);
 
-$di[ApiController::class] = function (Container $di): ApiController {
-    return new ApiController($di->get(PostRepository::class));
-};
+$di[ApiController::class] = fn (Container $di): ApiController => new ApiController($di->get(PostRepository::class));
 
 /* Error handler for altering PHP errors output */
 set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
@@ -252,7 +214,7 @@ set_error_handler(function (int $errno, string $errstr, string $errfile, int $er
         return;
     }
 
-    throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
 return $di;

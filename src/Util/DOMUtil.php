@@ -15,7 +15,7 @@ class DOMUtil
      * @param string $html HTML string without html or body tag,
      *                     e.g. 'Hello <em>world</em>'
      */
-    public static function createFragment(string $html):\DOMDocumentFragment
+    public static function createFragment(string $html): \DOMDocumentFragment
     {
         $ignoreHtmlErrors = true;
 
@@ -67,7 +67,7 @@ class DOMUtil
      * @param string $html HTML string without html or body tag,
      *                     containg a single DOM node e.g. '<em>test</em>'
      */
-    public static function createNode(string $html):\DOMNode
+    public static function createNode(string $html): \DOMNode
     {
         $fragment = self::createFragment($html);
         $node = $fragment->firstChild;
@@ -96,7 +96,7 @@ class DOMUtil
      */
     public static function getOuterHtml(\DOMNode $node): string
     {
-        return $node->ownerDocument->saveHTML($node);
+        return $node->ownerDocument->saveHTML($node) ?: '';
     }
 
     /**
@@ -175,9 +175,9 @@ class DOMUtil
         throw new \Exception("Transformer must return either null, or \DOMNode, or \DOMDocumentFragment");
     }
 
-    public static function hasClass(string $classList, string $class)
+    public static function hasClass(string $classList, string $class): bool
     {
-        $classes = preg_split("/\s+/", trim($classList));
+        $classes = preg_split("/\s+/", trim($classList)) ?: [];
 
         return in_array($class, $classes, true);
     }

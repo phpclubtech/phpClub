@@ -8,25 +8,15 @@ use phpClub\ThreadParser\Exception\DateParseException;
 
 class DateConverter
 {
-    /**
-     * @var \DateTimeZone
-     */
-    private $timeZone;
+    private \DateTimeZone $timeZone;
 
-    /**
-     * @param \DateTimeZone $timeZone The timezone that date belongs to.
-     */
     public function __construct(\DateTimeZone $timeZone)
     {
         $this->timeZone = $timeZone;
     }
 
     /**
-     * @param string $date
-     *
      * @throws \Exception
-     *
-     * @return \DateTimeImmutable
      */
     public function toDateTime(string $date): \DateTimeImmutable
     {
@@ -90,11 +80,6 @@ class DateConverter
         return $dateTime;
     }
 
-    /**
-     * @param string $date
-     *
-     * @return string
-     */
     private function normalizeDate(string $date): string
     {
         $rusToEng = [
@@ -114,6 +99,6 @@ class DateConverter
 
         $withEngMonths = strtr($date, $rusToEng);
 
-        return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths));
+        return trim(preg_replace('/[^a-z\d\s:\/]+/i', '', $withEngMonths) ?: '');
     }
 }

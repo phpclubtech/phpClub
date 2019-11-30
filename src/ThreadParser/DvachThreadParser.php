@@ -57,11 +57,6 @@ class DvachThreadParser extends AbstractThreadParser
                 | //span[starts-with(@id, "exlink_")]';
     }
 
-    /**
-     * @param Crawler $fileNode
-     *
-     * @return File
-     */
     protected function extractFile(Crawler $fileNode): File
     {
         [, $fullName, $thumbName, $width, $height] = $this->extractOnClickJsArgs($fileNode);
@@ -73,11 +68,6 @@ class DvachThreadParser extends AbstractThreadParser
             ->setWidth((int) $width);
     }
 
-    /**
-     * @param Crawler $fileNode
-     *
-     * @return array
-     */
     private function extractOnClickJsArgs(Crawler $fileNode): array
     {
         $argsXPath = '//div[@class="image-link"]/a/@onclick | //a[@name="expandfunc"]/@onclick';
@@ -89,6 +79,8 @@ class DvachThreadParser extends AbstractThreadParser
 
         $params = $argsNode->text();
 
-        return preg_split("/','|',|,|\)/", $params, -1, PREG_SPLIT_NO_EMPTY);
+        $result = preg_split("/','|',|,|\)/", $params, -1, PREG_SPLIT_NO_EMPTY);
+
+        return $result ?: [];
     }
 }
