@@ -6,16 +6,14 @@ namespace Tests\ThreadParser;
 
 use phpClub\Entity\Post;
 use phpClub\ThreadParser\MDvachThreadParser;
+use phpClub\Util\FsUtil;
 use Tests\AbstractTestCase;
 
 class MDvachHtmlParserTest extends AbstractTestCase
 {
-    /**
-     * @var MDvachThreadParser
-     */
-    private $threadParser;
+    private MDvachThreadParser $threadParser;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->threadParser = $this->getContainer()->get(MDvachThreadParser::class);
     }
@@ -23,18 +21,18 @@ class MDvachHtmlParserTest extends AbstractTestCase
     public function testExtractSinglePost()
     {
         $path = __DIR__ . '/../Fixtures/m2-ch/pr-thread-5-m2ch-googlecache-288635.html';
-        $html = file_get_contents($path);
+        $html = FsUtil::getContents($path);
 
         $thread = $this->threadParser->extractThread($html);
 
         // OP post
         $post = $this->findPostById($thread->getPosts(), 288635);
 
-        $this->assertContains('xnn2uE3AU', $post->getAuthor());
+        $this->assertStringContainsString('xnn2uE3AU', $post->getAuthor());
         $this->assertEquals('2013-06-18 06:19', $post->getDate()->format('Y-m-d h:i'));
-        $this->assertContains('В этом ITT треде мы изучаем', $post->getText());
-        $this->assertContains('Я хочу оформить код красиво', $post->getText());
-        $this->assertContains('Клуб любителей изучать', $post->getTitle());
+        $this->assertStringContainsString('В этом ITT треде мы изучаем', $post->getText());
+        $this->assertStringContainsString('Я хочу оформить код красиво', $post->getText());
+        $this->assertStringContainsString('Клуб любителей изучать', $post->getTitle());
         $this->assertCount(1, $post->getFiles());
 
         // Last post
@@ -56,7 +54,7 @@ class MDvachHtmlParserTest extends AbstractTestCase
     public function testCanParseM2chThread()
     {
         $path = __DIR__ . '/../Fixtures/m2-ch/pr-thread-5-m2ch-googlecache-288635.html';
-        $html = file_get_contents($path);
+        $html = FsUtil::getContents($path);
 
         $thread = $this->threadParser->extractThread($html);
         $posts = $thread->getPosts();

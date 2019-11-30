@@ -11,15 +11,8 @@ use Slim\Interfaces\RouterInterface;
 
 class UrlGenerator
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var ArhivachClient
-     */
-    private $arhivachClient;
+    private RouterInterface $router;
+    private ArhivachClient $arhivachClient;
 
     public function __construct(RouterInterface $router, ArhivachClient $arhivachClient)
     {
@@ -42,7 +35,7 @@ class UrlGenerator
         return $this->router->pathFor('chain', ['post' => $post->getId()]);
     }
 
-    public function toSearch(string $query)
+    public function toSearch(string $query): string
     {
         return $this->router->pathFor('search') . "?q={$query}";
     }

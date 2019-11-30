@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Controller;
 
 use phpClub\Repository\PostRepository;
@@ -9,7 +11,7 @@ use Slim\Http\Response;
 
 class ApiController
 {
-    private $postRepository;
+    private PostRepository $postRepository;
 
     public function __construct(PostRepository $postRepository)
     {
@@ -32,19 +34,19 @@ class ApiController
 
         $json = [
             'data' => [
-                'id'            => $post->getId(),
-                'thread'        => $post->getThread()->getId(),
-                'title'         => $post->getTitle(),
-                'author'        => $post->getAuthor(),
-                'email'         => $post->getEmail(),
-                'date'          => $post->getDate(),
+                'id' => $post->getId(),
+                'thread' => $post->getThread()->getId(),
+                'title' => $post->getTitle(),
+                'author' => $post->getAuthor(),
+                'email' => $post->getEmail(),
+                'date' => $post->getDate(),
                 'dateFormatted' => $post->getDate()->format('Y/m/d H:i:s'),
-                'text'          => $post->getText(),
-                'files'         => [],
-                'replies'       => [],
-                'isOpPost'      => $post->isOpPost(),
-                'isFirstPost'   => $post->isFirstPost(),
-                'isOld'         => $post->isOld(),
+                'text' => $post->getText(),
+                'files' => [],
+                'replies' => [],
+                'isOpPost' => $post->isOpPost(),
+                'isFirstPost' => $post->isFirstPost(),
+                'isOld' => $post->isOld(),
             ],
 
             'status' => 'OK',
@@ -52,19 +54,19 @@ class ApiController
 
         foreach ($post->getFiles() as $file) {
             $json['data']['files'][] = [
-                'id'        => $file->getId(),
-                'name'      => $file->getName(),
-                'size'      => $file->getSize(),
-                'width'     => $file->getWidth(),
-                'height'    => $file->getHeight(),
-                'path'      => $file->getPath(),
+                'id' => $file->getId(),
+                'name' => $file->getName(),
+                'size' => $file->getSize(),
+                'width' => $file->getWidth(),
+                'height' => $file->getHeight(),
+                'path' => $file->getPath(),
                 'thumbPath' => $file->getThumbPath(),
             ];
         }
 
         foreach ($post->getReplies() as $reply) {
             $json['data']['replies'][] = [
-                'id'     => $reply->getReference()->getId(),
+                'id' => $reply->getReference()->getId(),
                 'thread' => $reply->getReference()->getThread()->getId(),
             ];
         }

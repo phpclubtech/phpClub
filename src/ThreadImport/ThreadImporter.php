@@ -13,10 +13,10 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 class ThreadImporter
 {
-    private $fileStorage;
-    private $entityManager;
-    private $lastPostUpdater;
-    private $chainManager;
+    private FileStorageInterface $fileStorage;
+    private EntityManagerInterface $entityManager;
+    private LastPostUpdater $lastPostUpdater;
+    private ChainManager $chainManager;
 
     public function __construct(
         FileStorageInterface $fileStorage,
@@ -30,10 +30,6 @@ class ThreadImporter
         $this->chainManager = $chainManager;
     }
 
-    /**
-     * @param Thread[]      $threads
-     * @param callable|null $onThreadImported
-     */
     public function import(array $threads, callable $onThreadImported = null): void
     {
         $this->entityManager->beginTransaction();
@@ -56,16 +52,12 @@ class ThreadImporter
 
     /**
      * @param Thread[] $threads
-     *
-     * @return void
      */
     private function cascadeRemoveThreads(array $threads): void
     {
         $connection = $this->entityManager->getConnection();
 
-        $threadIds = array_map(function (Thread $thread) {
-            return $thread->getId();
-        }, $threads);
+        $threadIds = array_map(fn (Thread $thread) => $thread->getId(), $threads);
 
         $connection->executeQuery('DELETE FROM thread WHERE id IN (?)',
             [$threadIds],

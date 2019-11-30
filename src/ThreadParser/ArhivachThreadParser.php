@@ -51,11 +51,6 @@ class ArhivachThreadParser extends AbstractThreadParser
         return '//span[@class="post_comment"]/div[@class="post_image_block"]';
     }
 
-    /**
-     * @param Crawler $postNode
-     *
-     * @return string
-     */
     protected function extractAuthor(Crawler $postNode): string
     {
         $authorXPath = $this->getAuthorXPath();
@@ -70,11 +65,6 @@ class ArhivachThreadParser extends AbstractThreadParser
         return $author !== '' ? $author : $trip;
     }
 
-    /**
-     * @param Crawler $fileNode
-     *
-     * @return File
-     */
     protected function extractFile(Crawler $fileNode): File
     {
         $fileXPath = '//a[@class="expand_image"]';
@@ -115,11 +105,6 @@ class ArhivachThreadParser extends AbstractThreadParser
             ->setClientName($clientName);
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return bool
-     */
     private function isOldArhivachThread(string $fileName): bool
     {
         return strpos($fileName, 'abload.de') !== false;

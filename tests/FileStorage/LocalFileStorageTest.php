@@ -13,12 +13,9 @@ use Tests\AbstractTestCase;
 
 class LocalFileStorageTest extends AbstractTestCase
 {
-    /**
-     * @var LocalFileStorage
-     */
-    private $fileStorage;
+    private LocalFileStorage $fileStorage;
 
-    public function setUp()
+    public function setUp(): void
     {
         $testDirectory = vfsStream::setup();
         $this->fileStorage = new LocalFileStorage(new Filesystem(), $testDirectory->url());

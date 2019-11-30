@@ -12,13 +12,14 @@ use phpClub\ThreadImport\ChainManager;
 use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\DvachThreadParser;
+use phpClub\Util\FsUtil;
 use PHPUnit\Framework\TestCase;
 use Slim\Container;
 use Tests\FileStorage\FileStorageMock;
 
 abstract class AbstractTestCase extends TestCase
 {
-    private static $container;
+    private static ?Container $container = null;
 
     public function createThread($id): Thread
     {
@@ -58,13 +59,17 @@ abstract class AbstractTestCase extends TestCase
     {
         /** @var DvachThreadParser $parser */
         $parser = $this->getContainer()->get(DvachThreadParser::class);
-        $thread = $parser->extractThread(file_get_contents($pathToHtml));
+        $thread = $parser->extractThread(FsUtil::getContents($pathToHtml));
+        /** @var LastPostUpdater $lastPostUpdater */
+        $lastPostUpdater = $this->createMock(LastPostUpdater::class);
+        /** @var ChainManager $chainManager */
+        $chainManager = $this->createMock(ChainManager::class);
 
         $importer = new ThreadImporter(
             new FileStorageMock(),
             $this->getContainer()->get(EntityManager::class),
-            $this->createMock(LastPostUpdater::class),
-            $this->createMock(ChainManager::class)
+            $lastPostUpdater,
+            $chainManager
         );
 
         $importer->import([$thread]);

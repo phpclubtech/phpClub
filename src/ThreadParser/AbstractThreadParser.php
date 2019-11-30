@@ -14,20 +14,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 abstract class AbstractThreadParser
 {
-    /**
-     * @var DateConverter
-     */
-    protected $dateConverter;
-
-    /**
-     * @var MarkupConverter
-     */
-    protected $markupConverter;
-
-    /**
-     * @var CloudflareEmailDecoder
-     */
-    private $cloudflareEmailDecoder;
+    protected DateConverter $dateConverter;
+    protected MarkupConverter $markupConverter;
+    private CloudflareEmailDecoder $cloudflareEmailDecoder;
 
     public function __construct(DateConverter $dateConverter, MarkupConverter $markupConverter, CloudflareEmailDecoder $cloudflareEmailDecoder)
     {
@@ -54,12 +43,6 @@ abstract class AbstractThreadParser
 
     abstract protected function extractFile(Crawler $fileNode): File;
 
-    /**
-     * @param string $threadHtml
-     * @param string $threadPath
-     *
-     * @return Thread
-     */
     public function extractThread(string $threadHtml, string $threadPath = ''): Thread
     {
         $hasCloudflareEmails = $this->cloudflareEmailDecoder->hasCloudflareEmails($threadHtml);
@@ -87,7 +70,7 @@ abstract class AbstractThreadParser
                     "%s: %s\nPost HTML: \n%s...",
                     get_class($e),
                     $e->getMessage(),
-                    mb_substr($html, 0, 2000)
+                    mb_substr($html, 0, 2_000)
                 );
 
                 throw new ThreadParseException($details, 0, $e);
@@ -146,11 +129,6 @@ abstract class AbstractThreadParser
         }
     }
 
-    /**
-     * @param Crawler $postNode
-     *
-     * @return int
-     */
     protected function extractId(Crawler $postNode): int
     {
         $idXPath = $this->getIdXPath();
@@ -165,11 +143,6 @@ abstract class AbstractThreadParser
         return (int) $postId;
     }
 
-    /**
-     * @param Crawler $postNode
-     *
-     * @return string
-     */
     protected function extractTitle(Crawler $postNode): string
     {
         $titleXPath = $this->getTitleXPath();
@@ -182,11 +155,6 @@ abstract class AbstractThreadParser
         return trim($titleNode->text());
     }
 
-    /**
-     * @param Crawler $postNode
-     *
-     * @return string
-     */
     protected function extractAuthor(Crawler $postNode): string
     {
         $authorXPath = $this->getAuthorXPath();
@@ -207,12 +175,7 @@ abstract class AbstractThreadParser
         return $author !== '' ? $author : $trip;
     }
 
-    /**
-     * @param Crawler $postNode
-     *
-     * @return \DateTimeImmutable
-     */
-    protected function extractDate(Crawler $postNode): \DateTimeInterface
+    protected function extractDate(Crawler $postNode): \DateTimeImmutable
     {
         $dateXPath = $this->getDateXPath();
         $dateNode = $postNode->filterXPath($dateXPath);
@@ -224,11 +187,6 @@ abstract class AbstractThreadParser
         return $this->dateConverter->toDateTime($dateNode->text());
     }
 
-    /**
-     * @param Crawler $postNode
-     *
-     * @return string
-     */
     protected function extractText(Crawler $postNode): string
     {
         $textXPath = $this->getTextXPath();
@@ -246,9 +204,6 @@ abstract class AbstractThreadParser
     }
 
     /**
-     * @param Crawler $postNode
-     * @param string  $threadPath
-     *
      * @return File[]
      */
     protected function extractFiles(Crawler $postNode, string $threadPath): array

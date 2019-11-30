@@ -10,8 +10,8 @@ use phpClub\ThreadParser\ArhivachThreadParser;
 
 class ArhivachClient
 {
-    private $guzzle;
-    private $threadParser;
+    private Client $guzzle;
+    private ArhivachThreadParser $threadParser;
 
     public function __construct(
         Client $guzzle,

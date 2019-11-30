@@ -9,7 +9,7 @@ use phpClub\Entity\Thread;
 
 class LastPostUpdater
 {
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {
@@ -20,9 +20,7 @@ class LastPostUpdater
     {
         assert((bool) count($threads));
 
-        $threadIds = array_map(function (Thread $thread) {
-            return $thread->getId();
-        }, $threads);
+        $threadIds = array_map(fn (Thread $thread) => $thread->getId(), $threads);
 
         $deleteLastPostsSql = 'DELETE FROM last_post WHERE thread_id IN (?)';
         $this->connection->executeQuery($deleteLastPostsSql, [$threadIds], [Connection::PARAM_INT_ARRAY]);

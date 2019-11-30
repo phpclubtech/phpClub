@@ -17,14 +17,8 @@ class DvachClient
     private const POST_TEXT = 'comment';
     private const THREAD_TITLE = 'subject';
 
-    /**
-     * @var Client
-     */
-    private $guzzle;
+    private Client $guzzle;
 
-    /**
-     * @param Client $guzzle
-     */
     public function __construct(Client $guzzle)
     {
         $this->guzzle = $guzzle;
@@ -43,22 +37,13 @@ class DvachClient
         return array_map([$this, 'extractThread'], $phpThreadsArray);
     }
 
-    /**
-     * @param array $threadArray
-     *
-     * @return bool
-     */
     private function looksLikePhpThread(array $threadArray): bool
     {
         return (bool) preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
     }
 
     /**
-     * @param array $phpThread
-     *
      * @throws \Exception
-     *
-     * @return Thread
      */
     private function extractThread(array $phpThread): Thread
     {
@@ -83,11 +68,6 @@ class DvachClient
         return $thread;
     }
 
-    /**
-     * @param array $postArray
-     *
-     * @return Post
-     */
     private function extractPost(array $postArray): Post
     {
         $post = new Post($postArray['num']);
@@ -105,11 +85,6 @@ class DvachClient
         return $post;
     }
 
-    /**
-     * @param array $fileArray
-     *
-     * @return File
-     */
     private function extractFile(array $fileArray): File
     {
         return (new File())

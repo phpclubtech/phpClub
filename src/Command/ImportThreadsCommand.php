@@ -12,6 +12,7 @@ use phpClub\ThreadParser\ArhivachThreadParser;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\Exception\ThreadParseException;
 use phpClub\ThreadParser\MDvachThreadParser;
+use phpClub\Util\FsUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,35 +21,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportThreadsCommand extends Command
 {
-    /**
-     * @var ThreadImporter
-     */
-    private $threadImporter;
-
-    /**
-     * @var DvachClient
-     */
-    private $dvachApiClient;
-
-    /**
-     * @var ArhivachClient
-     */
-    private $arhivachClient;
-
-    /**
-     * @var DvachThreadParser
-     */
-    private $dvachThreadParser;
-
-    /**
-     * @var ArhivachThreadParser
-     */
-    private $arhivachThreadParser;
-
-    /**
-     * @var MDvachThreadParser
-     */
-    private $mDvachThreadParser;
+    private ThreadImporter $threadImporter;
+    private DvachClient $dvachApiClient;
+    private ArhivachClient $arhivachClient;
+    private DvachThreadParser $dvachThreadParser;
+    private ArhivachThreadParser $arhivachThreadParser;
+    private MDvachThreadParser $mDvachThreadParser;
 
     public function __construct(
         ThreadImporter $threadImporter,
@@ -136,8 +114,6 @@ class ImportThreadsCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     *
      * @throws \Exception
      *
      * @return Thread[]
@@ -170,15 +146,15 @@ class ImportThreadsCommand extends Command
         // Array of resolved paths to HTML files
         $htmlPaths = [];
 
-        if ($fileGlobs) {
+        if (is_array($fileGlobs)) {
             foreach ($fileGlobs as $glob) {
                 $paths = glob($glob, GLOB_BRACE | GLOB_ERR);
                 $htmlPaths = array_merge($htmlPaths, $paths);
             }
         }
 
-        if ($threadsDir) {
-            $paths = glob($threadsDir . '/*/*.htm*');
+        if (is_string($threadsDir)) {
+            $paths = glob($threadsDir . '/*/*.htm*') ?: [];
             $htmlPaths = array_merge($htmlPaths, $paths);
         }
 
@@ -192,10 +168,9 @@ class ImportThreadsCommand extends Command
         $threadNumber = 0;
 
         foreach ($htmlPaths as $path) {
-
             // $progress->setMessage(basename($path));
-            $threadNumber++;
-            $html = file_get_contents($path);
+            ++$threadNumber;
+            $html = FsUtil::getContents($path);
             $isMDvach = $this->isMDvachPage($html);
             $isArhivach = $this->looksLikeArchivachPage($html);
 
@@ -272,25 +247,25 @@ class ImportThreadsCommand extends Command
     private function getDefaultArhivachThreads(): array
     {
         return [
-            25    => getenv('ARHIVACH_DOMAIN') . '/thread/25318/',
-            79    => getenv('ARHIVACH_DOMAIN') . '/thread/191923/',
+            25 => getenv('ARHIVACH_DOMAIN') . '/thread/25318/',
+            79 => getenv('ARHIVACH_DOMAIN') . '/thread/191923/',
             '79b' => getenv('ARHIVACH_DOMAIN') . '/thread/193343/', // Нелегетимный 79-й тред
-            80    => getenv('ARHIVACH_DOMAIN') . '/thread/197740/',
-            81    => getenv('ARHIVACH_DOMAIN') . '/thread/204328/',
-            82    => getenv('ARHIVACH_DOMAIN') . '/thread/213097/',
-            83    => getenv('ARHIVACH_DOMAIN') . '/thread/216627/',
-            84    => getenv('ARHIVACH_DOMAIN') . '/thread/224683/',
-            85    => getenv('ARHIVACH_DOMAIN') . '/thread/233392/',
-            86    => getenv('ARHIVACH_DOMAIN') . '/thread/245785/',
-            87    => getenv('ARHIVACH_DOMAIN') . '/thread/249265/',
-            88    => getenv('ARHIVACH_DOMAIN') . '/thread/254710/',
-            89    => getenv('ARHIVACH_DOMAIN') . '/thread/261841/',
-            90    => getenv('ARHIVACH_DOMAIN') . '/thread/266631/',
-            91    => getenv('ARHIVACH_DOMAIN') . '/thread/282397/',
-            92    => getenv('ARHIVACH_DOMAIN') . '/thread/282400/',
-            93    => getenv('ARHIVACH_DOMAIN') . '/thread/302513/',
-            94    => getenv('ARHIVACH_DOMAIN') . '/thread/302511/',
-            95    => getenv('ARHIVACH_DOMAIN') . '/thread/312253/',
+            80 => getenv('ARHIVACH_DOMAIN') . '/thread/197740/',
+            81 => getenv('ARHIVACH_DOMAIN') . '/thread/204328/',
+            82 => getenv('ARHIVACH_DOMAIN') . '/thread/213097/',
+            83 => getenv('ARHIVACH_DOMAIN') . '/thread/216627/',
+            84 => getenv('ARHIVACH_DOMAIN') . '/thread/224683/',
+            85 => getenv('ARHIVACH_DOMAIN') . '/thread/233392/',
+            86 => getenv('ARHIVACH_DOMAIN') . '/thread/245785/',
+            87 => getenv('ARHIVACH_DOMAIN') . '/thread/249265/',
+            88 => getenv('ARHIVACH_DOMAIN') . '/thread/254710/',
+            89 => getenv('ARHIVACH_DOMAIN') . '/thread/261841/',
+            90 => getenv('ARHIVACH_DOMAIN') . '/thread/266631/',
+            91 => getenv('ARHIVACH_DOMAIN') . '/thread/282397/',
+            92 => getenv('ARHIVACH_DOMAIN') . '/thread/282400/',
+            93 => getenv('ARHIVACH_DOMAIN') . '/thread/302513/',
+            94 => getenv('ARHIVACH_DOMAIN') . '/thread/302511/',
+            95 => getenv('ARHIVACH_DOMAIN') . '/thread/312253/',
         ];
     }
 }

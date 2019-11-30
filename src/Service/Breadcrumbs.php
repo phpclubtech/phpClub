@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Service;
 
 class Breadcrumbs
 {
-    private $breadcrumbs = [];
+    private array $breadcrumbs = [];
 
     public function addCrumb(string $title, string $url): self
     {

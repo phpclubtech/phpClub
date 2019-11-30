@@ -14,36 +14,34 @@ use Doctrine\Common\Collections\Criteria;
 class Post
 {
     /** @Id @Column(type="integer") **/
-    private $id;
+    private int $id;
 
     /**
      * Contains HTML code.
      *
      * @Column(type="text")
      */
-    private $text;
+    private ?string $text = null;
 
     /**
-     * @var \DateTimeImmutable
-     *
      * @Column(type="datetime_immutable")
      */
-    private $date;
+    private ?\DateTimeImmutable $date = null;
 
     /** @Column(type="string", nullable=true) **/
-    private $email;
+    private ?string $email = null;
 
     /** @Column(type="boolean") */
-    private $isOpPost = false;
+    private bool $isOpPost = false;
 
     /** @Column(type="boolean") */
-    private $isFirstPost;
+    private bool $isFirstPost = false;
 
     /** @Column(type="string") **/
-    private $title;
+    private ?string $title = null;
 
     /** @Column(type="string") **/
-    private $author;
+    private ?string $author = null;
 
     /**
      * @OneToMany(targetEntity="File", mappedBy="post", cascade={"all"})
@@ -54,7 +52,7 @@ class Post
      * @ManyToOne(targetEntity="Thread", inversedBy="posts")
      * @JoinColumn(nullable=false, onDelete="CASCADE")
      **/
-    private $thread;
+    private ?Thread $thread;
 
     /**
      * @var ArrayCollection|RefLink[]
@@ -207,6 +205,6 @@ class Post
     public function isOld(): bool
     {
         // Chains supported only for threads 80+
-        return $this->id < 825576;
+        return $this->id < 825_576;
     }
 }

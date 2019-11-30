@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace phpClub\ThreadParser;
 
+use InvalidArgumentException;
 use phpClub\ThreadParser\Exception\InvalidMarkupException;
 use phpClub\Util\DOMUtil;
 
@@ -19,20 +20,20 @@ class MarkupConverter
      * <strong>text</strong>
      * <font color="...">...</font>
      */
-    private static $allowedTags = [
-        'p'         => [],
-        'br'        => [],
-        'strong'    => [],
-        'em'        => [],
-        'sub'       => [],
-        'sup'       => [],
-        'pre'       => [],
-        'code'      => [],
-        'font'      => ['color'],
-        'span'      => ['class'],
+    private static array $allowedTags = [
+        'p' => [],
+        'br' => [],
+        'strong' => [],
+        'em' => [],
+        'sub' => [],
+        'sup' => [],
+        'pre' => [],
+        'code' => [],
+        'font' => ['color'],
+        'span' => ['class'],
         // There can also be attributes like onmouseover, onmouseout, onclick
         // but we strip them before validating
-        'a'         => ['href', 'rel', 'target', 'class',
+        'a' => ['href', 'rel', 'target', 'class',
             'data-thread', 'data-num', ],
     ];
 
@@ -40,28 +41,28 @@ class MarkupConverter
      * Classes that can be used with spans, e.g.
      * <span class="spoiler">...</span>.
      */
-    private static $allowedSpanClasses = [
-        'unkfunc'           => true, // a quote
-        's'                 => true, // strike-out
-        'u'                 => true, // underline
-        'o'                 => true, // overline
-        'spoiler'           => true,
-        'code_container'    => true,
-        'code_line'         => true,
-        'pomyanem'          => true, // message about a banner user from moderator
+    private static array $allowedSpanClasses = [
+        'unkfunc' => true, // a quote
+        's' => true, // strike-out
+        'u' => true, // underline
+        'o' => true, // overline
+        'spoiler' => true,
+        'code_container' => true,
+        'code_line' => true,
+        'pomyanem' => true, // message about a banner user from moderator
     ];
 
     /**
      * Classes that can be used on <a> tag.
      */
-    private static $allowedAClasses = [
-        'post-reply-link'   => true,
+    private static array $allowedAClasses = [
+        'post-reply-link' => true,
     ];
 
     /**
      * Allows additional tags that are present in arhivach code.
      */
-    private $isArhivachMode = false;
+    private bool $isArhivachMode = false;
 
     public function __construct(bool $isArhivachMode = false)
     {
@@ -85,9 +86,9 @@ class MarkupConverter
      * It returns a modified DOM node or null if there is nothing left and
      * all content was removed.
      *
-     * @param \DOMDocumentFragment|\DOMElement|\DOMText $body
+     * @param \DOMDocumentFragment|\DOMElement|\DOMText|\DOMNode $body
      */
-    public function transformBody(\DOMNode $body): ?\DOMNode
+    public function transformBody($body): ?\DOMNode
     {
         $type = $body->nodeType;
 
@@ -97,18 +98,20 @@ class MarkupConverter
         }
 
         if ($type == XML_DOCUMENT_FRAG_NODE) {
+            /* @var \DOMDocumentFragment $body */
             $this->transformChildren($body);
 
             return $body;
         }
 
         if ($type === XML_ELEMENT_NODE) {
+            /** @var \DOMElement $body */
             $keep = $this->transformElementRecursively($body);
 
             return $keep ? $body : null;
         }
 
-        throw new \InvalidArgumentException("Invalid DOM Node type; only text, element or document fragment node is allowed, given type='$type'");
+        throw new InvalidArgumentException("Invalid DOM Node type; only text, element or document fragment node is allowed, given type='$type'");
     }
 
     /**

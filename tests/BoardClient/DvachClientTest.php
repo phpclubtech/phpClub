@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use phpClub\BoardClient\DvachClient;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
+use phpClub\Util\FsUtil;
 use PHPUnit\Framework\TestCase;
 
 class DvachClientTest extends TestCase
@@ -18,10 +19,10 @@ class DvachClientTest extends TestCase
     public function testThreads92and93(): void
     {
         $dvachClient = $this->createDvachApiClient(
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog.json')),
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/93a.json')),
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/93b.json')),
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/92.json'))
+            new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/catalog.json')),
+            new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/93a.json')),
+            new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/93b.json')),
+            new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/92.json'))
         );
 
         $phpThreads = $dvachClient->getAlivePhpThreads();
@@ -42,7 +43,7 @@ class DvachClientTest extends TestCase
         $this->assertEquals('Аноним', $opPost->getAuthor());
 
         $thirdPost = $phpThread93a->getPosts()[2];
-        $this->assertContains('Первый в этом ИТТ треде.', $thirdPost->getText());
+        $this->assertStringContainsString('Первый в этом ИТТ треде.', $thirdPost->getText());
         $this->assertCount(1, $thirdPost->getFiles());
         $this->assertEquals('https://2ch.hk/pr/src/1049651/15035109769900.jpg', $thirdPost->getFiles()->first()->getPath());
         $this->assertEquals('https://2ch.hk/pr/thumb/1049651/15035109769900s.jpg', $thirdPost->getFiles()->first()->getThumbPath());
@@ -51,7 +52,7 @@ class DvachClientTest extends TestCase
     public function testThreadsNotFound(): void
     {
         $dvachApiClient = $this->createDvachApiClient(
-            new Response(200, ['Content-Type' => 'application/json'], file_get_contents(__DIR__ . '/../Fixtures/dvach_api/catalog_without_php_threads.json'))
+            new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/catalog_without_php_threads.json'))
         );
         $this->assertEmpty($dvachApiClient->getAlivePhpThreads());
     }

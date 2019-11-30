@@ -17,15 +17,8 @@ interface FileStorageInterface
     /**
      * @param string $path      Absolute path or remote url
      * @param string $directory Prefix
-     *
-     * @return bool
      */
     public function isFileExist(string $path, string $directory): bool;
 
-    /**
-     * @param string $path
-     *
-     * @return int
-     */
     public function getFileSize(string $path): int;
 }

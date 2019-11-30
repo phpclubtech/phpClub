@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Entity;
 
 /**
@@ -8,19 +10,19 @@ namespace phpClub\Entity;
 class RefLink
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ManyToOne(targetEntity="Post", inversedBy="replies")
      * @JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $post;
+    private Post $post;
 
     /** @ManyToOne(targetEntity="Post") */
-    private $reference;
+    private Post $reference;
 
     /** @Column(type="integer") **/
-    private $depth;
+    private int $depth;
 
     public function __construct(Post $post, Post $reference, int $depth)
     {
