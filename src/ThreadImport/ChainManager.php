@@ -12,8 +12,8 @@ use phpClub\Repository\PostRepository;
 
 class ChainManager
 {
-    private $entityManager;
-    private $postRepository;
+    private EntityManagerInterface $entityManager;
+    private PostRepository $postRepository;
 
     public function __construct(EntityManagerInterface $entityManager, PostRepository $postRepository)
     {
@@ -21,9 +21,6 @@ class ChainManager
         $this->postRepository = $postRepository;
     }
 
-    /**
-     * @param Thread $thread
-     */
     public function insertChain(Thread $thread): void
     {
         /** @var Post $firstPost */
@@ -39,17 +36,12 @@ class ChainManager
         $this->entityManager->flush();
     }
 
-    /**
-     * @param Post      $forPost
-     * @param Post|null $reference
-     * @param int       $depth
-     */
     private function recursiveInsertChain(Post $forPost, Post $reference = null, int $depth = 0): void
     {
         $reference = $reference ?: $forPost;
 
         if ($depth === 0) {
-            $reflink = new Reflink($forPost, $forPost, $depth);
+            $reflink = new RefLink($forPost, $forPost, $depth);
             $this->entityManager->persist($reflink);
         }
 
@@ -68,11 +60,6 @@ class ChainManager
         }
     }
 
-    /**
-     * @param Post $post
-     *
-     * @return array
-     */
     private function parseReferences(Post $post): array
     {
         $regexp = '/<a href="[\S]+" class="post-reply-link" data-thread="(\d+)" data-num="(\d+)">/';

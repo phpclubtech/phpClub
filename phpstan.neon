@@ -1,8 +1,14 @@
 parameters:
-	level: 5
+	level: 6
 	inferPrivatePropertyTypeFromConstructor: true
 	excludes_analyse:
 		- %currentWorkingDirectory%/src/Migrations/*
+		- %currentWorkingDirectory%/tests/ThreadParser/MarkupConverterTest.php
+		- %currentWorkingDirectory%/tests/Util/DOMUtilTest.php
+		- %currentWorkingDirectory%/src/ThreadParser/MarkupConverter.php
+		- %currentWorkingDirectory%/src/Command/ImportThreadsCommand.php
 	ignoreErrors:
-#	    - '#Method App\Command\.*::execute() should return int|null but empty return statement found.#'
-	    - '#If condition is always true.#'
+	    -
+	        message: '#If condition is always true.#'
+	        path: %currentWorkingDirectory%/src/Util/DOMUtil.php
+

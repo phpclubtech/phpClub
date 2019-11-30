@@ -10,45 +10,41 @@ namespace phpClub\Entity;
 class File
 {
     /** @Id @Column(type="integer") @GeneratedValue **/
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string
      * @Column(type="string")
      */
-    private $path;
+    private ?string $path = null;
 
     /**
-     * @var string
      * @Column(type="string")
      */
-    private $thumbPath;
+    private ?string $thumbPath = null;
 
     /** @Column(type="integer", nullable=true) **/
-    private $size;
+    private ?int $size = null;
 
     /** @Column(type="integer", nullable=true) **/
-    private $width;
+    private ?int $width = null;
 
     /** @Column(type="integer", nullable=true) **/
-    private $height;
+    private ?int $height = null;
 
     /**
      * The client-provided file name.
      *
-     * @var string
      * @Column(type="string", nullable=true)
      */
-    private $clientName;
+    private ?string $clientName = null;
 
     /**
-     * @var Post
      * @ManyToOne(targetEntity="Post", inversedBy="files")
      * @JoinColumn(nullable=false, onDelete="CASCADE")
      **/
-    private $post;
+    private ?Post $post = null;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -73,17 +69,17 @@ class File
         $this->size = $size;
     }
 
-    public function getHeight(): int
+    public function getHeight(): ?int
     {
         return $this->height;
     }
 
-    public function getWidth(): int
+    public function getWidth(): ?int
     {
         return $this->width;
     }
 
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
     }

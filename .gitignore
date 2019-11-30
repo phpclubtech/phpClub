@@ -17,3 +17,5 @@
 config/sphinx.conf
 var
 deploy_key
+.phpunit.result.cache
+.php_cs.cache

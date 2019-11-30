@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace phpClub\Repository;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 
-class ThreadRepository extends BaseEntityRepository
+class ThreadRepository extends EntityRepository
 {
-    /**
-     * @return Query
-     */
     public function getThreadsWithLastPostsQuery(): Query
     {
         $dql = 'SELECT t, lp FROM phpClub\Entity\Thread t

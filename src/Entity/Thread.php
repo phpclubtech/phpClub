@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +13,7 @@ use Doctrine\Common\Collections\Collection;
 class Thread
 {
     /** @Id @Column(type="integer") **/
-    private $id;
+    private int $id;
 
     /**
      * @var Post[]|Collection

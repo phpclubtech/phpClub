@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pagination;
+namespace Tests\Pagination;
 
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
@@ -14,17 +14,10 @@ use Tests\AbstractTestCase;
 
 class PaginatorTest extends AbstractTestCase
 {
-    /**
-     * @var PaginationRenderer
-     */
-    private $paginationRenderer;
+    private PaginationRenderer $paginationRenderer;
+    private Router $router;
 
-    /**
-     * @var Router
-     */
-    private $router;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->router = $this->getContainer()->get('router');
         $this->router->map(['GET'], '/', function () {

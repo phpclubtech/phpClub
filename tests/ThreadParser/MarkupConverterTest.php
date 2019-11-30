@@ -12,10 +12,9 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class MarkupConverterTest extends TestCase
 {
-    /** @var MarkupConverter */
-    private $markupConverter;
+    private MarkupConverter $markupConverter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->markupConverter = new MarkupConverter();
     }

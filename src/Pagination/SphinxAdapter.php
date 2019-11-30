@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Pagination;
 
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
@@ -9,10 +11,10 @@ use phpClub\Repository\PostRepository;
 
 class SphinxAdapter implements AdapterInterface
 {
-    private const MAX_SEARCH_COUNT = 10000;
-    private $connection;
-    private $query;
-    private $postRepository;
+    private const MAX_SEARCH_COUNT = 10_000;
+    private Connection $connection;
+    private string $query;
+    private PostRepository $postRepository;
 
     public function __construct(Connection $connection, PostRepository $postRepository, string $query)
     {
@@ -21,9 +23,6 @@ class SphinxAdapter implements AdapterInterface
         $this->query = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNbResults()
     {
         $query = $this->query;
@@ -41,9 +40,6 @@ class SphinxAdapter implements AdapterInterface
         return $count;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSlice($offset, $length)
     {
         $query = $this->query;

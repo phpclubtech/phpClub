@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\Controller;
 
 use Foolz\SphinxQL\Drivers\Pdo\Connection;
@@ -12,20 +14,20 @@ use phpClub\Service\UrlGenerator;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Views\PhpRenderer as View;
+use Slim\Views\PhpRenderer;
 
 class SearchController
 {
-    private $view;
-    private $postRepository;
-    private $paginationRenderer;
-    private $sphinxConnection;
-    private $urlGenerator;
+    private PhpRenderer $view;
+    private PostRepository $postRepository;
+    private PaginationRenderer $paginationRenderer;
+    private Connection $sphinxConnection;
+    private UrlGenerator $urlGenerator;
 
     public function __construct(
         PostRepository $postRepository,
         PaginationRenderer $paginationRenderer,
-        View $view,
+        PhpRenderer $view,
         Connection $sphinxConnection,
         UrlGenerator $urlGenerator
     ) {
@@ -49,10 +51,10 @@ class SearchController
         $breadcrumbs->addCrumb("Поиск по запросу \"{$query}\"", $this->urlGenerator->toSearch($query));
 
         $viewArgs = [
-            'query'       => $query,
-            'posts'       => $posts,
+            'query' => $query,
+            'posts' => $posts,
             'breadcrumbs' => $breadcrumbs->getAllBreadCrumbs(),
-            'pagination'  => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
+            'pagination' => $this->paginationRenderer->render($posts, $request->getAttribute('route'), $request->getQueryParams()),
         ];
 
         return $this->view->render($response, '/searchResults.phtml', $viewArgs);

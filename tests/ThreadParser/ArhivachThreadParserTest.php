@@ -6,41 +6,39 @@ namespace Tests\ThreadParser;
 
 use phpClub\Entity\File;
 use phpClub\ThreadParser\ArhivachThreadParser;
+use phpClub\Util\FsUtil;
 use Tests\AbstractTestCase;
 
 class ArhivachThreadParserTest extends AbstractTestCase
 {
-    /**
-     * @var ArhivachThreadParser
-     */
-    private $threadParser;
+    private ArhivachThreadParser $threadParser;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->threadParser = $this->getContainer()->get(ArhivachThreadParser::class);
     }
 
     public function testThread83()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/arhivach/83.html'));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents(__DIR__ . '/../Fixtures/arhivach/83.html'));
         $posts = $thread->getPosts();
         $post = $posts[16];
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('24/11/16 23:34:24', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('881710', $post->getId());
-        $this->assertContains('Помогите с циклами, ребята.', $post->getText());
+        $this->assertStringContainsString('Помогите с циклами, ребята.', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertTrue($post->getFiles()->isEmpty());
 
         $post = $posts[452];
-        $this->assertContains('Лучше всего почитать у Фаулера', $post->getText());
+        $this->assertStringContainsString('Лучше всего почитать у Фаулера', $post->getText());
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEmpty($post->getTitle());
         $this->assertTrue($post->getFiles()->isEmpty());
 
         $post = $posts->last();
         $this->assertEquals('Аноним', $post->getAuthor());
-        $this->assertContains('Проверил файлообменник и написал в новом треде', $post->getText());
+        $this->assertStringContainsString('Проверил файлообменник и написал в новом треде', $post->getText());
         $this->assertEquals('github.com/fidnex/filehost', $post->getTitle());
         $this->assertTrue($post->getFiles()->isEmpty());
 
@@ -50,13 +48,13 @@ class ArhivachThreadParserTest extends AbstractTestCase
 
     public function testThread90()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/arhivach/90.html'));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents(__DIR__ . '/../Fixtures/arhivach/90.html'));
         $posts = $thread->getPosts();
         $post = $posts[27];
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('04/06/17 04:56:50', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('1000752', $post->getId());
-        $this->assertContains('rand() использует линейный ГПСЧ, который абсолютно предсказуем и имеет относительно небольшой период', $post->getText());
+        $this->assertStringContainsString('rand() использует линейный ГПСЧ, который абсолютно предсказуем и имеет относительно небольшой период', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
 
@@ -64,7 +62,7 @@ class ArhivachThreadParserTest extends AbstractTestCase
         $this->assertEquals('someApprentice', $post->getAuthor());
         $this->assertEquals('03/06/17 20:05:31', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('1000566', $post->getId());
-        $this->assertContains('sudo searchd --config sphinx.conf', $post->getText());
+        $this->assertStringContainsString('sudo searchd --config sphinx.conf', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(0, $post->getFiles());
 
@@ -72,13 +70,13 @@ class ArhivachThreadParserTest extends AbstractTestCase
         $this->assertEquals('14/06/17 09:46:46', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('1005616', $post->getId());
-        $this->assertContains('Для передачи параметров есть следующие способы:', $post->getText());
+        $this->assertStringContainsString('Для передачи параметров есть следующие способы:', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(4, $post->getFiles());
 
         $post = $posts[856];
         $webm = $post->getFiles()->first();
-        $this->assertContains('.webm', $webm->getPath());
+        $this->assertStringContainsString('.webm', $webm->getPath());
         $this->assertNotEmpty($webm->getThumbPath());
 
         $givenFileNames = $posts[0]->getFiles()->map(function (File $file) {
@@ -92,14 +90,14 @@ class ArhivachThreadParserTest extends AbstractTestCase
 
     public function testThread25()
     {
-        $thread = $this->threadParser->extractThread(file_get_contents(__DIR__ . '/../Fixtures/arhivach/25.html'));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents(__DIR__ . '/../Fixtures/arhivach/25.html'));
         $posts = $thread->getPosts();
 
         $post = $posts[8];
         $this->assertEquals('!xnn2uE3AU.', $post->getAuthor());
         $this->assertEquals('09/06/14 14:49:35', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('360403', $post->getId());
-        $this->assertContains('http://brainstorage.me/jobs?q=haskell', $post->getText());
+        $this->assertStringContainsString('http://brainstorage.me/jobs?q=haskell', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(1, $post->getFiles());
         $this->assertNotEmpty($post->getFiles()->first()->getPath());
@@ -109,7 +107,7 @@ class ArhivachThreadParserTest extends AbstractTestCase
         $this->assertEquals('Аноним', $post->getAuthor());
         $this->assertEquals('10/06/14 16:44:24', $post->getDate()->format('d/m/y H:i:s'));
         $this->assertEquals('360614', $post->getId());
-        $this->assertContains('Аноны, помогите!', $post->getText());
+        $this->assertStringContainsString('Аноны, помогите!', $post->getText());
         $this->assertEmpty($post->getTitle());
         $this->assertCount(1, $post->getFiles());
         $this->assertNotEmpty($post->getFiles()->first()->getPath());
@@ -121,7 +119,7 @@ class ArhivachThreadParserTest extends AbstractTestCase
      */
     public function testExtractThread($pathToThreadHtml)
     {
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToThreadHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToThreadHtml));
         $this->assertGreaterThan(100, $thread->getPosts()->count());
         $opPost = $thread->getPosts()->first();
         $this->assertNotEmpty($opPost->getAuthor());
@@ -142,7 +140,7 @@ class ArhivachThreadParserTest extends AbstractTestCase
     public function testFiles()
     {
         $pathToHtml = __DIR__ . '/../Fixtures/arhivach/83.html';
-        $thread = $this->threadParser->extractThread(file_get_contents($pathToHtml));
+        $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
         $posts = $thread->getPosts();
         /** @var File[] $files */
         $files = $posts->first()->getFiles();

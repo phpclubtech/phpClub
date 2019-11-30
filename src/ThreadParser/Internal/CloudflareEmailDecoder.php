@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace phpClub\ThreadParser\Internal;
 
 use phpClub\Util\DOMUtil;

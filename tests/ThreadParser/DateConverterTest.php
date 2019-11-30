@@ -10,12 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class DateConverterTest extends TestCase
 {
-    /**
-     * @var DateConverter
-     */
-    private $dateConverter;
+    private DateConverter $dateConverter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dateConverter = new DateConverter(new \DateTimeZone('UTC'));
     }

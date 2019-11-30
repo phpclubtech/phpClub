@@ -13,22 +13,11 @@ use Tests\AbstractTestCase;
 
 class LastPostUpdaterTest extends AbstractTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
+    private EntityManager $entityManager;
+    private LastPostUpdater $lastPostUpdater;
+    private ThreadRepository $threadRepository;
 
-    /**
-     * @var LastPostUpdater
-     */
-    private $lastPostUpdater;
-
-    /**
-     * @var ThreadRepository
-     */
-    private $threadRepository;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->entityManager = $this->getContainer()->get(EntityManager::class);
         $this->threadRepository = $this->getContainer()->get(ThreadRepository::class);
@@ -85,7 +74,7 @@ class LastPostUpdaterTest extends AbstractTestCase
     {
         $thread = $this->createThread($fromId);
 
-        for ($i = $fromId; $i < $toId; $i++) {
+        for ($i = $fromId; $i < $toId; ++$i) {
             $thread->addPost($this->createPost($i, $thread));
         }
 
@@ -94,7 +83,7 @@ class LastPostUpdaterTest extends AbstractTestCase
         return $thread;
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->entityManager->getConnection()->rollBack();
     }
