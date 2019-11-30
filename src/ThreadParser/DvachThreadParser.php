@@ -80,6 +80,7 @@ class DvachThreadParser extends AbstractThreadParser
         $params = $argsNode->text();
 
         $result = preg_split("/','|',|,|\)/", $params, -1, PREG_SPLIT_NO_EMPTY);
+
         return $result ?: [];
     }
 }
