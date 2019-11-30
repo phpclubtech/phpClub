@@ -17,6 +17,7 @@ class FsUtil
         if (!$contents) {
             throw new \Exception(sprintf('Unable to read file contents, path %s', $path));
         }
+
         return $contents;
     }
 }

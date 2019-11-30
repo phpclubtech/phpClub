@@ -52,7 +52,7 @@ class CommonParserTest extends AbstractTestCase
         $dir = dirname(__DIR__);
 
         $threads = [
-            'dvach/2.html' => [$dir . '/Fixtures/dvach/2.html', $this->getDvachThread2Samples()],
+            'dvach/2.html'  => [$dir . '/Fixtures/dvach/2.html', $this->getDvachThread2Samples()],
             'dvach/30.html' => [$dir . '/Fixtures/dvach/30.html', $this->getDvachThread30Samples()],
             'dvach/34.html' => [$dir . '/Fixtures/dvach/34.html', $this->getDvachThread34Samples()],
             'dvach/82.html' => [$dir . '/Fixtures/dvach/82.html', $this->getDvachThread82Samples()],
