@@ -67,7 +67,7 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
     $metaConfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode, $proxyDir, $cache);
     $metaConfig->setNamingStrategy(new UnderscoreNamingStrategy());
     $metaConfig->setProxyDir($proxyDir);
-    $metaConfig->setAutoGenerateProxyClasses(!Environment::isProd());
+    $metaConfig->setAutoGenerateProxyClasses(true);
 
     return EntityManager::create($config, $metaConfig);
 };
