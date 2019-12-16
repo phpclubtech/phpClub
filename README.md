@@ -23,8 +23,10 @@ php -S 127.0.0.1:9001 -t public dev-server.php
 
 ## Sphinx
 Для работы поиска нужен Sphinx.
-1. Скопируйте конфигурацию Sphinx по умолчанию и отредактируйте доступы к БД: `cp config/sphinx.conf.example config/sphinx.conf`
-2. Запустите индексацию: `indexer --config /path/to/project/config/sphinx.conf --all --rotate`
+1. Скопируйте конфигурацию Sphinx по умолчанию и отредактируйте доступы к БД: `sudo cp config/sphinx.conf.example /etc/sphinxsearch/sphinx.conf`
+2. Запустите индексацию: `sudo indexer --all --rotate`
+3. Включите автозапуск демона: `sudo sed -i 's/START=no/START=yes/g' /etc/default/sphinxsearch`
+4. Перезапустите сервис: `sudo systemctl restart sphinxsearch.service`
 
 ## Примеры импорта тредов из различных источников
 1) Импортировать треды 1-14, 22-24, 26-78 из локальной папки
