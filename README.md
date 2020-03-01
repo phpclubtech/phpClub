@@ -34,3 +34,28 @@ php -S 127.0.0.1:9001 -t public dev-server.php
 
 2) Импортировать треды 25, 79-95 из архивача:
 - `./bin/console import-threads --source=arhivach`
+
+## Вызов команд Доктрины
+
+Для вызова команд Доктрины можно запускать утилиты `doctrine` и `doctrine-migrations`. Чтобы увидеть список доступных команд, запустите их с опцией `list`:
+
+```sh
+vendor/bin/doctrine-migrations list
+vendor/bin/doctrine list
+```
+
+Чтобы увидеть справку по команде, запустите её c опцией `--help` (например: `./vendor/bin/doctrine orm:validate-schema --help`).
+
+## Создание миграций
+
+Как правило, миграции (изменения в схеме БД) генерируются на основе изменений в файлах сущностей (в папке [src/Entity](src/Entity)). Чтобы изменить что-то в БД, отредактируйте аннотации в сущностях, затем запустите утилиту Доктрины для генерации миграций: 
+
+```sh
+vendor/bin/doctrine-migrations migrations:diff --formatted
+```
+
+Она сгенерирует новый файл миграции. Чтобы выполнить её, снова запустите утилиту Доктрины:
+
+```sh
+vendor/bin/doctrine-migrations migrations:migrate
+```

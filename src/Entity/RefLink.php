@@ -18,7 +18,10 @@ class RefLink
      */
     private Post $post;
 
-    /** @ManyToOne(targetEntity="Post") */
+    /** 
+     * @ManyToOne(targetEntity="Post")
+     * @JoinColumn(nullable=false, onDelete="CASCADE")
+     */
     private Post $reference;
 
     /** @Column(type="integer") **/

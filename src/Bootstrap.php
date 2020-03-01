@@ -46,6 +46,7 @@ use phpClub\ThreadParser\Internal\CloudflareEmailDecoder;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\Util\Environment;
+use phpClub\Util\ConsoleUtil;
 use Psr\Log\LoggerInterface;
 use Slim\Container;
 use Slim\Handlers\Error;
@@ -116,13 +117,18 @@ $di[PostRepository::class] = fn (Container $di) => $di->get(EntityManager::class
 
 $di[ChainRepository::class] = fn (Container $di) => $di->get(EntityManager::class)->getRepository(RefLink::class);
 
-$di[LocalFileStorage::class] = fn () => new LocalFileStorage(new Filesystem(), __DIR__ . '/../public');
+$di[LocalFileStorage::class] = fn (Container $di) => new LocalFileStorage(
+    new Filesystem(), 
+    $di[Client::class],
+    __DIR__ . '/../public'
+);
 
 $di[ThreadImporter::class] = fn (Container $di) => new ThreadImporter(
     $di[$di['settings']['fileStorage']],
     $di[EntityManager::class],
     $di[LastPostUpdater::class],
-    $di[ChainManager::class]
+    $di[ChainManager::class],
+    $di[LoggerInterface::class]
 );
 
 $di[ImportThreadsCommand::class] = fn (Container $di) => new ImportThreadsCommand(
@@ -178,6 +184,16 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
             throw new Exception('Invalid SLACK_WEBHOOK_URL');
         }
         $logger->pushHandler(new SlackWebhookHandler($url));
+    }
+
+    /* 
+        For console commands in dev environment, copy log to stderr.
+
+        Disabled in prod env to prevent spamming from cron scripts.
+        TODO: maybe enable in prod if not run from cron?
+    */
+    if (!Environment::isProd()) {
+        ConsoleUtil::copyLogToConsole($logger, Logger::INFO);
     }
 
     return $logger;

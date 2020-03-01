@@ -13,7 +13,11 @@ class ArhivachThreadParser extends AbstractThreadParser
 {
     protected function getPostsXPath(): string
     {
-        return '//div[@class="post"]';
+        /* 
+            Skip ads: 
+            <div class="post" id="M521122ScriptRootC785766"><div id="M521122PreloadC785766">Loading...</div></div>
+        */
+        return '//div[@class="post" and not(contains(@id, "ScriptRoot") and contains(./div/@id, "Preload"))]';
     }
 
     protected function getAuthorXPath(): string
