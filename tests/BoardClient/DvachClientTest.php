@@ -25,7 +25,7 @@ class DvachClientTest extends TestCase
             new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/92.json'))
         );
 
-        $phpThreads = $dvachClient->getAlivePhpThreads();
+        $phpThreads = $dvachClient->getAlivePhpThreads(DvachClient::RETURN_THREADS);
 
         $this->assertCount(3, $phpThreads);
 
@@ -54,7 +54,7 @@ class DvachClientTest extends TestCase
         $dvachApiClient = $this->createDvachApiClient(
             new Response(200, ['Content-Type' => 'application/json'], FsUtil::getContents(__DIR__ . '/../Fixtures/dvach_api/catalog_without_php_threads.json'))
         );
-        $this->assertEmpty($dvachApiClient->getAlivePhpThreads());
+        $this->assertEmpty($dvachApiClient->getAlivePhpThreads(DvachClient::RETURN_THREADS));
     }
 
     private function createDvachApiClient(Response ...$responses): DvachClient

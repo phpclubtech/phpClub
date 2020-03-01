@@ -116,6 +116,11 @@ class Post
         }
     }
 
+    public function removeAllFiles(): void 
+    {
+        $this->files->clear();
+    }
+
     public function setTitle(string $title): self
     {
         $this->title = $title;

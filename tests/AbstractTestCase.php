@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Tests;
 
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Slim\Container;
+use Tests\FileStorage\FileStorageMock;
 use phpClub\Entity\File;
 use phpClub\Entity\Post;
 use phpClub\Entity\Thread;
@@ -13,9 +17,6 @@ use phpClub\ThreadImport\LastPostUpdater;
 use phpClub\ThreadImport\ThreadImporter;
 use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\Util\FsUtil;
-use PHPUnit\Framework\TestCase;
-use Slim\Container;
-use Tests\FileStorage\FileStorageMock;
 
 abstract class AbstractTestCase extends TestCase
 {
@@ -49,7 +50,7 @@ abstract class AbstractTestCase extends TestCase
     public function getContainer(): Container
     {
         if (!self::$container) {
-            self::$container = require_once __DIR__ . '/../src/Bootstrap.php';
+            self::$container = require __DIR__ . '/../src/Bootstrap.php';
         }
 
         return self::$container;
@@ -69,9 +70,11 @@ abstract class AbstractTestCase extends TestCase
             new FileStorageMock(),
             $this->getContainer()->get(EntityManager::class),
             $lastPostUpdater,
-            $chainManager
+            $chainManager,
+            $this->getContainer()->get(LoggerInterface::class)
         );
 
-        $importer->import([$thread]);
+        // Do not import images to speed up tests
+        $importer->import([$thread], null, true);
     }
 }

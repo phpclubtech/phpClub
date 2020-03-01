@@ -18,8 +18,11 @@ abstract class AbstractThreadParser
     protected MarkupConverter $markupConverter;
     private CloudflareEmailDecoder $cloudflareEmailDecoder;
 
-    public function __construct(DateConverter $dateConverter, MarkupConverter $markupConverter, CloudflareEmailDecoder $cloudflareEmailDecoder)
-    {
+    public function __construct(
+        DateConverter $dateConverter, 
+        MarkupConverter $markupConverter, 
+        CloudflareEmailDecoder $cloudflareEmailDecoder
+    ) {
         $this->markupConverter = $markupConverter;
         $this->dateConverter = $dateConverter;
         $this->cloudflareEmailDecoder = $cloudflareEmailDecoder;

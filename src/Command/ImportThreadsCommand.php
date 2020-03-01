@@ -13,6 +13,7 @@ use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\Exception\ThreadParseException;
 use phpClub\ThreadParser\MDvachThreadParser;
 use phpClub\Util\FsUtil;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -84,33 +85,40 @@ class ImportThreadsCommand extends Command
             InputOption::VALUE_NONE,
             'Skip threads that cannot be parsed instead of aborting'
         );
+
+        $this->addOption(
+            'dump-urls',
+            null,
+            InputOption::VALUE_NONE,
+            'Instead of importing threads, print their URLs, each on a new line. Can only be used together with --source/-s'
+        );
+
+        $this->addOption(
+            'download-to',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Instead of importing threads, download and save their HTML/JSON files into a given folder. Can only be used together with --source/-s'
+        );
+
+        $this->addOption(
+            'no-images',
+            null,
+            InputOption::VALUE_NONE,
+            'Do not download images when parsing threads'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $isDryRun = (bool) $input->getOption('dry-run');
+        $noImages = (bool) $input->getOption('no-images');
 
         $output->setVerbosity(OutputInterface::VERBOSITY_VERY_VERBOSE);
         $output->writeln('Parsing threads...');
 
         $threads = $this->getThreads($input, $output);
 
-        if ($isDryRun) {
-            $output->writeln("Dry run, don't save anything");
-        } else {
-            $output->writeln('Saving threads...');
-
-            $progress = new ProgressBar($output, count($threads));
-            $progress->setMessage('Thread saving progress');
-            $progress->start();
-
-            $this->threadImporter->import($threads, function () use (&$progress) {
-                $progress->advance();
-            });
-
-            $progress->finish();
-            $output->writeln('');
-        }
+        $this->saveThreads($output, $isDryRun, $noImages, $threads);
     }
 
     /**
@@ -118,17 +126,58 @@ class ImportThreadsCommand extends Command
      *
      * @return Thread[]
      */
-    private function getThreads(InputInterface $input, OutputInterface $output): array
-    {
+    private function getThreads(
+        InputInterface $input, 
+        OutputInterface $output
+    ): array {
         $source = $input->getOption('source');
+        $dumpUrls = (bool)$input->getOption('dump-urls');
+        $downloadTo = $input->getOption('download-to');
+
+        if ($downloadTo !== null && $source === null) {
+            throw new \InvalidArgumentException("--save-html can be used only together with --source");
+        }
+
+        if ($dumpUrls && $source === null) {
+            throw new \InvalidArgumentException("--dump-urls can be used only together with --source");
+        }
 
         if ($source) {
             if ($source === '2ch-api') {
-                return $this->dvachApiClient->getAlivePhpThreads();
+                if ($dumpUrls) {
+                    $urls = $this->dvachApiClient->getAlivePhpThreads(DvachClient::RETURN_URLS);
+                    $this->dumpUrls($output, $urls);
+                    return [];
+                }
+
+                if ($downloadTo !== null) {
+                    $jsons = $this->dvachApiClient->getAlivePhpThreads(DvachClient::RETURN_BODIES);
+                    $this->saveBodies($output, $downloadTo, $jsons, 'json');
+                    return [];
+                }
+
+                $threads = $this->dvachApiClient->
+                    getAlivePhpThreads(DvachClient::RETURN_THREADS);
+                // $this->saveThreads($output, $isDryRun, $threads);
+                return $threads;
             }
 
             if ($source === 'arhivach') {
-                return $this->arhivachClient->getPhpThreads($this->getDefaultArhivachThreads());
+                $urls = $this->getDefaultArhivachThreads();
+                if ($dumpUrls) {
+                    $this->dumpUrls($output, $urls);
+                    return [];
+                }
+
+                if ($downloadTo !== null) {
+                    $htmls = $this->arhivachClient->downloadThreads($urls);
+                    $this->saveBodies($output, $downloadTo, $htmls, 'html');
+                    return [];
+                }
+
+                $threads = $this->arhivachClient->getPhpThreads($urls);
+                // $this->saveThreads($output, $isDryRun, $threads);
+                return $threads;
             }
 
             throw new \Exception('Source option must be "2ch-api" or "arhivach"');
@@ -210,6 +259,61 @@ class ImportThreadsCommand extends Command
         }
 
         return $threads;
+        // $this->saveThreads($output, $isDryRun, $threads);
+    }
+
+    /**
+     * @param Thread[] $threads 
+     */
+    private function saveThreads(
+        OutputInterface $output, 
+        bool $isDryRun, 
+        bool $noImages,
+        array $threads
+    ): void { 
+        if (!count($threads)) {
+            $output->writeln("No threads to save");
+            return;
+        }
+
+        if ($isDryRun) {
+            $output->writeln("Dry run, don't save anything");
+        } else {
+            $output->writeln('Saving threads...');
+
+            $progress = new ProgressBar($output, count($threads));
+            $progress->setMessage('Thread saving progress');
+            $progress->start();
+
+            $this->threadImporter->import($threads, function () use (&$progress) {
+                $progress->advance();
+            }, $noImages);
+
+            $progress->finish();
+            $output->writeln('');
+        }
+    }
+
+    private function dumpUrls(OutputInterface $output, iterable $urls): void 
+    {
+        foreach ($urls as $url) {
+            $output->writeln($url);
+        }
+    }
+
+    private function saveBodies(
+        OutputInterface $output, 
+        string $downloadTo, 
+        array $files, 
+        string $extension
+    ): void {
+        $fs = new Filesystem();
+
+        foreach ($files as $threadName => $content) {
+            $path = sprintf("%s/%s.%s", $downloadTo, $threadName, $extension);
+            $output->writeln("Dump: $path");
+            $fs->dumpFile($path, $content);
+        }
     }
 
     private function isMDvachPage(string $html): bool

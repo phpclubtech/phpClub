@@ -11,6 +11,15 @@ use phpClub\Entity\Thread;
 
 class DvachClient
 {
+    /** Return an array of thread URLs (links to JSON files), [threadId => URL] */
+    const RETURN_URLS = 'RETURN_URLS';
+    
+    /** Return an array of JSON files, [threadId => JSON] */
+    const RETURN_BODIES = 'RETURN_BODIES';
+
+    /** Parse threads and return an array of Thread objects [threadId => Thread] */
+    const RETURN_THREADS = 'RETURN_THREADS';
+
     // Fixes 2ch.hk API poor naming
     private const POST_AUTHOR = 'name';
     private const POST_TITLE = 'subject';
@@ -25,16 +34,44 @@ class DvachClient
     }
 
     /**
-     * @return Thread[]
+     * @param string $returnType One of constants self::RETURN_*, determines 
+     *                           what will be returned.
+     * @return Thread[]|string[]
      */
-    public function getAlivePhpThreads(): array
-    {
+    public function getAlivePhpThreads(string $returnType = self::RETURN_THREADS): array {
         $responseBody = (string) $this->guzzle->get('https://2ch.hk/pr/catalog.json')->getBody();
         $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
         $threads = $responseJson['threads'];
         $phpThreadsArray = array_filter($threads, [$this, 'looksLikePhpThread']);
 
-        return array_map([$this, 'extractThread'], $phpThreadsArray);
+        $result = [];
+
+        foreach ($phpThreadsArray as $threadArray) {
+            $threadId = (int) $threadArray['num'];
+            $url = $this->makeThreadUrl($threadArray);
+
+            switch ($returnType) {
+                case self::RETURN_URLS:
+                    $data = $url;
+                    break;
+
+                case self::RETURN_BODIES:                    
+                    $data = $this->downloadThread($url);
+                    break;
+
+                case self::RETURN_THREADS:
+                    $jsonString = $this->downloadThread($url);
+                    $data = $this->extractThread($threadId, $jsonString);
+                    break;
+
+                default:
+                    throw new \InvalidArgumentException("Invalid return type $returnType");
+            }
+
+            $result[$threadId] = $data;
+        }
+
+        return $result;
     }
 
     private function looksLikePhpThread(array $threadArray): bool
@@ -42,14 +79,29 @@ class DvachClient
         return (bool) preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
     }
 
+    private function makeThreadUrl(array $phpThread): string 
+    {
+        $threadId = (int) $phpThread['num'];
+        return "https://2ch.hk/pr/res/{$threadId}.json";
+    }
+
+    /**
+     * Returns a string containing JSON for given thread URL 
+     */
+    private function downloadThread(string $url): string 
+    {
+        $responseBody = (string) $this->guzzle->get($url)->getBody();
+        return $responseBody;
+    }
+
     /**
      * @throws \Exception
      */
-    private function extractThread(array $phpThread): Thread
-    {
-        $threadId = (int) $phpThread['num'];
-        $responseBody = (string) $this->guzzle->get("https://2ch.hk/pr/res/{$threadId}.json")->getBody();
-        $responseJson = \GuzzleHttp\json_decode($responseBody, $assoc = true);
+    private function extractThread(
+        int $threadId, 
+        string $threadJson
+    ): Thread {
+        $responseJson = \GuzzleHttp\json_decode($threadJson, $assoc = true);
 
         $postsArray = $responseJson['threads'][0]['posts'] ?? null;
 
