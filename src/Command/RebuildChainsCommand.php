@@ -31,15 +31,9 @@ class RebuildChainsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Removing chains...');
-
-        $this->chainManager->removeAllChains();
-
         $output->writeln('Building chains...');
 
-        foreach ($this->threadRepository->findAll() as $thread) {
-            $this->chainManager->insertChain($thread);
-        }
+        $this->chainManager->rebuildAllChains();
 
         $output->writeln('Done');
     }

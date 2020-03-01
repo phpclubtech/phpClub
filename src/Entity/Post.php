@@ -116,7 +116,7 @@ class Post
         }
     }
 
-    public function removeAllFiles(): void 
+    public function removeAllFiles(): void
     {
         $this->files->clear();
     }
