@@ -12,7 +12,7 @@ function API() {
 
 }
 
-API.prototype.getPost= function(id) {
+API.prototype.loadPost = function(id) {
     var promise = $.get({
       url: '/api/board/get/message/' + id + '/',
       dataType: 'json'
@@ -91,10 +91,12 @@ PopUp.prototype.handle = function() {
         this.hide();
     }.bind(this));
 
-    $(document).keyup(function(e) {
+    $(document).keydown(function(e) {
          if (e.keyCode == 27) {
             if (this.visible) {
                 this.hide();
+                // Tell the browser that the key press was handled
+                e.preventDefault();
             }
         }
     }.bind(this));
@@ -162,24 +164,33 @@ PostPreview.prototype.handle = function() {
 
     $(document).on('mouseover', '.post-reply-link', function() {
         var id = $(this).data('num');
+        var postUnderMouse = $(this).closest('.post');
 
         var post = $('.post[data-id="' + id +'"]');
+
+        // List of ids of already opened and visible posts to mark
+        // links to them
+        var openedIds = that.getOpenedIdsList(postUnderMouse);
 
         if (post.length != 0) {
             var clone = post.clone();
 
-            that.render(this, clone);
+            that.render(this, clone, openedIds);
+            that.markOpenedLinks(clone);
         } else {
-            that.api.getPost(id).then(
+            that.api.loadPost(id).then(
                 function(data) {
                     data['data']['dateFormatted'] = data['data']['dateFormatted'];
 
                     var template = $('#post-template').html();
-                    var html = ejs.render(template, {post: data['data']});
+                    var html = ejs.render(template, {
+                        post: data['data']
+                    });
 
                     var preview = $(html);
 
-                    that.render(this, preview);
+                    that.render(this, preview, openedIds);
+                    that.markOpenedLinks(preview);
                 }.bind(this),
 
                 function(jqXHR, textStatus) {
@@ -201,6 +212,8 @@ PostPreview.prototype.handle = function() {
     $(document).on('mouseleave', '.post-preview', function(e) {
         if ($('.post-preview').last().is($(this))) {
             $(this).remove();
+            var newLastPost = $('.post-preview').last();
+            that.markOpenedLinks(newLastPost);
         }
 
         if ($(e.relatedTarget).closest('.post-preview').length == 0) {
@@ -211,12 +224,16 @@ PostPreview.prototype.handle = function() {
     return this;
 }
 
-PostPreview.prototype.render = function(replyLink, preview) {
+PostPreview.prototype.render = function(replyLink, preview, openedIds) {
     var offset = $(replyLink).offset();
     var width = $(replyLink).width();
     var height = $(replyLink).height();
+    openedIds = openedIds || [];
 
     preview.addClass('post-preview');
+    if (openedIds.length) {
+        preview.attr('data-opened-ids', openedIds.join(','));
+    }
 
     if (preview.hasClass('op-post')) {
         preview.removeClass('op-post');
@@ -228,6 +245,47 @@ PostPreview.prototype.render = function(replyLink, preview) {
     $('body').append(preview);
 }
 
+/**
+ * Find all popup post previews, and mark links to those that 
+ * are already opened (also remove mark from links that were
+ * marked,but now should not be)
+ */
+PostPreview.prototype.markOpenedLinks = function (lastPreview) {
+
+    if (lastPreview.length == 0) {
+        // No opened previews
+        return;
+    }
+
+    var openedIds = this.getOpenedIdsList(lastPreview);
+    var openedSet = {};
+    for (var i = 0; i < openedIds.length; i++) {
+        openedSet[openedIds[i]] = true;
+    }
+
+    var allPreviews = $('.post-preview');
+
+    allPreviews.find('.post-reply-link').each(function () {
+        var link = $(this);
+        var ref = parseInt(link.attr('data-num'), 10);
+        if (ref in openedSet) {
+            link.addClass('reply-link-opened');
+        } else {
+            link.removeClass('reply-link-opened');
+        }
+    });
+}
+
+/**
+ * Gets an data-opened-ids list from attributes of a .post node
+ */
+PostPreview.prototype.getOpenedIdsList = function (post) {
+    var openedIdsString = post.attr('data-opened-ids') || '';
+    var id = post.attr('data-id');
+    var openedIds = openedIdsString ? openedIdsString.split(',') : [];
+    openedIds.push(id);
+    return openedIds;
+}
 
 function Arrows() {
     this.up = $('#up-nav-arrow');

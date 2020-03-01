@@ -342,6 +342,10 @@ sup {vertical-align: super; font-size: smaller;}
     position: absolute;
 }
 
+.reply-link-opened, .reply-link-opened:hover {
+    color: #999;
+}
+
 #lightbox {
     position: fixed;
     top: 0;
