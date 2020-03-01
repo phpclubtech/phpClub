@@ -7,7 +7,7 @@
     },
     "require": {
         "php": "^7.4",
-        "doctrine/orm": "^2.6",
+        "doctrine/orm": "^2.7",
         "doctrine/migrations": "^2",
         "slim/slim": "^3.8",
         "slim/php-view": "^2.2",
@@ -25,7 +25,8 @@
         "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-PDO_mysql": "*",
-        "jdorn/sql-formatter": "^1.2"
+        "jdorn/sql-formatter": "^1.2",
+        "ocramius/doctrine-batch-utils": "^2.0"
     },
     "require-dev": {
         "mikey179/vfsStream": "^1.6",

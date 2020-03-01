@@ -6,19 +6,21 @@ namespace phpClub\ThreadImport;
 
 use Doctrine\ORM\EntityManagerInterface;
 use phpClub\Entity\Post;
-use phpClub\Entity\RefLink;
 use phpClub\Entity\Thread;
 use phpClub\Repository\PostRepository;
+use phpClub\Repository\ThreadRepository;
 
 class ChainManager
 {
     private EntityManagerInterface $entityManager;
     private PostRepository $postRepository;
+    private ThreadRepository $threadRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, PostRepository $postRepository)
+    public function __construct(EntityManagerInterface $entityManager, PostRepository $postRepository, ThreadRepository $threadRepository)
     {
         $this->entityManager = $entityManager;
         $this->postRepository = $postRepository;
+        $this->threadRepository = $threadRepository;
     }
 
     public function insertChain(Thread $thread): void
@@ -38,11 +40,12 @@ class ChainManager
 
     private function recursiveInsertChain(Post $forPost, Post $reference = null, int $depth = 0): void
     {
-        $reference = $reference ?: $forPost;
+        $query = 'INSERT INTO ref_link (post_id, reference_id, depth) VALUES (?, ?, ?)';
 
+        $reference = $reference ?: $forPost;
+        $connection = $this->entityManager->getConnection();
         if ($depth === 0) {
-            $reflink = new RefLink($forPost, $forPost, $depth);
-            $this->entityManager->persist($reflink);
+            $connection->executeQuery($query, [$forPost->getId(), $forPost->getId(), $depth]);
         }
 
         $references = $this->parseReferences($reference);
@@ -51,10 +54,8 @@ class ChainManager
             /** @var Post|null $reference */
             $reference = $this->postRepository->find($reference);
             if ($reference && !$reference->isFirstPost()) {
-                $reflink = new RefLink($forPost, $reference, $depth + 1);
-                $this->entityManager->persist($reflink);
-                $reflink = new RefLink($reference, $forPost, $depth * -1 - 1);
-                $this->entityManager->persist($reflink);
+                $connection->executeQuery($query, [$forPost->getId(), $reference->getId(), $depth + 1]);
+                $connection->executeQuery($query, [$reference->getId(), $forPost->getId(), $depth * -1 - 1]);
                 $this->recursiveInsertChain($forPost, $reference, $depth + 1);
             }
         }
@@ -68,9 +69,19 @@ class ChainManager
         return $matches[2];
     }
 
-    public function removeAllChains(): void
+    private function removeAllChains(): void
     {
         $connection = $this->entityManager->getConnection();
         $connection->executeQuery('DELETE FROM ref_link');
+    }
+
+    public function rebuildAllChains(): void
+    {
+        $this->entityManager->getConnection()->transactional(function () {
+            $this->removeAllChains();
+            foreach ($this->threadRepository->findAllChunks() as $thread) {
+                $this->insertChain($thread);
+            }
+        });
     }
 }

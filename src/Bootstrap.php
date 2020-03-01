@@ -45,8 +45,8 @@ use phpClub\ThreadParser\DvachThreadParser;
 use phpClub\ThreadParser\Internal\CloudflareEmailDecoder;
 use phpClub\ThreadParser\MarkupConverter;
 use phpClub\ThreadParser\MDvachThreadParser;
-use phpClub\Util\Environment;
 use phpClub\Util\ConsoleUtil;
+use phpClub\Util\Environment;
 use Psr\Log\LoggerInterface;
 use Slim\Container;
 use Slim\Handlers\Error;
@@ -75,7 +75,7 @@ $di[EntityManager::class] = function (Container $di): EntityManager {
 
 $di[EntityManagerInterface::class] = fn (Container $di) => $di[EntityManager::class];
 
-$di[ChainManager::class] = fn (Container $di) => new ChainManager($di[EntityManager::class], $di[PostRepository::class]);
+$di[ChainManager::class] = fn (Container $di) => new ChainManager($di[EntityManager::class], $di[PostRepository::class], $di[ThreadRepository::class]);
 
 $di[LastPostUpdater::class] = fn (Container $di) => new LastPostUpdater($di[EntityManager::class]->getConnection());
 
@@ -118,7 +118,7 @@ $di[PostRepository::class] = fn (Container $di) => $di->get(EntityManager::class
 $di[ChainRepository::class] = fn (Container $di) => $di->get(EntityManager::class)->getRepository(RefLink::class);
 
 $di[LocalFileStorage::class] = fn (Container $di) => new LocalFileStorage(
-    new Filesystem(), 
+    new Filesystem(),
     $di[Client::class],
     __DIR__ . '/../public'
 );
@@ -186,7 +186,7 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
         $logger->pushHandler(new SlackWebhookHandler($url));
     }
 
-    /* 
+    /*
         For console commands in dev environment, copy log to stderr.
 
         Disabled in prod env to prevent spamming from cron scripts.
