@@ -6,11 +6,11 @@ namespace phpClub\ThreadImport;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Logger;
 use phpClub\Entity\File;
 use phpClub\Entity\Thread;
 use phpClub\FileStorage\FileStorageInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Psr\Log\LoggerInterface;
 
 class ThreadImporter
 {
@@ -18,14 +18,14 @@ class ThreadImporter
     private EntityManagerInterface $entityManager;
     private LastPostUpdater $lastPostUpdater;
     private ChainManager $chainManager;
-    private LoggerInterface $logger;
+    private Logger $logger;
 
     public function __construct(
         FileStorageInterface $fileStorage,
         EntityManagerInterface $entityManager,
         LastPostUpdater $lastPostUpdater,
         ChainManager $chainManager,
-        LoggerInterface $logger
+        Logger $logger
     ) {
         $this->fileStorage = $fileStorage;
         $this->entityManager = $entityManager;

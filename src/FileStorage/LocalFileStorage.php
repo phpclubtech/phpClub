@@ -27,6 +27,7 @@ class LocalFileStorage implements FileStorageInterface
 
         if (!$this->isFileExist($path, $directory)) {
             if ($this->doesLookLikeUrl($path)) {
+                /** @var resource $content */
                 $content = $this->guzzle->get($path)->getBody();
                 $this->filesystem->dumpFile($targetPath, $content);
             } else {

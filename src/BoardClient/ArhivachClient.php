@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace phpClub\BoardClient;
 
 use GuzzleHttp\Client;
+use LogicException;
 use phpClub\Entity\Thread;
 use phpClub\ThreadParser\ArhivachThreadParser;
 
@@ -46,7 +47,7 @@ class ArhivachClient
         foreach ($urls as $url) {
             $threadId = $this->getThreadIdFromUrl($url);
             if (array_key_exists($threadId, $htmls)) {
-                throw new \LogicException("Thread key $threadId is not unique");
+                throw new LogicException("Thread key $threadId is not unique");
             }
 
             $htmls[$threadId] = (string) $this->guzzle->get($url)->getBody();
