@@ -41,9 +41,7 @@ class ChainManagerTest extends AbstractTestCase
 
         foreach ($chains as $postId => $expectedChain) {
             $givenChain = $this->chainRepository->getChain($postId)
-                ->map(function (Post $post) {
-                    return $post->getId();
-                })
+                ->map(fn(Post $post) => $post->getId())
                 ->toArray();
 
             $this->assertEquals($expectedChain, $givenChain);

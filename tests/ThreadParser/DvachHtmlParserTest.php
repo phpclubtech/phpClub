@@ -183,9 +183,7 @@ class DvachHtmlParserTest extends AbstractTestCase
         $thread = $this->threadParser->extractThread(FsUtil::getContents($pathToHtml));
 
         $postWithWebm = $thread->getPosts()
-            ->filter(function (Post $post) {
-                return $post->getId() === 610463;
-            })
+            ->filter(fn(Post $post) => $post->getId() === 610463)
             ->first();
 
         $this->assertStringContainsString('.webm', $postWithWebm->getFiles()->first()->getPath());

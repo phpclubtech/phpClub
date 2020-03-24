@@ -79,9 +79,7 @@ class ArhivachThreadParserTest extends AbstractTestCase
         $this->assertStringContainsString('.webm', $webm->getPath());
         $this->assertNotEmpty($webm->getThumbPath());
 
-        $givenFileNames = $posts[0]->getFiles()->map(function (File $file) {
-            return $file->getName();
-        })->toArray();
+        $givenFileNames = $posts[0]->getFiles()->map(fn(File $file) => $file->getName())->toArray();
 
         $expectedFileNames = ['php-noob-1.png', 'cat-cafe-osaka.jpg', 'l0-sensei.jpg', 'just-google-it.jpg'];
 

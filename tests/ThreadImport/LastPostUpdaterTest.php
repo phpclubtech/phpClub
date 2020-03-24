@@ -43,9 +43,7 @@ class LastPostUpdaterTest extends AbstractTestCase
 
         foreach ($threadsWithLastPosts as $thread) {
             $postIds = $thread->getLastPosts()
-                ->map(function (Post $post) {
-                    return $post->getId();
-                })
+                ->map(fn(Post $post) => $post->getId())
                 ->toArray();
 
             $this->assertEquals($postIds, current($expectedLastPosts));

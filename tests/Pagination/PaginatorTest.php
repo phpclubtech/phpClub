@@ -20,18 +20,15 @@ class PaginatorTest extends AbstractTestCase
     public function setUp(): void
     {
         $this->router = $this->getContainer()->get('router');
-        $this->router->map(['GET'], '/', function () {
-        })->setName('index');
-        $this->router->map(['GET'], '/search', function () {
-        })->setName('search');
+        $this->router->map(['GET'], '/', fn() => null)->setName('index');
+        $this->router->map(['GET'], '/search', fn() => null)->setName('search');
 
         $this->paginationRenderer = new PaginationRenderer($this->router);
     }
 
     public function testPaginationIsNotRenderedWhenItemsCountIsLessThanMaxPerPage()
     {
-        $route = (new Route(['GET'], '/', function () {
-        }))->setName('index');
+        $route = (new Route(['GET'], '/', fn() => null))->setName('index');
 
         $pagerfanta = (new Pagerfanta(new ArrayAdapter([1, 2, 3, 4])))->setMaxPerPage(10);
         $html = $this->paginationRenderer->render($pagerfanta, $route);

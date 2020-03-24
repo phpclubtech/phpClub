@@ -76,7 +76,7 @@ class DvachClient
 
     private function looksLikePhpThread(array $threadArray): bool
     {
-        return (bool) preg_match('/Клуб.*PHP/ui', $threadArray[self::THREAD_TITLE]);
+        return (bool) preg_match('/(Клуб.*PHP|PHP тред)/ui', $threadArray[self::THREAD_TITLE]);
     }
 
     private function makeThreadUrl(array $phpThread): string 
