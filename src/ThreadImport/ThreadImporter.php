@@ -50,6 +50,10 @@ class ThreadImporter
             }
             
             $this->entityManager->persist($thread);
+            // Save posts into database so that chainManager can 
+            // save links between them
+            $this->entityManager->flush();
+
             $this->chainManager->insertChain($thread);
             if ($onThreadImported) {
                 $onThreadImported($thread);

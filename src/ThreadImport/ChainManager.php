@@ -34,8 +34,6 @@ class ChainManager
         foreach ($thread->getPosts() as $post) {
             $this->recursiveInsertChain($post);
         }
-
-        $this->entityManager->flush();
     }
 
     private function recursiveInsertChain(Post $forPost, Post $reference = null, int $depth = 0): void
