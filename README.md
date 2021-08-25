@@ -1,8 +1,8 @@
-# phpClub [![Build Status](https://travis-ci.org/richBlueElephant/phpClub.svg?branch=master)](https://travis-ci.org/richBlueElephant/phpClub) [![Slack](https://cdn.rawgit.com/foobar1643/90576e886c2c2ef22726e66a643a9c92/raw/dcaa60aafbb87f70c5310ea9875f35fe79c8ad7e/slack.svg)](https://join.slack.com/t/phpclub-group/shared_invite/enQtMzA2MjcyMTAwNjc5LTNlZTI3ZjE5MTgyZWVhZjc3MmMyMzlhZGJmYTg0ODQ3YjAzYWRmMGNjZmJhYjdlMWFhZjg5MzNhNWE1YzdmNjc)
+# phpClub [![Build Status](https://travis-ci.org/richBlueElephant/phpClub.svg?branch=master)](https://travis-ci.org/richBlueElephant/phpClub)
 Сайт: http://phpclub.tech/
 
 ## Установка
-1. Склонируйте репозиторий: `git clone https://github.com/richBlueElephant/phpClub.git`
+1. Склонируйте репозиторий: `git clone https://github.com/phpclubtech/phpClub.git`
 2. Перейдите в папку с проектом и установите зависимости: `cd phpClub && composer install`
 3. Скопируйте конфигурационный файл и отредактируйте доступы к БД: `cp .env.example .env`
 4. Запустите миграции: `vendor/bin/doctrine-migrations migrations:migrate --no-interaction`
