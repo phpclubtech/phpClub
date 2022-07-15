@@ -15,7 +15,6 @@ use Foolz\SphinxQL\Drivers\Pdo\Connection;
 use GuzzleHttp\Client;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Handler\SlackWebhookHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use phpClub\BoardClient\ArhivachClient;
@@ -178,13 +177,6 @@ $di[LoggerInterface::class] = function (Container $di): LoggerInterface {
     $rotatingFileHandler = new RotatingFileHandler($di['logger']['path'], 20, $di['logger']['level']);
     $rotatingFileHandler->setFormatter($formatter);
     $logger->pushHandler($rotatingFileHandler);
-    if (Environment::isProd()) {
-        $url = getenv('SLACK_WEBHOOK_URL');
-        if (!$url) {
-            throw new Exception('Invalid SLACK_WEBHOOK_URL');
-        }
-        $logger->pushHandler(new SlackWebhookHandler($url));
-    }
 
     /*
         For console commands in dev environment, copy log to stderr.
