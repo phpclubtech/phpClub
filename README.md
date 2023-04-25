@@ -1,5 +1,4 @@
 # phpClub [![Build Status](https://travis-ci.org/richBlueElephant/phpClub.svg?branch=master)](https://travis-ci.org/richBlueElephant/phpClub)
-Сайт: http://phpclub.tech/
 
 ## Установка
 1. Склонируйте репозиторий: `git clone https://github.com/phpclubtech/phpClub.git`
